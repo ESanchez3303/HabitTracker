@@ -573,7 +573,7 @@
       <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
      </property>
      <property name="wordWrap">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="rowCount">
       <number>12</number>
@@ -697,30 +697,7 @@
       </property>
      </column>
     </widget>
-    <widget class="QPushButton" name="M_addHabbitButton">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>10</y>
-       <width>51</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Times New Roman</family>
-       <pointsize>12</pointsize>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color:black; background-color:rgb(255, 231, 111)</string>
-     </property>
-     <property name="text">
-      <string>+</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="M_habbitLabel">
+    <widget class="QLabel" name="M_buttonFrame">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -748,7 +725,7 @@
       <number>2</number>
      </property>
      <property name="text">
-      <string>Habit Name</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -757,7 +734,7 @@
     <widget class="QLabel" name="M_sunLabel">
      <property name="geometry">
       <rect>
-       <x>254</x>
+       <x>794</x>
        <y>0</y>
        <width>108</width>
        <height>50</height>
@@ -791,7 +768,7 @@
     <widget class="QLabel" name="M_monLabel">
      <property name="geometry">
       <rect>
-       <x>362</x>
+       <x>254</x>
        <y>0</y>
        <width>108</width>
        <height>50</height>
@@ -825,7 +802,7 @@
     <widget class="QLabel" name="M_tueLabel">
      <property name="geometry">
       <rect>
-       <x>470</x>
+       <x>362</x>
        <y>0</y>
        <width>108</width>
        <height>50</height>
@@ -859,7 +836,7 @@
     <widget class="QLabel" name="M_wedLabel">
      <property name="geometry">
       <rect>
-       <x>578</x>
+       <x>470</x>
        <y>0</y>
        <width>108</width>
        <height>50</height>
@@ -893,7 +870,7 @@
     <widget class="QLabel" name="M_thuLabel">
      <property name="geometry">
       <rect>
-       <x>686</x>
+       <x>578</x>
        <y>0</y>
        <width>108</width>
        <height>50</height>
@@ -927,7 +904,7 @@
     <widget class="QLabel" name="M_friLabel">
      <property name="geometry">
       <rect>
-       <x>794</x>
+       <x>686</x>
        <y>0</y>
        <width>108</width>
        <height>50</height>
@@ -995,10 +972,10 @@
     <widget class="QPushButton" name="M_addHabitButton">
      <property name="geometry">
       <rect>
-       <x>190</x>
-       <y>9</y>
-       <width>51</width>
-       <height>31</height>
+       <x>12</x>
+       <y>8</y>
+       <width>231</width>
+       <height>36</height>
       </rect>
      </property>
      <property name="font">
@@ -1006,7 +983,7 @@
        <family>Times New Roman</family>
        <pointsize>15</pointsize>
        <italic>false</italic>
-       <bold>true</bold>
+       <bold>false</bold>
        <underline>false</underline>
       </font>
      </property>
@@ -1017,7 +994,7 @@
       <string notr="true">color:black; background-color: rgb(218, 215, 195)</string>
      </property>
      <property name="text">
-      <string>+</string>
+      <string>Add New Habit</string>
      </property>
     </widget>
     <widget class="QPushButton" name="pushButton_2">
@@ -1114,9 +1091,8 @@
       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
     </widget>
-    <zorder>M_addHabbitButton</zorder>
     <zorder>M_habitTable</zorder>
-    <zorder>M_habbitLabel</zorder>
+    <zorder>M_buttonFrame</zorder>
     <zorder>M_sunLabel</zorder>
     <zorder>M_monLabel</zorder>
     <zorder>M_tueLabel</zorder>
@@ -1124,10 +1100,10 @@
     <zorder>M_thuLabel</zorder>
     <zorder>M_friLabel</zorder>
     <zorder>M_satLabel</zorder>
-    <zorder>M_addHabitButton</zorder>
     <zorder>pushButton_2</zorder>
     <zorder>M_date</zorder>
     <zorder>M_dateTitle</zorder>
+    <zorder>M_addHabitButton</zorder>
    </widget>
    <widget class="QFrame" name="A_frame">
     <property name="geometry">
@@ -1160,6 +1136,7 @@
       <font>
        <family>Times New Roman</family>
        <pointsize>16</pointsize>
+       <bold>true</bold>
       </font>
      </property>
      <property name="styleSheet">
@@ -1175,7 +1152,7 @@
       <number>1</number>
      </property>
      <property name="text">
-      <string>New Habit Name:</string>
+      <string>New Habit</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -1279,23 +1256,25 @@
      <widget class="QPushButton" name="key_spacebar">
       <property name="geometry">
        <rect>
-        <x>71</x>
+        <x>93</x>
         <y>227</y>
-        <width>891</width>
+        <width>841</width>
         <height>59</height>
        </rect>
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>14</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>Space Bar</string>
@@ -1304,7 +1283,7 @@
      <widget class="QPushButton" name="key_E">
       <property name="geometry">
        <rect>
-        <x>228</x>
+        <x>283</x>
         <y>10</y>
         <width>70</width>
         <height>70</height>
@@ -1312,15 +1291,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>E</string>
@@ -1329,7 +1310,7 @@
      <widget class="QPushButton" name="key_Y">
       <property name="geometry">
        <rect>
-        <x>462</x>
+        <x>517</x>
         <y>10</y>
         <width>70</width>
         <height>70</height>
@@ -1337,15 +1318,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>Y</string>
@@ -1354,7 +1337,7 @@
      <widget class="QPushButton" name="key_A">
       <property name="geometry">
        <rect>
-        <x>111</x>
+        <x>166</x>
         <y>82</y>
         <width>70</width>
         <height>70</height>
@@ -1362,15 +1345,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>A</string>
@@ -1379,7 +1364,7 @@
      <widget class="QPushButton" name="key_K">
       <property name="geometry">
        <rect>
-        <x>657</x>
+        <x>712</x>
         <y>82</y>
         <width>70</width>
         <height>70</height>
@@ -1387,15 +1372,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>K</string>
@@ -1404,7 +1391,7 @@
      <widget class="QPushButton" name="key_N">
       <property name="geometry">
        <rect>
-        <x>612</x>
+        <x>634</x>
         <y>154</y>
         <width>70</width>
         <height>70</height>
@@ -1412,15 +1399,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>N</string>
@@ -1429,7 +1418,7 @@
      <widget class="QPushButton" name="key_W">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>205</x>
         <y>10</y>
         <width>70</width>
         <height>70</height>
@@ -1437,15 +1426,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>W</string>
@@ -1454,7 +1445,7 @@
      <widget class="QPushButton" name="key_R">
       <property name="geometry">
        <rect>
-        <x>306</x>
+        <x>361</x>
         <y>10</y>
         <width>70</width>
         <height>70</height>
@@ -1462,15 +1453,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>R</string>
@@ -1479,7 +1472,7 @@
      <widget class="QPushButton" name="key_Q">
       <property name="geometry">
        <rect>
-        <x>72</x>
+        <x>127</x>
         <y>10</y>
         <width>70</width>
         <height>70</height>
@@ -1487,15 +1480,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>Q</string>
@@ -1504,7 +1499,7 @@
      <widget class="QPushButton" name="key_P">
       <property name="geometry">
        <rect>
-        <x>774</x>
+        <x>829</x>
         <y>10</y>
         <width>70</width>
         <height>70</height>
@@ -1512,15 +1507,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>P</string>
@@ -1529,7 +1526,7 @@
      <widget class="QPushButton" name="key_C">
       <property name="geometry">
        <rect>
-        <x>378</x>
+        <x>400</x>
         <y>154</y>
         <width>70</width>
         <height>70</height>
@@ -1537,15 +1534,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>C</string>
@@ -1554,7 +1553,7 @@
      <widget class="QPushButton" name="key_F">
       <property name="geometry">
        <rect>
-        <x>345</x>
+        <x>400</x>
         <y>82</y>
         <width>70</width>
         <height>70</height>
@@ -1562,15 +1561,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>F</string>
@@ -1579,7 +1580,7 @@
      <widget class="QPushButton" name="key_V">
       <property name="geometry">
        <rect>
-        <x>456</x>
+        <x>478</x>
         <y>154</y>
         <width>70</width>
         <height>70</height>
@@ -1587,15 +1588,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>V</string>
@@ -1604,7 +1607,7 @@
      <widget class="QPushButton" name="key_O">
       <property name="geometry">
        <rect>
-        <x>696</x>
+        <x>751</x>
         <y>10</y>
         <width>70</width>
         <height>70</height>
@@ -1612,15 +1615,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>O</string>
@@ -1629,7 +1634,7 @@
      <widget class="QPushButton" name="key_U">
       <property name="geometry">
        <rect>
-        <x>540</x>
+        <x>595</x>
         <y>10</y>
         <width>70</width>
         <height>70</height>
@@ -1637,15 +1642,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>U</string>
@@ -1654,23 +1661,25 @@
      <widget class="QPushButton" name="key_backSpace">
       <property name="geometry">
        <rect>
-        <x>850</x>
-        <y>10</y>
-        <width>111</width>
-        <height>214</height>
+        <x>790</x>
+        <y>154</y>
+        <width>143</width>
+        <height>70</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <pointsize>13</pointsize>
-        <bold>true</bold>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>Backspace</string>
@@ -1679,7 +1688,7 @@
      <widget class="QPushButton" name="key_M">
       <property name="geometry">
        <rect>
-        <x>690</x>
+        <x>712</x>
         <y>154</y>
         <width>70</width>
         <height>70</height>
@@ -1687,15 +1696,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>M</string>
@@ -1704,7 +1715,7 @@
      <widget class="QPushButton" name="key_Z">
       <property name="geometry">
        <rect>
-        <x>222</x>
+        <x>244</x>
         <y>154</y>
         <width>70</width>
         <height>70</height>
@@ -1712,15 +1723,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>Z</string>
@@ -1729,7 +1742,7 @@
      <widget class="QPushButton" name="key_H">
       <property name="geometry">
        <rect>
-        <x>501</x>
+        <x>556</x>
         <y>82</y>
         <width>70</width>
         <height>70</height>
@@ -1737,15 +1750,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>H</string>
@@ -1754,7 +1769,7 @@
      <widget class="QPushButton" name="key_T">
       <property name="geometry">
        <rect>
-        <x>384</x>
+        <x>439</x>
         <y>10</y>
         <width>70</width>
         <height>70</height>
@@ -1762,15 +1777,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>T</string>
@@ -1779,7 +1796,7 @@
      <widget class="QPushButton" name="key_J">
       <property name="geometry">
        <rect>
-        <x>579</x>
+        <x>634</x>
         <y>82</y>
         <width>70</width>
         <height>70</height>
@@ -1787,15 +1804,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>J</string>
@@ -1804,7 +1823,7 @@
      <widget class="QPushButton" name="key_L">
       <property name="geometry">
        <rect>
-        <x>735</x>
+        <x>790</x>
         <y>82</y>
         <width>70</width>
         <height>70</height>
@@ -1812,15 +1831,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>L</string>
@@ -1829,7 +1850,7 @@
      <widget class="QPushButton" name="key_G">
       <property name="geometry">
        <rect>
-        <x>423</x>
+        <x>478</x>
         <y>82</y>
         <width>70</width>
         <height>70</height>
@@ -1837,15 +1858,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>G</string>
@@ -1854,7 +1877,7 @@
      <widget class="QPushButton" name="key_B">
       <property name="geometry">
        <rect>
-        <x>534</x>
+        <x>556</x>
         <y>154</y>
         <width>70</width>
         <height>70</height>
@@ -1862,15 +1885,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>B</string>
@@ -1879,7 +1904,7 @@
      <widget class="QPushButton" name="key_I">
       <property name="geometry">
        <rect>
-        <x>618</x>
+        <x>673</x>
         <y>10</y>
         <width>70</width>
         <height>70</height>
@@ -1887,15 +1912,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>I</string>
@@ -1904,7 +1931,7 @@
      <widget class="QPushButton" name="key_X">
       <property name="geometry">
        <rect>
-        <x>300</x>
+        <x>322</x>
         <y>154</y>
         <width>70</width>
         <height>70</height>
@@ -1912,15 +1939,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>X</string>
@@ -1929,7 +1958,7 @@
      <widget class="QPushButton" name="key_S">
       <property name="geometry">
        <rect>
-        <x>189</x>
+        <x>244</x>
         <y>82</y>
         <width>70</width>
         <height>70</height>
@@ -1937,15 +1966,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>S</string>
@@ -1954,7 +1985,7 @@
      <widget class="QPushButton" name="key_D">
       <property name="geometry">
        <rect>
-        <x>267</x>
+        <x>322</x>
         <y>82</y>
         <width>70</width>
         <height>70</height>
@@ -1962,15 +1993,17 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
        <string>D</string>
@@ -1979,7 +2012,7 @@
      <widget class="QPushButton" name="key_capps">
       <property name="geometry">
        <rect>
-        <x>71</x>
+        <x>93</x>
         <y>154</y>
         <width>143</width>
         <height>70</height>
@@ -1987,18 +2020,20 @@
       </property>
       <property name="font">
        <font>
+        <family>Palatino Linotype</family>
         <pointsize>15</pointsize>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="accessibleName">
        <string/>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:white;background-color: rgb(177, 140, 77)</string>
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
       </property>
       <property name="text">
-       <string>Capps Lock</string>
+       <string>Caps Lock</string>
       </property>
      </widget>
     </widget>
@@ -2027,7 +2062,7 @@
       <string notr="true">color:black; background-color: rgb(165, 255, 171)</string>
      </property>
      <property name="text">
-      <string>Save Habit</string>
+      <string>Save</string>
      </property>
     </widget>
     <zorder>A_title</zorder>
@@ -2036,6 +2071,8 @@
     <zorder>A_cancelButton</zorder>
     <zorder>A_saveButton</zorder>
    </widget>
+   <zorder>A_frame</zorder>
+   <zorder>M_frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
