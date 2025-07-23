@@ -10,8 +10,7 @@ class Habbit_tracker;
 }
 QT_END_NAMESPACE
 
-class Habbit_tracker : public QMainWindow
-{
+class Habbit_tracker : public QMainWindow{
     Q_OBJECT
 
 public:
