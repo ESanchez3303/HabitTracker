@@ -3,6 +3,10 @@
 
 #include <QMainWindow>
 #include <QFrame>
+#include <QRadioButton>
+
+
+using namespace std;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -13,12 +17,17 @@ QT_END_NAMESPACE
 class Habbit_tracker : public QMainWindow{
     Q_OBJECT
 
+
+
+
 public:
     Habbit_tracker(QWidget *parent = nullptr);
     ~Habbit_tracker();
 
 private:
+    // Variables
     Ui::Habbit_tracker *ui;
+    int habitCount = 0;
 
 
     // Frame Control Functions:
@@ -34,6 +43,10 @@ private:
     void setCapps();
     void insertKey();
     void A_cancelButtonClicked();
-    void addHabit();
+    void A_saveButtonClicked();
+
+
+    // Helper Functions:
+    bool validString(QString &input);
 };
 #endif // HABBIT_TRACKER_H

@@ -566,17 +566,23 @@
      <property name="editTriggers">
       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
      </property>
+     <property name="tabKeyNavigation">
+      <bool>false</bool>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
      <property name="dragDropOverwriteMode">
       <bool>false</bool>
      </property>
      <property name="selectionMode">
-      <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+      <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
      </property>
      <property name="rowCount">
-      <number>12</number>
+      <number>0</number>
      </property>
      <property name="columnCount">
       <number>8</number>
@@ -596,18 +602,6 @@
      <attribute name="verticalHeaderDefaultSectionSize">
       <number>40</number>
      </attribute>
-     <row/>
-     <row/>
-     <row/>
-     <row/>
-     <row/>
-     <row/>
-     <row/>
-     <row/>
-     <row/>
-     <row/>
-     <row/>
-     <row/>
      <column>
       <property name="text">
        <string>Habit Name</string>
@@ -1193,6 +1187,25 @@
       </property>
       <property name="styleSheet">
        <string notr="true">background-color:white;color:black;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="A_note">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>115</y>
+        <width>611</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;</string>
+      </property>
+      <property name="text">
+       <string>Note: Name can only include letters and spaces</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>

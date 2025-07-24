@@ -1,6 +1,11 @@
 #include "habbit_tracker.h"
 #include "./ui_habbit_tracker.h"
+#include <string>
 #include <QKeyEvent>
+#include <QRadioButton>
+#include <QHBoxLayout>
+
+using namespace std;
 
 Habbit_tracker::~Habbit_tracker(){
     delete ui;
@@ -27,7 +32,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
     ui->M_habitTable->setShowGrid(true);
     ui->M_habitTable->setGridStyle(Qt::SolidLine);
-    ui->M_habitTable->setRowCount(12);
+    ui->M_habitTable->setRowCount(11);
 
 
     // Connecting all the keyboard keys and Setting their Focus Policy
@@ -42,12 +47,17 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     ui->A_saveButton->setFocusPolicy(Qt::NoFocus);
 
 
+    ui->M_habitTable->setFocusPolicy(Qt::NoFocus);
+
+
 
 
 
     // Connections
     connect(ui->M_addHabitButton, &QPushButton::clicked, this, &Habbit_tracker::M_addHabbitButtonClicked);
     connect(ui->A_cancelButton, &QPushButton::clicked, this, &Habbit_tracker::A_cancelButtonClicked);
+    connect(ui->A_saveButton, &QPushButton::clicked, this, &Habbit_tracker::A_saveButtonClicked);
+
 
 
 
@@ -75,6 +85,8 @@ void Habbit_tracker::switchFrame(QFrame* target){
         // Clearing the name text
         ui->A_nameInput->setText("");
         ui->A_nameInput->setFocus();
+        ui->A_note->setStyleSheet("color:black;");
+
     }
     target->show();
 }
@@ -96,6 +108,7 @@ void Habbit_tracker::M_addHabbitButtonClicked(){
 void Habbit_tracker::A_cancelButtonClicked(){
     switchFrame(ui->M_frame);
 }
+
 void Habbit_tracker::setCapps(){
     // When starting, isCapps is true. So it will enter the first section
     if(isCapps){
@@ -127,6 +140,7 @@ void Habbit_tracker::setCapps(){
     // Change state of capps locked
     isCapps = !isCapps;
 }
+
 void Habbit_tracker::insertKey(){
     QPushButton* btn = qobject_cast<QPushButton*>(sender());
     if (!btn) return;
@@ -164,27 +178,84 @@ void Habbit_tracker::insertKey(){
     }
 }
 
+void Habbit_tracker::A_saveButtonClicked() {
+    // Get the text from the name input field, returning if the string is empty or invalid
+    QString habitName = ui->A_nameInput->text().trimmed();
 
-void Habbit_tracker::addHabit(){
-    //int row = ui->M_habitTable->rowCount();
-    //ui->M_habitTable->insertRow(row);
-    //
-    //// Add a QLineEdit for the habit name
-    //QLineEdit *habitNameEdit = new QLineEdit(this);
-    //ui->M_habitTable->setCellWidget(row, 0, habitNameEdit);
-    //
-    //// Add radio buttons for each day
-    //for (int col = 1; col <= 7; ++col) {
-    //    QRadioButton *radio = new QRadioButton(this);
-    //
-    //    // Wrap it in a centered layout
-    //    QWidget *container = new QWidget(this);
-    //    QHBoxLayout *layout = new QHBoxLayout(container);
-    //    layout->addWidget(radio);
-    //    layout->setAlignment(Qt::AlignCenter);
-    //    layout->setContentsMargins(0, 0, 0, 0);
-    //    container->setLayout(layout);
-    //
-    //    ui->M_habitTable->setCellWidget(row, col, container);
-    //}
+    if (!validString(habitName)) {
+        ui->A_note->setStyleSheet("color:red;");
+        ui->A_nameInput->setText("");
+        return;
+    } else {
+        ui->A_note->setStyleSheet("color:black;");
+    }
+
+    // Only insert a new row if we're past the initial number of rows
+    if (habitCount >= ui->M_habitTable->rowCount()) {
+        ui->M_habitTable->insertRow(habitCount);
+    }
+
+    // Set the habit name in the first column
+    QTableWidgetItem *nameItem = new QTableWidgetItem(habitName);
+    ui->M_habitTable->setItem(habitCount, 0, nameItem);
+
+    // Add radio buttons for each day (columns 1 to 7)
+    for (int col = 1; col <= 7; ++col) {
+        QRadioButton *radio = new QRadioButton(this);
+        radio->setStyleSheet(
+            "QRadioButton::indicator {"
+            "   width: 25px;"
+            "   height: 25px;"
+            "}"
+            );
+
+        QWidget *container = new QWidget(this);
+        QHBoxLayout *layout = new QHBoxLayout(container);
+        layout->addWidget(radio);
+        layout->setAlignment(Qt::AlignCenter);
+        layout->setContentsMargins(0, 0, 0, 0);
+        container->setLayout(layout);
+
+        ui->M_habitTable->setCellWidget(habitCount, col, container);
+    }
+
+    habitCount++;                      // Move to next row for next habit
+    switchFrame(ui->M_frame);          // Go back to main frame
 }
+
+
+
+
+
+
+
+
+
+
+// HELPER FUNCTIONS:
+bool Habbit_tracker::validString(QString &input) {
+    // Step 1: Remove leading spaces
+    int firstCharIndex = 0;
+    while (firstCharIndex < input.length() && input[firstCharIndex].isSpace()) {
+        ++firstCharIndex;
+    }
+
+    QString trimmed = input.mid(firstCharIndex);
+
+    // Step 2: Return false if it's empty after trimming
+    if (trimmed.isEmpty())
+        return false;
+
+    // Step 3: Validate characters: must be only letters or spaces
+    bool hasLetter = false;
+    for (QChar ch : trimmed) {
+        if (ch.isLetter()) {
+            hasLetter = true;
+        } else if (!ch.isSpace()) {
+            return false; // invalid character found
+        }
+    }
+
+    return hasLetter;
+}
+
