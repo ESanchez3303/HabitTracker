@@ -1,9 +1,9 @@
 #include "habbit_tracker.h"
 #include "./ui_habbit_tracker.h"
-#include <string>
 #include <QKeyEvent>
 #include <QRadioButton>
 #include <QHBoxLayout>
+#include <filesystem>
 
 using namespace std;
 
@@ -12,6 +12,45 @@ Habbit_tracker::~Habbit_tracker(){
 }
 
 
+void Habbit_tracker::loadHabits(){
+
+    // Make folder if the folder does not exist
+    if(!filesystem::exists(filesPath)){
+        filesystem::create_directories(filesPath);
+    }
+
+    // Looking through all the folders in the filesPath folder, for every entry get the name and load it into the vector
+    for (const auto& entry : filesystem::recursive_directory_iterator(filesPath)) {
+        if (entry.is_regular_file()) {
+            // Getting the name in <name_name.txt> and fixing to <name_name>
+            string currFileName = entry.path().filename().string(); // e.g., "<name_name>.txt"
+            currFileName = currFileName.substr(0, currFileName.length() - 4); // Remove ".txt"
+
+            // Fixing <name_name> to <name name>
+            string habitName = "";
+            for(auto &ch:currFileName){
+                if(ch == '_'){
+                    habitName += ' ';
+                }
+                else
+                    habitName += ch;
+            }
+
+
+            // Making and loading object using name and filesPath
+            habit newHabit(currFileName, filesPath);
+            newHabit.makeFromFile();
+
+            // Copying the object into the vector
+            allHabits.push_back(newHabit);
+        }
+    }
+
+    // DEBUG: printing out the current list of habits that we have
+    for(auto &currHabit:allHabits){
+        cout << currHabit.getName() << endl;
+    }
+}
 
 Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui::Habbit_tracker){
     ui->setupUi(this);
@@ -60,14 +99,13 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
 
 
+    // Loading all the habits into the allHabits vector
+    loadHabits();
 
 
     // Switching to the Main Frame
     switchFrame(ui->M_frame);
 }
-
-
-
 
 
 // FRAME CONTROL FUNCTIONS:
@@ -94,10 +132,17 @@ void Habbit_tracker::switchFrame(QFrame* target){
 
 
 
+
+
+
+
 // MAIN MENU FUNCTIONS:
 void Habbit_tracker::M_addHabbitButtonClicked(){
     switchFrame(ui->A_frame);
 }
+
+
+
 
 
 
