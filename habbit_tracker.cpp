@@ -4,6 +4,8 @@
 #include <QRadioButton>
 #include <QHBoxLayout>
 #include <filesystem>
+#include <iostream>
+#include <QCheckBox>
 
 using namespace std;
 
@@ -19,16 +21,17 @@ void Habbit_tracker::loadHabits(){
         filesystem::create_directories(filesPath);
     }
 
+
     // Looking through all the folders in the filesPath folder, for every entry get the name and load it into the vector
     for (const auto& entry : filesystem::recursive_directory_iterator(filesPath)) {
         if (entry.is_regular_file()) {
             // Getting the name in <name_name.txt> and fixing to <name_name>
-            string currFileName = entry.path().filename().string(); // e.g., "<name_name>.txt"
-            currFileName = currFileName.substr(0, currFileName.length() - 4); // Remove ".txt"
+            string habitNameWith_ = entry.path().filename().string(); // e.g., "<name_name>.txt"
+            habitNameWith_ = habitNameWith_.substr(0, habitNameWith_.length() - 4); // Remove ".txt"
 
             // Fixing <name_name> to <name name>
             string habitName = "";
-            for(auto &ch:currFileName){
+            for(auto &ch:habitNameWith_){
                 if(ch == '_'){
                     habitName += ' ';
                 }
@@ -38,7 +41,7 @@ void Habbit_tracker::loadHabits(){
 
 
             // Making and loading object using name and filesPath
-            habit newHabit(currFileName, filesPath);
+            habit newHabit(habitName, filesPath);
             newHabit.makeFromFile();
 
             // Copying the object into the vector
@@ -46,9 +49,39 @@ void Habbit_tracker::loadHabits(){
         }
     }
 
-    // DEBUG: printing out the current list of habits that we have
+
+    // Loading from already filled vector into the habit table
+    int habitCount = 0;
     for(auto &currHabit:allHabits){
-        cout << currHabit.getName() << endl;
+        array<bool,7> week = currHabit.getWeek();
+        QTableWidgetItem *nameItem = new QTableWidgetItem(QString::fromStdString(currHabit.getName()));
+        ui->M_habitTable->setItem(habitCount, 0, nameItem);
+
+        // Add radio buttons for each day (columns 1 to 7)
+        for (int col = 1; col <= 7; ++col) {
+            QCheckBox *check = new QCheckBox(this);
+            if (week[col - 1])
+                check->setChecked(true);
+            else
+                check->setChecked(false);
+
+            check->setStyleSheet(
+                "QCheckBox::indicator {"
+                "   width: 25px;"
+                "   height: 25px;"
+                "}"
+                );
+
+            QWidget *container = new QWidget(this);
+            QHBoxLayout *layout = new QHBoxLayout(container);
+            layout->addWidget(check);
+            layout->setAlignment(Qt::AlignCenter);
+            layout->setContentsMargins(0, 0, 0, 0);
+            container->setLayout(layout);
+
+            ui->M_habitTable->setCellWidget(habitCount, col, container);
+        }
+        habitCount++;
     }
 }
 
@@ -76,7 +109,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
     // Connecting all the keyboard keys and Setting their Focus Policy
     QList<QPushButton*> keys = ui->A_keyboard->findChildren<QPushButton*>();
-    for (const auto &key : keys) {
+    for (auto &key : keys) {
         connect(key, &QPushButton::clicked, this, &Habbit_tracker::insertKey);
         key->setFocusPolicy(Qt::NoFocus);
     }
@@ -106,6 +139,9 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     // Switching to the Main Frame
     switchFrame(ui->M_frame);
 }
+
+
+
 
 
 // FRAME CONTROL FUNCTIONS:
@@ -235,20 +271,24 @@ void Habbit_tracker::A_saveButtonClicked() {
         ui->A_note->setStyleSheet("color:black;");
     }
 
+
+
+    // ADDING
+    int habitCount = allHabits.size();
     // Only insert a new row if we're past the initial number of rows
     if (habitCount >= ui->M_habitTable->rowCount()) {
         ui->M_habitTable->insertRow(habitCount);
     }
 
-    // Set the habit name in the first column
+    // SETTING THE HABIT IN THE GRAPH
     QTableWidgetItem *nameItem = new QTableWidgetItem(habitName);
     ui->M_habitTable->setItem(habitCount, 0, nameItem);
 
     // Add radio buttons for each day (columns 1 to 7)
     for (int col = 1; col <= 7; ++col) {
-        QRadioButton *radio = new QRadioButton(this);
-        radio->setStyleSheet(
-            "QRadioButton::indicator {"
+        QCheckBox *check = new QCheckBox(this);
+        check->setStyleSheet(
+            "QCheckBox::indicator {"
             "   width: 25px;"
             "   height: 25px;"
             "}"
@@ -256,7 +296,7 @@ void Habbit_tracker::A_saveButtonClicked() {
 
         QWidget *container = new QWidget(this);
         QHBoxLayout *layout = new QHBoxLayout(container);
-        layout->addWidget(radio);
+        layout->addWidget(check);
         layout->setAlignment(Qt::AlignCenter);
         layout->setContentsMargins(0, 0, 0, 0);
         container->setLayout(layout);
@@ -264,7 +304,14 @@ void Habbit_tracker::A_saveButtonClicked() {
         ui->M_habitTable->setCellWidget(habitCount, col, container);
     }
 
-    habitCount++;                      // Move to next row for next habit
+
+    // ADDING TO THE VECTOR OF ALL HABITS
+    habit newHabit(habitName.toStdString(), filesPath); // Making new Habit object
+    newHabit.writeToFile();                             // Saving new habit to its path
+    allHabits.push_back(newHabit);                      // Adding new habit to the vector
+
+
+
     switchFrame(ui->M_frame);          // Go back to main frame
 }
 

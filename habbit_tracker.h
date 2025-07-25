@@ -4,9 +4,9 @@
 #include <QMainWindow>
 #include <QFrame>
 #include <QRadioButton>
-#include <filesystem>
+#include "habitClass.h"
 
-#include "habitClass.cpp"
+
 
 using namespace std;
 
@@ -29,9 +29,8 @@ public:
 private:
     // Variables
     Ui::Habbit_tracker *ui;
-    int habitCount = 0;
     vector<habit> allHabits;
-    string filesPath = "/habits";
+    string filesPath = "habits";
 
 
     // Frame Control Functions:

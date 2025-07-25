@@ -1,37 +1,7 @@
-
+#include "habitClass.h"
 #include <iostream>
-#include <string>
-#include <vector>
 #include <fstream>
 using namespace std;
-
-
-class habit{
-private:
-    string name = "";
-    string fileName = ""; // <name_name>.txt
-    bool week[7];
-    vector<bool[7]> history;
-
-
-public:
-    // Constructor
-    habit(string newName, string newFilePath);
-
-    // Saves the week into the history (NOTE: this should be called periodically)
-    void saveWeek();
-
-    // Files Functions:
-    bool writeToFile();
-    bool makeFromFile();
-
-    // Get Functions
-    string getName() { return name; }
-    string getFileName() {return fileName; }
-
-};
-
-// =========================================================================================
 
 // CONSTRUCTOR:
 habit::habit(string newName, string newFilePath){
@@ -39,6 +9,8 @@ habit::habit(string newName, string newFilePath){
     for(auto &day:week)            // For every day in the week
         day = 0;                   // ----> Set 0
 
+
+    name = newName;
     // Fixing the name to be a file name:
     fileName = "";
     for(auto &ch: newName){
@@ -54,9 +26,9 @@ habit::habit(string newName, string newFilePath){
 
 
 void habit::saveWeek(){
-    history.push_back(week);    // Pushes into the history the current week
-    for(auto &day:week)         // Resets the week to start a new one
-        day = 0;
+    //history.push_back(week);    // Pushes into the history the current week
+    //for(auto &day:week)         // Resets the week to start a new one
+    //    day = 0;
 }
 
 
@@ -95,7 +67,7 @@ bool habit::writeToFile(){
         for(auto &day:weekInstance){
             habitFile << day;
         }
-        cout << endl;
+        habitFile << endl;
     }
 
     habitFile.close();
@@ -153,7 +125,7 @@ bool habit::makeFromFile(){
             return false;
         }
 
-        bool newWeek[7];
+        array<bool,7> newWeek = {0,0,0,0,0,0,0};
         int dayCounter = 0;
         for(auto &ch:tempString){
             if(ch == '0')
@@ -177,6 +149,47 @@ bool habit::makeFromFile(){
 }
 
 
+void habit::printWeek(){
+    for(auto &day:week){
+        cout << day;
+    }
+    cout << endl;
+}
+
+void habit::printHistory(int targetWeek){
+    if(targetWeek == -1){ // print all history
+        for(auto &currWeek:history){
+            for(auto &day:currWeek){
+                cout << day;
+            }
+            cout << endl;
+        }
+
+    }
+
+    if(targetWeek > (history.size()-1)){
+        cout << "ERROR: target week is above the size of history." << endl;
+        return;
+    }
+
+
+    for(auto &day: history[targetWeek]){
+        cout << day;
+    }
+    cout << endl;
+
+}
+
+
+array<bool,7> habit::getHistory(int targetWeek){
+    if(targetWeek > (history.size()-1) || targetWeek < 0){
+        array<bool,7> temp;
+        cout << "ERROR: targetweek outside of range" << endl;
+        return temp;
+    }
+
+    return history[targetWeek];
+}
 
 
 
