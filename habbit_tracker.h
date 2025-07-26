@@ -51,7 +51,7 @@ private:
     QString isCheckedColor  = "#a8e6a3";
     QString currentDayColor = "#ffcba0";
 
-    int dayCheckerInterval = 60000; // 60 seconds (60 * 1000ms)
+    int dayCheckerInterval = 5000; // 60 seconds (60 * 1000ms)
     // ============================================================
 
 
