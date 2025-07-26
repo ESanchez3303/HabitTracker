@@ -26,9 +26,9 @@ habit::habit(string newName, string newFilePath){
 
 
 void habit::saveWeek(){
-    //history.push_back(week);    // Pushes into the history the current week
-    //for(auto &day:week)         // Resets the week to start a new one
-    //    day = 0;
+    history.push_back(week);    // Pushes into the history the current week
+    for(auto &day:week)         // Resets the week to start a new one
+        day = 0;
 }
 
 
@@ -62,7 +62,7 @@ bool habit::writeToFile(){
     habitFile << endl;
 
 
-    // Writting the history that was saved (logic: first in vector is first to print)
+    // Writting the history that was saved (logic: first in vector, is oldest week, is first to print)
     for(auto &weekInstance:history){
         for(auto &day:weekInstance){
             habitFile << day;
@@ -195,7 +195,13 @@ array<bool,7> habit::getHistory(int targetWeek){
 
 
 
-
+void habit::setDay(int targetDay, bool setTo){
+    if(targetDay > 7 || targetDay < 0){
+        cerr << "ERROR: in set day, target day is not 0-7: targetDay:" << targetDay << endl;
+        return;
+    }
+    week[targetDay] = setTo;
+}
 
 
 

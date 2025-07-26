@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/faces">
+        <file>images/happyFace.png</file>
+        <file>images/sadFace.png</file>
+        <file>images/nuetralFace.png</file>
+    </qresource>
+</RCC>

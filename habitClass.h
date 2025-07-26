@@ -12,7 +12,7 @@ private:
     string name = "";
     string fileName = ""; // <name_name>.txt
     array<bool, 7> week = {0,0,0,0,0,0,0};
-    vector<array<bool,7>> history;
+    vector<array<bool,7>> history;              // {z,x,x,x,x,y} | 'y' is newer information while 'z' is oldest information
 
 
 public:
@@ -32,11 +32,16 @@ public:
     string getFileName() {return fileName; }
     array<bool,7> getWeek() { return week; }
     array<bool,7> getHistory(int targetIndex);
+    vector<array<bool,7>> getAllHistory(){return history;}
 
 
     // Printing Functions
     void printWeek();
     void printHistory(int targetWeek);
+
+
+    // Set Functions:
+    void setDay(int targetDay, bool setTo);
 
 };
 

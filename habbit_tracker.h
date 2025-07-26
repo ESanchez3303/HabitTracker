@@ -5,6 +5,9 @@
 #include <QFrame>
 #include <QRadioButton>
 #include "habitClass.h"
+#include <QDate>
+#include <QTime>
+#include "balancegraph.h"
 
 
 
@@ -19,7 +22,8 @@ QT_END_NAMESPACE
 class Habbit_tracker : public QMainWindow{
     Q_OBJECT
 
-
+private slots:
+    void onCheckmarkToggled(int state);
 
 
 public:
@@ -31,6 +35,24 @@ private:
     Ui::Habbit_tracker *ui;
     vector<habit> allHabits;
     string filesPath = "habits";
+    QTimer *dayCheckTimer;
+    QDate currentDate;
+    int historyIndex = 0;
+
+
+    // Changable Variables: =======================================
+    QString checkBoxStyleSheet =
+        "QCheckBox::indicator {width: 30px; height: 30px;}";
+    bool showGrid = true;
+    int initRowCount = 11;
+    int rowHeight = 50;
+
+    QString notCheckedColor = "#f5a3a3";
+    QString isCheckedColor  = "#a8e6a3";
+    QString currentDayColor = "#ffcba0";
+
+    int dayCheckerInterval = 60000; // 60 seconds (60 * 1000ms)
+    // ============================================================
 
 
     // Frame Control Functions:
@@ -39,6 +61,11 @@ private:
 
     // Main Frame Functions
     void M_addHabbitButtonClicked();
+    void M_removeButtonClicked();
+    void M_cancelButtonClicked();
+    void M_confirmButtonClicked();
+    void M_viewHistoryButtonClicked();
+
 
 
     // Add Frame Functions
@@ -47,6 +74,14 @@ private:
     void insertKey();
     void A_cancelButtonClicked();
     void A_saveButtonClicked();
+
+
+
+    // History Frame Functions:
+    BalanceGraph *habitGraph = nullptr;
+    void H_backButtonClicked();
+    void H_arrowClicked();
+    void H_showHistoryButtonClicked();
 
 
     // Helper Functions:

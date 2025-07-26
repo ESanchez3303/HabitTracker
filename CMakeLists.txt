@@ -25,6 +25,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         habitClass.h
         habitClass.cpp
+        images.qrc
+        balancegraph.cpp balancegraph.h
 
 
     )
