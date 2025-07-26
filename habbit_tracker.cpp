@@ -459,9 +459,7 @@ void Habbit_tracker::H_arrowClicked(){
 }
 
 void Habbit_tracker::H_showHistoryButtonClicked(){
-    cout << "entered"<< endl;
     if(historyIndex < 0 || historyIndex > (allHabits.size()-1)) return;
-    cout << "passed" << endl;
 
     vector<int> allValues;
     vector<array<bool,7>> habitsHistory = allHabits[historyIndex].getAllHistory();
