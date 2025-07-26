@@ -116,11 +116,11 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
     // Setting up the day checker timer to keep track of what day it is
     dayCheckTimer = new QTimer(this);
-    //currentDate = QDate::currentDate();
-    currentDate = QDate(2025, 7, 27); // <---- TESTING
+    currentDate = QDate::currentDate();
+    //currentDate = QDate(2025, 7, 27); // <---- TESTING
     connect(dayCheckTimer, &QTimer::timeout, this, [=]() mutable {
-        //QDate now = QDate::currentDate();
-        QDate now = QDate(2025, 7, 28); // <--- TESTING
+        QDate now = QDate::currentDate();
+        //QDate now = QDate(2025, 7, 28); // <--- TESTING
         if (now != currentDate) {                    // If now has moved to a different date than saved currentDate
             if (currentDate.dayOfWeek() == 7) {      // If it was sunday, we need to save all past week and set new week up
                 for(auto &currHabit:allHabits){

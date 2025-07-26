@@ -119,6 +119,8 @@ bool habit::makeFromFile(){
     // Reading the history file:
     history.clear();
     while(getline(habitFile,tempString)){
+        if(tempString.empty()) // only the last line should be empty
+            continue;
         if((int)tempString.length() != 7){
             cerr << "ERROR: History line is not len=7. File:" << fileName << ":" << tempString << endl;
             habitFile.close();
@@ -145,6 +147,12 @@ bool habit::makeFromFile(){
     }
 
     habitFile.close();
+
+    // Removing history if the history is more than 100 entries
+    if (history.size() > 100) {
+        history.erase(history.begin(), history.begin() + (history.size() - 100)); // Saving only the last 100
+        writeToFile(); // ReWritting the file
+    }
     return true;
 }
 
@@ -202,6 +210,14 @@ void habit::setDay(int targetDay, bool setTo){
     }
     week[targetDay] = setTo;
 }
+
+
+
+
+
+
+
+
 
 
 
