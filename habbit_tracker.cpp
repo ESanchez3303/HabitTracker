@@ -10,6 +10,9 @@
 #include <QDate>
 #include <QMessageBox>
 #include <QTimer>
+#include <QColor>
+#include <QScrollBar>
+
 
 using namespace std;
 
@@ -48,16 +51,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     ui->M_removeFrame->raise(); // Raising since we are going to be messing with the frames in the ui a lot
 
 
-    // Setting up the history buttons apperance when disabled and enabled
-    ui->H_upArrow->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
-    ui->H_downArrow->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
-    ui->H_showHistoryButton->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
+
 
 
     // Setting up the Habit Tracker Table
@@ -81,12 +75,13 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
         connect(key, &QPushButton::clicked, this, &Habbit_tracker::insertKey);
         key->setFocusPolicy(Qt::NoFocus);
     }
-    // Setting the rest of the buttons and frames to have no focus either
+
+    // Setting no focus to other things
     ui->A_keyboard->setFocusPolicy(Qt::NoFocus);
     ui->A_cancelButton->setFocusPolicy(Qt::NoFocus);
     ui->A_saveButton->setFocusPolicy(Qt::NoFocus);
     ui->M_habitTable->setFocusPolicy(Qt::NoFocus);
-
+    ui->H_spanDisplay->setFocusPolicy(Qt::NoFocus);
 
 
     // Connections
@@ -102,15 +97,13 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     connect(ui->H_backButton, &QPushButton::clicked, this, &Habbit_tracker::H_backButtonClicked);
     connect(ui->H_downArrow, &QPushButton::clicked, this, &Habbit_tracker::H_arrowClicked);
     connect(ui->H_upArrow, &QPushButton::clicked, this, &Habbit_tracker::H_arrowClicked);
-    connect(ui->H_showHistoryButton, &QPushButton::clicked, this, &Habbit_tracker::H_showHistoryButtonClicked);
+    connect(ui->H_lastWeekButton, &QPushButton::clicked, this, &Habbit_tracker::spanButtonClicked);
+    connect(ui->H_monthButton, &QPushButton::clicked, this, &Habbit_tracker::spanButtonClicked);
+    connect(ui->H_yearButton, &QPushButton::clicked, this, &Habbit_tracker::spanButtonClicked);
+    connect(ui->H_scrollDownButton, &QPushButton::clicked, this, &Habbit_tracker::scrollButtonClicked);
+    connect(ui->H_scrollUpButton, &QPushButton::clicked, this, &Habbit_tracker::scrollButtonClicked);
 
 
-
-    // Setting up the habitGraph to present the history
-    habitGraph = new BalanceGraph();
-    QVBoxLayout* layout = new QVBoxLayout(ui->H_habitGraphFrame);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(habitGraph);
 
 
 
@@ -156,9 +149,15 @@ void Habbit_tracker::switchFrame(QFrame* target){
         loadHabits();
     }
     else if(target == ui->A_frame){
+
+        // Hiding the numbers
+        showNums = false;
+
         // Setting keyboard to Capital Letters
-        isCapps = true;
+        showCapps = false;
         setCapps();
+
+
 
         // Clearing the name text
         ui->A_nameInput->setText("");
@@ -171,24 +170,52 @@ void Habbit_tracker::switchFrame(QFrame* target){
         ui->A_face->setStyleSheet("border-image: url(:/faces/images/nuetralFace.png) 0 0 0 0 stretch stretch;");
     }
     else if(target == ui->H_frame){
+        // Resetting the Top Text and the disabled buttons if any
         if(allHabits.size() <= 0){                                                      // If there are no habits, show mess. and disable buttons
             ui->H_habitName->setText("There are currently no habits");
             ui->H_upArrow->setDisabled(true);
             ui->H_downArrow->setDisabled(true);
-            ui->H_showHistoryButton->setDisabled(true);
+            ui->H_lastWeekButton->setDisabled(true);
+            ui->H_monthButton->setDisabled(true);
+            ui->H_yearButton->setDisabled(true);
             historyIndex = -1;
         }
         else{                                                                           // If there ARE habits, set to first, and enable buttons
             ui->H_habitName->setText(QString::fromStdString(allHabits[0].getName()));
             ui->H_upArrow->setDisabled(true);     // Setting up arrow to be disabled because we are at the top already
             ui->H_downArrow->setDisabled((allHabits.size() == 1 ? true:false)); // If size = 1, then set down to disable, else to false
-            ui->H_showHistoryButton->setDisabled(false);
+            ui->H_lastWeekButton->setDisabled(false);
+            ui->H_monthButton->setDisabled(false);
+            ui->H_yearButton->setDisabled(false);
             historyIndex = 0;
         }
 
-        // Reseting graph
-        vector<int> temp;
-        habitGraph->setGraphWithInt(temp);
+        // Resetting the date span text
+        ui->H_dateSpan->setText("Please select a span.");
+
+        // Setting up the history buttons apperance when disabled and enabled
+        ui->H_upArrow->setStyleSheet(R"(
+        QPushButton { background-color: rgb(255, 233, 176); }
+        QPushButton:disabled { background-color: #a0a0a0; } )");
+        ui->H_downArrow->setStyleSheet(R"(
+        QPushButton { background-color: rgb(255, 233, 176); }
+        QPushButton:disabled { background-color: #a0a0a0; } )");
+        ui->H_lastWeekButton->setStyleSheet(R"(
+        QPushButton { background-color: rgb(255, 233, 176); }
+        QPushButton:disabled { background-color: #a0a0a0; } )");
+        ui->H_monthButton->setStyleSheet(R"(
+        QPushButton { background-color: rgb(255, 233, 176); }
+        QPushButton:disabled { background-color: #a0a0a0; } )");
+        ui->H_yearButton->setStyleSheet(R"(
+        QPushButton { background-color: rgb(255, 233, 176); }
+        QPushButton:disabled { background-color: #a0a0a0; } )");
+
+        // Clearing the span display
+        ui->H_spanDisplay->clear();
+        ui->H_spanDisplay->clearSpans();
+        ui->H_spanDisplay->clearSelection();
+        ui->H_spanDisplay->setRowCount(0);
+        ui->H_spanDisplay->setColumnCount(0);
     }
     target->show();
 }
@@ -287,7 +314,7 @@ void Habbit_tracker::A_cancelButtonClicked(){
 
 void Habbit_tracker::setCapps(){
     // When starting, isCapps is true. So it will enter the first section
-    if(isCapps){
+    if(showCapps){
         ui->key_Q->setText("Q"); ui->key_A->setText("A"); ui->key_Z->setText("Z");
         ui->key_W->setText("W"); ui->key_S->setText("S"); ui->key_X->setText("X");
         ui->key_E->setText("E"); ui->key_D->setText("D"); ui->key_C->setText("C");
@@ -300,7 +327,6 @@ void Habbit_tracker::setCapps(){
         ui->key_P->setText("P");
     }
     else{
-
         ui->key_Q->setText("q"); ui->key_A->setText("a"); ui->key_Z->setText("z");
         ui->key_W->setText("w"); ui->key_S->setText("s"); ui->key_X->setText("x");
         ui->key_E->setText("e"); ui->key_D->setText("d"); ui->key_C->setText("c");
@@ -314,7 +340,51 @@ void Habbit_tracker::setCapps(){
     }
 
     // Change state of capps locked
-    isCapps = !isCapps;
+    showCapps = !showCapps;
+    showNums = false;
+}
+
+void Habbit_tracker::setNumbers(){
+    if(!showNums){
+        ui->key_Q->setText("1");
+        ui->key_W->setText("2");
+        ui->key_E->setText("3");
+        ui->key_R->setText("4");
+        ui->key_T->setText("5");
+        ui->key_Y->setText("6");
+        ui->key_U->setText("7");
+        ui->key_I->setText("8");
+        ui->key_O->setText("9");
+        ui->key_P->setText("0");
+    }
+    else{
+        if(!showCapps){
+            ui->key_Q->setText("Q");
+            ui->key_W->setText("W");
+            ui->key_E->setText("E");
+            ui->key_R->setText("R");
+            ui->key_T->setText("T");
+            ui->key_Y->setText("Y");
+            ui->key_U->setText("U");
+            ui->key_I->setText("I");
+            ui->key_O->setText("O");
+            ui->key_P->setText("P");
+        }
+        else{
+            ui->key_Q->setText("q");
+            ui->key_W->setText("w");
+            ui->key_E->setText("e");
+            ui->key_R->setText("r");
+            ui->key_T->setText("t");
+            ui->key_Y->setText("y");
+            ui->key_U->setText("u");
+            ui->key_I->setText("i");
+            ui->key_O->setText("o");
+            ui->key_P->setText("p");
+        }
+    }
+
+    showNums = !showNums;
 }
 
 void Habbit_tracker::insertKey(){
@@ -347,6 +417,12 @@ void Habbit_tracker::insertKey(){
         setCapps();
         return;
     }
+
+    if(keyText == "Num."){
+        setNumbers();
+        return;
+    }
+
 
     // Handle normal key input (A–Z)
     if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {
@@ -444,6 +520,26 @@ void Habbit_tracker::H_arrowClicked(){
     if (!pressedButton) return;
     if(historyIndex == -1) return;
 
+    // Clearing the spanDisplay since we switched and resetting the spanButtons
+    ui->H_spanDisplay->clear();
+    ui->H_spanDisplay->clearSpans();
+    ui->H_spanDisplay->clearSelection();
+    ui->H_spanDisplay->setRowCount(0);
+    ui->H_spanDisplay->setColumnCount(0);
+    ui->H_lastWeekButton->setStyleSheet(R"(
+        QPushButton { background-color: rgb(255, 233, 176); }
+        QPushButton:disabled { background-color: #a0a0a0; })");
+    ui->H_monthButton->setStyleSheet(R"(
+        QPushButton { background-color: rgb(255, 233, 176); }
+        QPushButton:disabled { background-color: #a0a0a0; } )");
+    ui->H_yearButton->setStyleSheet(R"(
+        QPushButton { background-color: rgb(255, 233, 176); }
+        QPushButton:disabled { background-color: #a0a0a0; } )");
+
+    pressedButton->setStyleSheet(R"(
+            QPushButton { background-color: rgb(255, 171, 69); }
+            QPushButton:disabled { background-color: #a0a0a0; })");
+
 
     // If there was only one, then the two buttons were disabled in the switchframe function
     if(pressedButton == ui->H_upArrow){
@@ -458,23 +554,343 @@ void Habbit_tracker::H_arrowClicked(){
     ui->H_downArrow->setDisabled((historyIndex >= (allHabits.size()-1) ? true:false));
 }
 
-void Habbit_tracker::H_showHistoryButtonClicked(){
-    if(historyIndex < 0 || historyIndex > (allHabits.size()-1)) return;
+void Habbit_tracker::spanButtonClicked(){
+    QPushButton *pressedButton = qobject_cast<QPushButton*>(sender());
+    if (!pressedButton) return;
+    if(historyIndex == -1) return;
+    if(allHabits[historyIndex].getHistorySize() == 0){   // If history is empty return
+        ui->H_dateSpan->setText("Not Enough Data to Generate.");
+        return;
+    }
 
-    vector<int> allValues;
-    vector<array<bool,7>> habitsHistory = allHabits[historyIndex].getAllHistory();
+    // Reseting the colors for all the buttons
+    ui->H_lastWeekButton->setStyleSheet(R"(
+        QPushButton { background-color: rgb(255, 233, 176); }
+        QPushButton:disabled { background-color: #a0a0a0; })");
+    ui->H_monthButton->setStyleSheet(R"(
+        QPushButton { background-color: rgb(255, 233, 176); }
+        QPushButton:disabled { background-color: #a0a0a0; } )");
+    ui->H_yearButton->setStyleSheet(R"(
+        QPushButton { background-color: rgb(255, 233, 176); }
+        QPushButton:disabled { background-color: #a0a0a0; } )");
 
-    for(auto& week:habitsHistory){
-        int weeksTotal = 0;
-        for(auto& day:week){
-            weeksTotal += (day ? 1:0);
+    pressedButton->setStyleSheet(R"(
+            QPushButton { background-color: rgb(255, 171, 69); }
+            QPushButton:disabled { background-color: #a0a0a0; })");
+
+    QDate spanStart;
+    QDate spanEnd;
+
+    // Setting the color to be set as currently in this tab
+    if(pressedButton == ui->H_lastWeekButton){
+        int currentDayOfWeek = currentDate.dayOfWeek();
+        spanStart = currentDate.addDays(-currentDayOfWeek - 6);
+        spanEnd = spanStart.addDays(6);
+    }
+    else if(pressedButton == ui->H_monthButton){
+        spanStart = QDate(currentDate.year(), currentDate.month(), 1);
+        spanEnd = spanStart.addMonths(1).addDays(-1);
+    }
+    else if(pressedButton == ui->H_yearButton){
+        spanStart = QDate(currentDate.year(), 1, 1);
+        spanEnd = QDate(currentDate.year(), 12, 31);
+    }
+
+    ui->H_dateSpan->setText(spanStart.toString(dateFormat) + "-" + spanEnd.toString(dateFormat));
+    updateSpanDisplay(spanStart,spanEnd,historyIndex, pressedButton);
+}
+
+void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habitIndex, QPushButton* pressedButton){
+    if (habitIndex < 0 || habitIndex >= allHabits.size()) return;
+
+    habit& currentHabit = allHabits[habitIndex];
+
+    // Clear the table
+    ui->H_spanDisplay->clear();
+    int rowCount = ui->H_spanDisplay->rowCount();
+    int colCount = ui->H_spanDisplay->columnCount();
+    for (int r = 0; r < rowCount; ++r) {
+        for (int c = 0; c < colCount; ++c) {
+            ui->H_spanDisplay->setSpan(r, c, 1, 1);
         }
-        allValues.push_back(weeksTotal);
     }
 
 
-    habitGraph->setGraphWithInt(allValues);
+    int columns = 0;
+    int rows = 1;
+
+    if (pressedButton == ui->H_lastWeekButton) {
+        ui->H_spanDisplay->setShowGrid(true);
+        ui->H_spanDisplay->horizontalHeader()->setVisible(true);
+        columns = 7;
+        rows = 1;
+
+        ui->H_spanDisplay->setColumnCount(columns);
+        ui->H_spanDisplay->setRowCount(rows);
+
+        // Set headers
+        QStringList headers = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+        ui->H_spanDisplay->setHorizontalHeaderLabels(headers);
+
+        // Find matching week
+        historyWeek* targetWeek = nullptr;
+        for (auto& hw : currentHabit.getHistory()) {
+            if (hw.start == spanStart && hw.end == spanEnd) {
+                targetWeek = &hw;
+                break;
+            }
+        }
+
+        for (int i = 0; i < 7; ++i) {
+            QTableWidgetItem* item = new QTableWidgetItem();
+            QDate currentDay = spanStart.addDays(i);
+            item->setText(QString::number(currentDay.day()));
+            item->setTextAlignment(Qt::AlignCenter);
+            if (targetWeek && targetWeek->values[i]) {
+                item->setBackground(Qt::green);
+            } else {
+                item->setBackground(Qt::white);
+            }
+            ui->H_spanDisplay->setItem(0, i, item);
+        }
+    }
+
+
+
+
+    else if (pressedButton == ui->H_monthButton) {
+         ui->H_spanDisplay->setShowGrid(true);
+        ui->H_spanDisplay->horizontalHeader()->setVisible(true);
+        int totalDays = spanStart.daysTo(spanEnd) + 1;
+        columns = 7;
+
+        // Calculate number of rows needed to display the month properly
+        int startDayOffset = spanStart.dayOfWeek() - 1; // Monday=1 -> offset=0
+        rows = ((totalDays + startDayOffset + columns - 1) / columns); // Ceiling division
+
+        ui->H_spanDisplay->setColumnCount(columns);
+        ui->H_spanDisplay->setRowCount(rows);
+
+        QStringList headers = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+        ui->H_spanDisplay->setHorizontalHeaderLabels(headers);
+
+        // Build progressMap as before
+        std::map<QDate, bool> progressMap;
+        for (const auto& hw : currentHabit.getHistory()) {
+            if (!(hw.end < spanStart || hw.start > spanEnd)) {
+                for (int i = 0; i < 7; ++i) {
+                    QDate day = hw.start.addDays(i);
+                    if (day >= spanStart && day <= spanEnd) {
+                        progressMap[day] = hw.values[i];
+                    }
+                }
+            }
+        }
+
+        int dayNumber = 1;
+        for (int row = 0; row < rows; ++row) {
+            for (int col = 0; col < columns; ++col) {
+                int cellIndex = row * columns + col;
+
+                QTableWidgetItem* item = nullptr;
+
+                if (cellIndex < startDayOffset || dayNumber > totalDays) {
+                    item = new QTableWidgetItem("");
+                    item->setFlags(Qt::NoItemFlags);
+                }
+                else {
+                    QDate currentDay = spanStart.addDays(dayNumber - 1);
+                    item = new QTableWidgetItem(QString::number(dayNumber));
+                    item->setTextAlignment(Qt::AlignCenter);
+
+                    if (progressMap.count(currentDay) && progressMap[currentDay]) {
+                        item->setBackground(Qt::green);
+                    }
+                    else {
+                        item->setBackground(Qt::white);
+                    }
+
+                    dayNumber++;
+                }
+
+                ui->H_spanDisplay->setItem(row, col, item);
+            }
+        }
+    }
+
+
+
+    else {
+        ui->H_spanDisplay->clear();
+
+        // === Configurable colors ===
+        QColor monthHeaderColor = QColor(255, 171, 69);     // Month Header
+        QColor weekdayHeaderColor = QColor(230, 230, 230);  // Slightly darker for weekdays
+        QColor spacerColor = QColor(214, 209, 158);         // Space Color
+        QColor dateBackgroundColor = QColor(255, 255, 255); // Default white for days
+        QColor completedColor = QColor(100, 200, 100);      // Green for completed
+
+        // === Layout config: 3×4 grid of months ===
+        const int monthsPerRow = 3;
+        const int monthsPerCol = 4;
+        const int monthsCount = 12;
+
+        const int monthCols = 7;
+        const int monthRows = 7; // 1 label + 1 header + 5 week rows
+
+        const int spacerCols = 1;
+        const int spacerRows = 1;
+
+        int totalCols = monthsPerRow * monthCols + (monthsPerRow - 1) * spacerCols;
+        int totalRows = monthsPerCol * monthRows + (monthsPerCol - 1) * spacerRows;
+
+        ui->H_spanDisplay->setColumnCount(totalCols);
+        ui->H_spanDisplay->setRowCount(totalRows);
+
+        ui->H_spanDisplay->horizontalHeader()->setVisible(false);
+        ui->H_spanDisplay->verticalHeader()->setVisible(false);
+        ui->H_spanDisplay->setShowGrid(false);
+
+        QStringList dayNames = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+
+        int year = spanStart.year();
+        habit& currentHabit = allHabits[habitIndex];
+
+        // Build progress map
+        std::map<QDate, bool> progressMap;
+        for (const auto& hw : currentHabit.getHistory()) {
+            for (int i = 0; i < 7; ++i) {
+                QDate day = hw.start.addDays(i);
+                if (day.year() == year) {
+                    progressMap[day] = hw.values[i];
+                }
+            }
+        }
+
+        for (int m = 0; m < monthsCount; ++m) {
+            int month = m + 1;
+
+            int monthRow = m / monthsPerRow;
+            int monthCol = m % monthsPerRow;
+            int baseRow = monthRow * (monthRows + spacerRows);
+            int baseCol = monthCol * (monthCols + spacerCols);
+
+            // === Month name ===
+            QString monthName = QLocale().monthName(month, QLocale::LongFormat);
+            QTableWidgetItem* monthLabel = new QTableWidgetItem(monthName);
+            monthLabel->setTextAlignment(Qt::AlignCenter);
+            monthLabel->setBackground(monthHeaderColor);
+            if (monthCols > 1) {
+                ui->H_spanDisplay->setSpan(baseRow, baseCol, 1, monthCols);
+            }
+            ui->H_spanDisplay->setItem(baseRow, baseCol, monthLabel);
+
+            // === Weekday headers ===
+            for (int d = 0; d < 7; ++d) {
+                QTableWidgetItem* dayHeader = new QTableWidgetItem(dayNames[d]);
+                dayHeader->setTextAlignment(Qt::AlignCenter);
+                dayHeader->setFlags(Qt::NoItemFlags);
+                dayHeader->setBackground(weekdayHeaderColor);
+                ui->H_spanDisplay->setItem(baseRow + 1, baseCol + d, dayHeader);
+            }
+
+            // === Day cells ===
+            QDate firstDay(year, month, 1);
+            int daysInMonth = firstDay.daysInMonth();
+            int startDayOffset = firstDay.dayOfWeek() - 1; // 0-indexed from Mon
+
+            int dayNum = 1;
+            for (int row = 0; row < 6; ++row) {
+                for (int col = 0; col < 7; ++col) {
+                    int cellIndex = row * 7 + col;
+                    QTableWidgetItem* item = nullptr;
+
+                    if (cellIndex < startDayOffset || dayNum > daysInMonth) {
+                        item = new QTableWidgetItem("");
+                        item->setFlags(Qt::NoItemFlags);
+                    } else {
+                        QDate currentDay(year, month, dayNum);
+                        item = new QTableWidgetItem(QString::number(dayNum));
+                        item->setTextAlignment(Qt::AlignCenter);
+
+                        if (progressMap.count(currentDay) && progressMap[currentDay]) {
+                            item->setBackground(completedColor);
+                        } else {
+                            item->setBackground(dateBackgroundColor);
+                        }
+                        dayNum++;
+                    }
+
+                    ui->H_spanDisplay->setItem(baseRow + 2 + row, baseCol + col, item);
+                }
+            }
+        }
+
+        // === Fill vertical spacers ===
+        for (int row = 0; row < totalRows; ++row) {
+            for (int col = monthCols; col < totalCols; col += (monthCols + spacerCols)) {
+                QTableWidgetItem* spacerItem = new QTableWidgetItem("");
+                spacerItem->setFlags(Qt::NoItemFlags);
+                spacerItem->setBackground(spacerColor);
+                ui->H_spanDisplay->setItem(row, col, spacerItem);
+            }
+        }
+
+        // === Fill horizontal spacers ===
+        for (int col = 0; col < totalCols; ++col) {
+            for (int row = monthRows; row < totalRows; row += (monthRows + spacerRows)) {
+                QTableWidgetItem* spacerItem = new QTableWidgetItem("");
+                spacerItem->setFlags(Qt::NoItemFlags);
+                spacerItem->setBackground(spacerColor);
+                ui->H_spanDisplay->setItem(row, col, spacerItem);
+            }
+        }
+
+        columns = totalCols;
+        rows = totalRows;
+    }
+
+
+
+
+    // NOW: Calculate and set column widths and row heights
+
+    // Get available size for the table viewport (excluding headers)
+    QSize viewportSize = ui->H_spanDisplay->viewport()->size();
+
+    // Calculate width per column (divide viewport width by number of columns)
+    int columnWidth = viewportSize.width() / columns;
+
+    // Calculate height per row (divide viewport height by number of rows)
+    int rowHeight = viewportSize.height() / rows;
+
+    // Apply sizes to columns and rows
+    for (int c = 0; c < columns; ++c) {
+        ui->H_spanDisplay->setColumnWidth(c, columnWidth);
+    }
+    for (int r = 0; r < rows; ++r) {
+        ui->H_spanDisplay->setRowHeight(r, rowHeight);
+    }
 }
+
+
+void Habbit_tracker::scrollButtonClicked(){
+    QObject* btn = sender();
+    if (!btn) return;
+
+    int currentValue = ui->H_spanDisplay->verticalScrollBar()->value();
+    int step = 2;
+
+    if (btn == ui->H_scrollDownButton) {
+        ui->H_spanDisplay->verticalScrollBar()->setValue(currentValue + step);
+    } else if (btn == ui->H_scrollUpButton) {
+        ui->H_spanDisplay->verticalScrollBar()->setValue(currentValue - step);
+    }
+}
+
+
+
+
 
 
 
@@ -496,17 +912,17 @@ bool Habbit_tracker::validString(QString &input) {
     if (trimmed.isEmpty())
         return false;
 
-    // Step 3: Validate characters: must be only letters or spaces
-    bool hasLetter = false;
+    // Step 3: Validate characters: must be only letters, digits, or spaces
+    bool hasLetterOrDigit = false;
     for (QChar ch : trimmed) {
-        if (ch.isLetter()) {
-            hasLetter = true;
+        if (ch.isLetterOrNumber()) {
+            hasLetterOrDigit = true;
         } else if (!ch.isSpace()) {
             return false; // invalid character found
         }
     }
 
-    return hasLetter;
+    return hasLetterOrDigit;
 }
 
 void Habbit_tracker::loadHabits(){
@@ -547,14 +963,14 @@ void Habbit_tracker::loadHabits(){
     }
 
 
-    // Loading from already filled vector into the habit table
+    //// Loading from already filled vector into the habit table
     int habitCount = 0;
     for(auto &currHabit:allHabits){
         array<bool,7> week = currHabit.getWeek();
         QTableWidgetItem *nameItem = new QTableWidgetItem(QString::fromStdString(currHabit.getName()));
         ui->M_habitTable->setItem(habitCount, 0, nameItem);
 
-        // Add radio buttons for each day (columns 1 to 7)
+        // Add check box buttons for each day (columns 1 to 7)
         for (int col = 1; col <= 7; ++col) {
             QCheckBox *check = new QCheckBox(this);
             if (week[col - 1])
@@ -598,7 +1014,6 @@ void Habbit_tracker::loadHabits(){
                 if (check) {
                     bool isToday = (col == todaysDay);
                     bool isPast = (col < todaysDay);
-                    check->setEnabled(isToday);
 
                     if (isPast) {
                         // Color past days
@@ -610,6 +1025,7 @@ void Habbit_tracker::loadHabits(){
                     } else {
                         // Future days — no color
                         cellWidget->setStyleSheet("");
+                        check->setDisabled(true);
                     }
                 }
             }
@@ -665,6 +1081,7 @@ void Habbit_tracker::onCheckmarkToggled(int state){
                 if (cellCheck == check) {                                    // If this is the sender saved above
                     allHabits[row].setDay(col - 1, state == Qt::Checked);    // Set the day
                     allHabits[row].writeToFile(); // Save update to file     // Save the file
+                    loadHabits();
                     return;
                 }
             }

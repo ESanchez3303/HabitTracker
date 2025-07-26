@@ -26,9 +26,9 @@ habit::habit(string newName, string newFilePath){
 
 
 void habit::saveWeek(){
-    history.push_back(week);    // Pushes into the history the current week
-    for(auto &day:week)         // Resets the week to start a new one
-        day = 0;
+    //history.push_back(week);    // Pushes into the history the current week
+    //for(auto &day:week)         // Resets the week to start a new one
+    //    day = 0;
 }
 
 
@@ -63,14 +63,17 @@ bool habit::writeToFile(){
 
 
     // Writting the history that was saved (logic: first in vector, is oldest week, is first to print)
-    for(auto &weekInstance:history){
-        for(auto &day:weekInstance){
-            habitFile << day;
+    for(auto& entry:history){
+        habitFile << "[" << entry.start.toString(dateFormat).toStdString() << ":";
+        habitFile << entry.end.toString(dateFormat).toStdString() << "]";
+        for(auto& value:entry.values){
+            habitFile << value;
         }
-        habitFile << endl;
+        cout << endl;
     }
 
     habitFile.close();
+    return true;
     return true;
 }
 
@@ -121,15 +124,16 @@ bool habit::makeFromFile(){
     while(getline(habitFile,tempString)){
         if(tempString.empty()) // only the last line should be empty
             continue;
-        if((int)tempString.length() != 7){
-            cerr << "ERROR: History line is not len=7. File:" << fileName << ":" << tempString << endl;
-            habitFile.close();
-            return false;
-        }
 
+        // Getting date from the history entry
+        string start = tempString.substr(1, 10);
+        string end = tempString.substr(12, 10);
+        string data  = tempString.substr(tempString.find(']')+1);
+
+        // Parsing through the data to set newWeek entry
         array<bool,7> newWeek = {0,0,0,0,0,0,0};
         int dayCounter = 0;
-        for(auto &ch:tempString){
+        for(auto &ch:data){
             if(ch == '0')
                 newWeek[dayCounter] = 0;
 
@@ -142,8 +146,12 @@ bool habit::makeFromFile(){
             }
             dayCounter++;
         }
+        historyWeek newHistWeek;
+        newHistWeek.start = QDate::fromString(start.c_str(),dateFormat);
+        newHistWeek.end = QDate::fromString(end.c_str(),dateFormat);
+        newHistWeek.values = newWeek;
 
-        history.push_back(newWeek);
+        history.push_back(newHistWeek);
     }
 
     habitFile.close();
@@ -153,6 +161,7 @@ bool habit::makeFromFile(){
         history.erase(history.begin(), history.begin() + (history.size() - 100)); // Saving only the last 100
         writeToFile(); // ReWritting the file
     }
+
     return true;
 }
 
@@ -164,40 +173,9 @@ void habit::printWeek(){
     cout << endl;
 }
 
-void habit::printHistory(int targetWeek){
-    if(targetWeek == -1){ // print all history
-        for(auto &currWeek:history){
-            for(auto &day:currWeek){
-                cout << day;
-            }
-            cout << endl;
-        }
-
-    }
-
-    if(targetWeek > (history.size()-1)){
-        cout << "ERROR: target week is above the size of history." << endl;
-        return;
-    }
 
 
-    for(auto &day: history[targetWeek]){
-        cout << day;
-    }
-    cout << endl;
 
-}
-
-
-array<bool,7> habit::getHistory(int targetWeek){
-    if(targetWeek > (history.size()-1) || targetWeek < 0){
-        array<bool,7> temp;
-        cout << "ERROR: targetweek outside of range" << endl;
-        return temp;
-    }
-
-    return history[targetWeek];
-}
 
 
 
@@ -209,6 +187,11 @@ void habit::setDay(int targetDay, bool setTo){
         return;
     }
     week[targetDay] = setTo;
+}
+
+
+historyWeek habit::getLastWeek(){
+    return history[history.size()-1];
 }
 
 

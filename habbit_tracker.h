@@ -7,8 +7,7 @@
 #include "habitClass.h"
 #include <QDate>
 #include <QTime>
-#include "balancegraph.h"
-
+#include <QPushButton>
 
 
 using namespace std;
@@ -38,20 +37,21 @@ private:
     QTimer *dayCheckTimer;
     QDate currentDate;
     int historyIndex = 0;
+    QString dateFormat = "MM/dd/yyyy";
 
 
     // Changable Variables: =======================================
     QString checkBoxStyleSheet =
         "QCheckBox::indicator {width: 30px; height: 30px;}";
     bool showGrid = true;
-    int initRowCount = 11;
+    int initRowCount = 9;
     int rowHeight = 50;
 
     QString notCheckedColor = "#f5a3a3";
     QString isCheckedColor  = "#a8e6a3";
     QString currentDayColor = "#ffcba0";
 
-    int dayCheckerInterval = 5000; // 60 seconds (60 * 1000ms)
+    int dayCheckerInterval = 60000; // 60 seconds (60 * 1000ms)
     // ============================================================
 
 
@@ -69,7 +69,9 @@ private:
 
 
     // Add Frame Functions
-    bool isCapps = true;
+    bool showCapps = false;
+    bool showNums = false;
+    void setNumbers();
     void setCapps();
     void insertKey();
     void A_cancelButtonClicked();
@@ -78,10 +80,11 @@ private:
 
 
     // History Frame Functions:
-    BalanceGraph *habitGraph = nullptr;
     void H_backButtonClicked();
     void H_arrowClicked();
-    void H_showHistoryButtonClicked();
+    void spanButtonClicked();
+    void updateSpanDisplay(QDate spanStart, QDate spanEnd, int habitIndex, QPushButton* pressedButton);
+    void scrollButtonClicked();
 
 
     // Helper Functions:
