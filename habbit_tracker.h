@@ -39,7 +39,7 @@ private:
     QDate currentDate;
     int habitIndex = 0;
     QString dateFormat = "MM/dd/yyyy";
-    int dayCheckerInterval = 5000; // 60 seconds (60 * 1000ms)
+    int dayCheckerInterval = 60000; // 60 seconds (60 * 1000ms)
 
 
     // Changable Variables: ==========================================

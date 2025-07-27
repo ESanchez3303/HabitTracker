@@ -95,8 +95,8 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     currentDate = QDate::currentDate();
     //currentDate = QDate(2025, 7, 27); // <---- Sunday
     connect(dayCheckTimer, &QTimer::timeout, this, [=]() mutable {
-        //QDate now = QDate::currentDate();
-        QDate now = QDate(2025, 7, 28); // <--- Monday | TESTING: moving into a new week
+        QDate now = QDate::currentDate();
+        //QDate now = QDate(2025, 7, 28); // <--- Monday | TESTING: moving into a new week
         if (now != currentDate) {                    // If now has moved to a different date than saved currentDate
             currentDate = now;                       // Updates the currentday to today to get ready for check of tomorrow
             if (currentDate.dayOfWeek() == 1) {      // If the new day is a MONDAY, then we need to save the previous week
