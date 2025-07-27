@@ -13,10 +13,9 @@
 using namespace std;
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class Habbit_tracker;
-}
+namespace Ui { class Habbit_tracker; }
 QT_END_NAMESPACE
+
 
 class Habbit_tracker : public QMainWindow{
     Q_OBJECT
@@ -30,77 +29,51 @@ public:
     ~Habbit_tracker();
 
 private:
-    // Variables
+    // Variables =====================================================================================================================
     Ui::Habbit_tracker *ui;
     vector<habit> allHabits;
-    string filesPath = "habits";
-    string colorsFileName = "colors.txt";
+
+
+    // FILES ==========================================================================================================================
+    string const filesPath = "habits";
+    string const colorsPath = "themes";
+    string const currentThemeFileName = colorsPath + "/selectedTheme.txt";
+    string const defaultColorsFileName = colorsPath + "/default.txt";
+    string targetThemeFileName = colorsPath + "/default.txt";
+
+
+    // TIME KEEPING ==================================================================================================================
     QTimer *dayCheckTimer;
     QDate currentDate;
-    int habitIndex = 0;
     QString dateFormat = "MM/dd/yyyy";
     int dayCheckerInterval = 60000; // 60 seconds (60 * 1000ms)
 
 
-    // Changable Variables: ==========================================
-        // Main Display Grid -----------------------------------
-        bool showGrid = true;
-        QString checkBox_width  = "30";
-        QString checkBox_height = "30";
-        int initRowCount = 9;
-        int rowHeight = 50;
-
-
-        // COLORS ----------------------------------------------
-        //Main Colors:
-        QString main_darker_color  = "(255,255,187)";
-        QString main_lighter_color = "(253,255,222)";
-
-        //Buttons Colors:
-        QString button_color       = "(255,233,176)";
-        QString button_select_color= "(255,171,69)";
-        QString button_disab_color = "(160,160,160)";
-
-        //Add Habit Colors:
-        QString keyboard_color     = "(255,170,0)";
-        QString cancel_button_color= "(255,126,126)";
-        QString save_button_color  = "(165,255,171)";
-
-        //Main Display Colors:
-        QString current_day_color  = "(255,203,160)";
-        QString is_checked_color   = "(168,230,163)";
-        QString not_checked_color  = "(245,163,163)";
-
-        //Calendar Colors:
-        QString month_header_color = "(255,171,69)";
-        QString week_header_color  = "(230,230,230)";
-        QString complete_color     = "(100,200,100)";
-        QString other_days_color = "(255,255,255)";
-
-        // Remove Habit Colors:
-        QString remove_item_selec_color = "(255,203,160)";
-
-    // ===============================================================
-
-
-
-
-    // Frame Control Functions:
+    // Frame Control Functions ======================================================================================================
     void switchFrame(QFrame* target);
 
 
 
+    // Main Frame Functions ===========================================================================================================
+    // ----------------------------
+    bool    const showGrid = true;
+    QString const checkBox_width  = "30";
+    QString const checkBox_height = "30";
+    int     const initRowCount = 9;
+    int     const rowHeight = 50;
+    // -----------------------------
 
-    // Main Frame Functions
+
     void M_addHabbitButtonClicked();
     void M_removeButtonClicked();
     void M_cancelButtonClicked();
     void M_confirmButtonClicked();
     void M_viewHistoryButtonClicked();
+    void M_settingsButtonClicked();
 
 
 
-    // Add Frame Functions
+    // Add Frame Functions ============================================================================================================
     bool showCapps = false;
     bool showNums = false;
     void setNumbers();
@@ -111,7 +84,9 @@ private:
 
 
 
-    // History Frame Functions:
+
+    // History Frame Functions =========================================================================================================
+    int habitIndex = 0;
     string currentTab = "";
     void H_backButtonClicked();
     void H_arrowClicked();
@@ -121,17 +96,39 @@ private:
     void displayNextPreviousButtonClicked();
 
 
-    // Helper Functions:
+
+
+
+    // Setings Frame Functions =========================================================================================================
+    void S_backButtonClicked();
+
+
+
+
+    // Helper Functions ===============================================================================================================
     bool validString(QString &input);
     void loadHabits();
     QColor stringToColor(QString input);
 
 
-    // Color Functions:
-    void paintColors();
+
+
+
+
+    // Theme Functions ================================================================================================================
+    QString main_darker_color, main_lighter_color;
+    QString button_color, button_select_color, button_disab_color;
+    QString keyboard_color, cancel_button_color, save_button_color;
+    QString current_day_color, is_checked_color, not_checked_color;
+    QString month_header_color,week_header_color,complete_color,other_days_color;
+    QString remove_item_selec_color;
+
+    void paintColors();        // Paints all the objects their colors set in variables
     void writeColorsToFile();  // Writes current colors in program mem. to file
-    void loadColorsFromFile(); // Reads from file and sets colors in program mem. | makes new file if no file exists
-    void resetColors();        // Removes the colors file and calls load function to make new file and set variables
+    void loadColorsFromFile(); // Reads information from file saved in targetThemeFileName
+
+
+
 };
 #endif // HABBIT_TRACKER_H
 

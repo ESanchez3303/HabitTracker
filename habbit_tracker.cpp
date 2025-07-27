@@ -71,6 +71,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     connect(ui->M_cancelButton, &QPushButton::clicked, this, &Habbit_tracker::M_cancelButtonClicked);
     connect(ui->M_confirmButton, &QPushButton::clicked, this, &Habbit_tracker::M_confirmButtonClicked);
     connect(ui->M_viewHistoryButton, &QPushButton::clicked, this, &Habbit_tracker::M_viewHistoryButtonClicked);
+    connect(ui->M_settingsButton, &QPushButton::clicked, this, &Habbit_tracker::M_settingsButtonClicked);
 
     connect(ui->A_cancelButton, &QPushButton::clicked, this, &Habbit_tracker::A_cancelButtonClicked);
     connect(ui->A_saveButton, &QPushButton::clicked, this, &Habbit_tracker::A_saveButtonClicked);
@@ -86,7 +87,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     connect(ui->H_displayPreviousButton, &QPushButton::clicked, this, &Habbit_tracker::displayNextPreviousButtonClicked);
     connect(ui->H_displayNextButton, &QPushButton::clicked, this, &Habbit_tracker::displayNextPreviousButtonClicked);
 
-
+    connect(ui->S_backButton, &QPushButton::clicked, this, &Habbit_tracker::S_backButtonClicked);
 
 
 
@@ -134,6 +135,7 @@ void Habbit_tracker::switchFrame(QFrame* target){
     ui->M_frame->hide();
     ui->A_frame->hide();
     ui->H_frame->hide();
+    ui->S_frame->hide();
     if(target == ui->M_frame){
         // Hiding the removing habits frame
         ui->M_removeFrame->hide();
@@ -226,6 +228,9 @@ void Habbit_tracker::switchFrame(QFrame* target){
 
 
     }
+    else if(target == ui->S_frame){
+
+    }
     target->show();
 }
 
@@ -242,7 +247,6 @@ void Habbit_tracker::switchFrame(QFrame* target){
 
 // MAIN MENU FUNCTIONS:
 void Habbit_tracker::M_addHabbitButtonClicked(){
-    ui->M_removeFrame->hide();
     switchFrame(ui->A_frame);
 }
 
@@ -263,6 +267,10 @@ void Habbit_tracker::M_removeButtonClicked(){
 
     // Making frame visible
     ui->M_removeFrame->show();
+}
+
+void Habbit_tracker::M_settingsButtonClicked(){
+    switchFrame(ui->S_frame);
 }
 
 void Habbit_tracker::M_cancelButtonClicked(){
@@ -1033,6 +1041,14 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
 
 
 
+// SETTINGS FRAME FUNCTIONS:
+void Habbit_tracker::S_backButtonClicked(){
+    switchFrame(ui->M_frame);
+}
+
+
+
+
 
 
 
@@ -1227,29 +1243,6 @@ QColor Habbit_tracker::stringToColor(QString input){
 
 
 
-// SLOTS FUNCTIONS:
-void Habbit_tracker::onCheckmarkToggled(int state){
-    QCheckBox *check = qobject_cast<QCheckBox*>(sender());                   // Saving the sender
-    if (!check)
-        return;
-
-    // Loop through the table to find where the checkbox is
-    for (int row = 0; row < ui->M_habitTable->rowCount(); ++row) {           // Looping through the rows
-        for (int col = 1; col <= 7; ++col) {                                 // Looping through the cols
-            QWidget *cellWidget = ui->M_habitTable->cellWidget(row, col);    // Casting the cellWidget
-            if (cellWidget) {
-                QCheckBox *cellCheck = cellWidget->findChild<QCheckBox*>();  // Grabbing the cell checkbox
-                if (cellCheck == check) {                                    // If this is the sender saved above
-                    allHabits[row].setDay(col - 1, state == Qt::Checked);    // Set the day
-                    allHabits[row].writeToFile(); // Save update to file     // Save the file
-                    loadHabits();
-                    return;
-                }
-            }
-        }
-    }
-
-}
 
 
 
@@ -1396,65 +1389,99 @@ void Habbit_tracker::paintColors(){
 }
 
 void Habbit_tracker::loadColorsFromFile(){
-    ifstream colorFile(colorsFileName);
-    if(!colorFile){  // If file does not open
 
-        // Write new file with default colors
-        ofstream newColorFile(colorsFileName);
-        newColorFile << "#WARNING: Do not put spaces inside the ()" << endl;
-        newColorFile << endl;
-        newColorFile << "#Main Colors:" << endl;
-        newColorFile << "main_darker_color=(255,255,187)" << endl;
-        newColorFile << "main_lighter_color=(253,255,222)" << endl;
-        newColorFile << endl;
-        newColorFile << "#Buttons Colors:" << endl;
-        newColorFile << "button_color=(255,233,176)" << endl;
-        newColorFile << "button_select_color=(255,171,69)" << endl;
-        newColorFile << "button_disab_color=(160,160,160)" << endl;
-        newColorFile << endl;
-        newColorFile << "#Add Habit Colors:" << endl;
-        newColorFile << "keyboard_color=(255,170,0)" << endl;
-        newColorFile << "cancel_button_color=(255,126,126)" << endl;
-        newColorFile << "save_button_color=(165,255,171)" << endl;
-        newColorFile << endl;
-        newColorFile << "#Main Display Colors:" << endl;
-        newColorFile << "current_day_color=(255,203,160)" << endl;
-        newColorFile << "is_checked_color=(168,230,163)" << endl;
-        newColorFile << "not_checked_color=(245,163,163)" << endl;
-        newColorFile << endl;
-        newColorFile << "#Calendar Colors:" << endl;
-        newColorFile << "month_header_color=(255,171,69)" << endl;
-        newColorFile << "week_header_color=(230,230,230)" << endl;
-        newColorFile << "complete_color=(100,200,100)" << endl;
-        newColorFile << "other_days_color=(255,255,255)" << endl;
-        newColorFile << endl;
-        newColorFile << "#Remove Habit Colors:" << endl;
-        newColorFile << "remove_item_selec_color=(255,203,160)" << endl;
-        newColorFile.close();
-
-        // Setting variables to default colors
-        main_darker_color  = "(255,255,187)";
-        main_lighter_color = "(253,255,222)";
-        button_color       = "(255,233,176)";
-        button_select_color= "(255,171,69)";
-        button_disab_color = "(160,160,160)";
-        keyboard_color     = "(255,170,0)";
-        cancel_button_color= "(255,126,126)";
-        save_button_color  = "(165,255,171)";
-        current_day_color  = "(255,203,160)";
-        is_checked_color   = "(168,230,163)";
-        not_checked_color  = "(245,163,163)";
-        month_header_color = "(255,171,69)";
-        week_header_color  = "(230,230,230)";
-        complete_color     = "(100,200,100)";
-        other_days_color   = "(255,255,255)";
-        remove_item_selec_color = "(255,203,160)";
-
-        return;
+    // Making path if path for colors if it does not exists
+    if(!filesystem::exists(colorsPath)){
+        filesystem::create_directories(colorsPath);
     }
 
-    // File was found, read and set values from the file
+
+    // Reading from the current theme file that says what file to use for the colors
+    ifstream themeFile(currentThemeFileName);
+    if(!themeFile){                                      // If there is no theme file, then make a new one with the default.txt being target
+        ofstream newThemeFile(currentThemeFileName);     // Make the file
+        newThemeFile << defaultColorsFileName;           // Write the const default file name
+        targetThemeFileName = defaultColorsFileName;     // Set the target theme to const default file name
+        newThemeFile.close();                            // Close
+    }else{
+        string tmp;
+        getline(themeFile, tmp);   // Get text from current theme file
+        targetThemeFileName = tmp; // Set the target theme to be that theme file name
+        themeFile.close();         // Close
+    }
+
+
+    // Check if target theme is the default AND if it does not exist, THEN MAKE THE DEFAULT FILE
+    if(targetThemeFileName == defaultColorsFileName){
+        ifstream colorFile(defaultColorsFileName);
+        if(!colorFile){
+            // Write new file with default colors
+            ofstream newColorFile(defaultColorsFileName);
+                newColorFile << "#WARNING: Do not put spaces inside the ()" << endl;
+                newColorFile << endl;
+                newColorFile << "#Main Colors:" << endl;
+                newColorFile << "main_darker_color=(255,255,187)" << endl;
+                newColorFile << "main_lighter_color=(253,255,222)" << endl;
+                newColorFile << endl;
+                newColorFile << "#Buttons Colors:" << endl;
+                newColorFile << "button_color=(255,233,176)" << endl;
+                newColorFile << "button_select_color=(255,171,69)" << endl;
+                newColorFile << "button_disab_color=(160,160,160)" << endl;
+                newColorFile << endl;
+                newColorFile << "#Add Habit Colors:" << endl;
+                newColorFile << "keyboard_color=(255,170,0)" << endl;
+                newColorFile << "cancel_button_color=(255,126,126)" << endl;
+                newColorFile << "save_button_color=(165,255,171)" << endl;
+                newColorFile << endl;
+                newColorFile << "#Main Display Colors:" << endl;
+                newColorFile << "current_day_color=(255,203,160)" << endl;
+                newColorFile << "is_checked_color=(168,230,163)" << endl;
+                newColorFile << "not_checked_color=(245,163,163)" << endl;
+                newColorFile << endl;
+                newColorFile << "#Calendar Colors:" << endl;
+                newColorFile << "month_header_color=(255,171,69)" << endl;
+                newColorFile << "week_header_color=(230,230,230)" << endl;
+                newColorFile << "complete_color=(100,200,100)" << endl;
+                newColorFile << "other_days_color=(255,255,255)" << endl;
+                newColorFile << endl;
+                newColorFile << "#Remove Habit Colors:" << endl;
+                newColorFile << "remove_item_selec_color=(255,203,160)" << endl;
+            newColorFile.close();
+
+            // Setting variables to default colors
+            main_darker_color  = "(255,255,187)";
+            main_lighter_color = "(253,255,222)";
+            button_color       = "(255,233,176)";
+            button_select_color= "(255,171,69)";
+            button_disab_color = "(160,160,160)";
+            keyboard_color     = "(255,170,0)";
+            cancel_button_color= "(255,126,126)";
+            save_button_color  = "(165,255,171)";
+            current_day_color  = "(255,203,160)";
+            is_checked_color   = "(168,230,163)";
+            not_checked_color  = "(245,163,163)";
+            month_header_color = "(255,171,69)";
+            week_header_color  = "(230,230,230)";
+            complete_color     = "(100,200,100)";
+            other_days_color   = "(255,255,255)";
+            remove_item_selec_color = "(255,203,160)";
+
+            return;
+        }
+        else
+            colorFile.close();
+    }
+
+
+    // READING FROM THE TARGET THEME FILE (Ofc if it was not written above ^)
+
+
+
+    ifstream colorFile(targetThemeFileName);
     try{
+        if(!colorFile)   // If file was not able to be opened, then throw into the catch
+            throw 0;
+
         string tempString;
         int count = 1;
 
@@ -1489,13 +1516,14 @@ void Habbit_tracker::loadColorsFromFile(){
         }
         colorFile.close();  // Close the file
     }
-    catch(...){    // IF ANYTHING GOES WRONG DURING READING
+    catch(...){    // IF ANYTHING GOES WRONG DURING READING AND CONVERTING
         colorFile.close();
-        QMessageBox::critical(this, "Colors file Error", "Color file was corrupted, resetting all colors to default");
-        if (filesystem::exists(colorsFileName)) {     // Remove the file
-            filesystem::remove(colorsFileName);
-        }
-        loadColorsFromFile();                         // Call this function again to make default file
+        QMessageBox::critical(this, "Theme file Error", "Theme file was corrupted, Please check file. Setting all colors to default. File"
+                                                        ":" + QString::fromStdString(targetThemeFileName));
+        if(filesystem::exists(currentThemeFileName))   // Remove the current theme so when the loadColors is called again it can make it
+            filesystem::remove(currentThemeFileName);  // We are removing in case its not DEFAULT and can be handled
+
+        loadColorsFromFile();                          // Call this function again to make default file
         return;
     }
 
@@ -1503,50 +1531,66 @@ void Habbit_tracker::loadColorsFromFile(){
 }
 
 void Habbit_tracker::writeColorsToFile(){
-    ofstream newColorFile(colorsFileName);
-    newColorFile << "#WARNING: Do not put spaces inside the ()" << endl;
-    newColorFile << endl;
-    newColorFile << "#Main Colors:" << endl;
-    newColorFile << "main_darker_color=" << main_darker_color.toStdString() << endl;
-    newColorFile << "main_lighter_color=" << main_lighter_color.toStdString() << endl;
-    newColorFile << endl;
-    newColorFile << "#Buttons Colors:" << endl;
-    newColorFile << "button_color=" << button_color.toStdString() << endl;
-    newColorFile << "button_select_color=" << button_select_color.toStdString() << endl;
-    newColorFile << "button_disab_color=" << button_disab_color.toStdString() << endl;
-    newColorFile << endl;
-    newColorFile << "#Add Habit Colors:" << endl;
-    newColorFile << "keyboard_color=" << keyboard_color.toStdString() << endl;
-    newColorFile << "cancel_button_color=" << cancel_button_color.toStdString() << endl;
-    newColorFile << "save_button_color=" << save_button_color.toStdString() << endl;
-    newColorFile << endl;
-    newColorFile << "#Main Display Colors:" << endl;
-    newColorFile << "current_day_color=" << current_day_color.toStdString() << endl;
-    newColorFile << "is_checked_color=" << is_checked_color.toStdString() << endl;
-    newColorFile << "not_checked_color=" << not_checked_color.toStdString() << endl;
-    newColorFile << endl;
-    newColorFile << "#Calendar Colors:" << endl;
-    newColorFile << "month_header_color=" << month_header_color.toStdString() << endl;
-    newColorFile << "week_header_color=" << week_header_color.toStdString() << endl;
-    newColorFile << "complete_color=" << complete_color.toStdString() << endl;
-    newColorFile << "other_days_color=" << other_days_color.toStdString() << endl;
-    newColorFile << endl;
-    newColorFile << "#Remove Habit Colors:" << endl;
-    newColorFile << "remove_item_selec_color=" << remove_item_selec_color.toStdString() << endl;
+    ofstream newColorFile(targetThemeFileName);
+        newColorFile << "#WARNING: Do not put spaces inside the ()" << endl;
+        newColorFile << endl;
+        newColorFile << "#Main Colors:" << endl;
+        newColorFile << "main_darker_color=" << main_darker_color.toStdString() << endl;
+        newColorFile << "main_lighter_color=" << main_lighter_color.toStdString() << endl;
+        newColorFile << endl;
+        newColorFile << "#Buttons Colors:" << endl;
+        newColorFile << "button_color=" << button_color.toStdString() << endl;
+        newColorFile << "button_select_color=" << button_select_color.toStdString() << endl;
+        newColorFile << "button_disab_color=" << button_disab_color.toStdString() << endl;
+        newColorFile << endl;
+        newColorFile << "#Add Habit Colors:" << endl;
+        newColorFile << "keyboard_color=" << keyboard_color.toStdString() << endl;
+        newColorFile << "cancel_button_color=" << cancel_button_color.toStdString() << endl;
+        newColorFile << "save_button_color=" << save_button_color.toStdString() << endl;
+        newColorFile << endl;
+        newColorFile << "#Main Display Colors:" << endl;
+        newColorFile << "current_day_color=" << current_day_color.toStdString() << endl;
+        newColorFile << "is_checked_color=" << is_checked_color.toStdString() << endl;
+        newColorFile << "not_checked_color=" << not_checked_color.toStdString() << endl;
+        newColorFile << endl;
+        newColorFile << "#Calendar Colors:" << endl;
+        newColorFile << "month_header_color=" << month_header_color.toStdString() << endl;
+        newColorFile << "week_header_color=" << week_header_color.toStdString() << endl;
+        newColorFile << "complete_color=" << complete_color.toStdString() << endl;
+        newColorFile << "other_days_color=" << other_days_color.toStdString() << endl;
+        newColorFile << endl;
+        newColorFile << "#Remove Habit Colors:" << endl;
+        newColorFile << "remove_item_selec_color=" << remove_item_selec_color.toStdString() << endl;
     newColorFile.close();
 }
 
-void Habbit_tracker::resetColors(){
-    if (filesystem::exists(colorsFileName)) {
-        filesystem::remove(colorsFileName);
+
+
+
+
+// SLOTS FUNCTIONS:
+void Habbit_tracker::onCheckmarkToggled(int state){
+    QCheckBox *check = qobject_cast<QCheckBox*>(sender());                   // Saving the sender
+    if (!check)
+        return;
+
+    // Loop through the table to find where the checkbox is
+    for (int row = 0; row < ui->M_habitTable->rowCount(); ++row) {           // Looping through the rows
+        for (int col = 1; col <= 7; ++col) {                                 // Looping through the cols
+            QWidget *cellWidget = ui->M_habitTable->cellWidget(row, col);    // Casting the cellWidget
+            if (cellWidget) {
+                QCheckBox *cellCheck = cellWidget->findChild<QCheckBox*>();  // Grabbing the cell checkbox
+                if (cellCheck == check) {                                    // If this is the sender saved above
+                    allHabits[row].setDay(col - 1, state == Qt::Checked);    // Set the day
+                    allHabits[row].writeToFile(); // Save update to file     // Save the file
+                    loadHabits();
+                    return;
+                }
+            }
+        }
     }
-    loadColorsFromFile();
+
 }
-
-
-
-
-
 
 
 
