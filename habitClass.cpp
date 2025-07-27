@@ -104,6 +104,7 @@ bool habit::makeFromFile(){
     }
 
     string tempString;
+
     // Reading to set the name
     getline(habitFile,tempString,':'); // Ignoring the "name:"
     getline(habitFile,name);           // Setting the name
@@ -172,13 +173,9 @@ bool habit::makeFromFile(){
         history.push_back(newHistWeek);
     }
 
-    habitFile.close();
 
-    // Removing history if the history is more than 100 entries
-    if (history.size() > 100) {
-        history.erase(history.begin(), history.begin() + (history.size() - 100)); // Saving only the last 100
-        writeToFile(); // ReWritting the file
-    }
+
+    habitFile.close();
 
     return true;
 }

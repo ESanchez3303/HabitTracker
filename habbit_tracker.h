@@ -37,7 +37,7 @@ private:
     string colorsFileName = "colors.txt";
     QTimer *dayCheckTimer;
     QDate currentDate;
-    int historyIndex = 0;
+    int habitIndex = 0;
     QString dateFormat = "MM/dd/yyyy";
     int dayCheckerInterval = 60000; // 60 seconds (60 * 1000ms)
 
@@ -117,6 +117,7 @@ private:
     void spanButtonClicked();
     void updateSpanDisplay(QDate spanStart, QDate spanEnd, int habitIndex, QPushButton* pressedButton);
     void scrollButtonClicked();
+    void displayNextPreviousButtonClicked();
 
 
     // Helper Functions:

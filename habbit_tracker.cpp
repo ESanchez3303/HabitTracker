@@ -13,6 +13,7 @@
 #include <QColor>
 #include <QScrollBar>
 #include <fstream>
+#include <QRegularExpression>
 
 
 using namespace std;
@@ -87,6 +88,8 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     connect(ui->H_yearButton, &QPushButton::clicked, this, &Habbit_tracker::spanButtonClicked);
     connect(ui->H_scrollDownButton, &QPushButton::clicked, this, &Habbit_tracker::scrollButtonClicked);
     connect(ui->H_scrollUpButton, &QPushButton::clicked, this, &Habbit_tracker::scrollButtonClicked);
+    connect(ui->H_displayPreviousButton, &QPushButton::clicked, this, &Habbit_tracker::displayNextPreviousButtonClicked);
+    connect(ui->H_displayNextButton, &QPushButton::clicked, this, &Habbit_tracker::displayNextPreviousButtonClicked);
 
 
 
@@ -164,6 +167,12 @@ void Habbit_tracker::switchFrame(QFrame* target){
         ui->A_face->setStyleSheet("border-image: url(:/faces/images/nuetralFace.png) 0 0 0 0 stretch stretch;");
     }
     else if(target == ui->H_frame){
+
+        // Reseting the buttons
+        ui->H_lastWeekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+        ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+        ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+
         // Resetting the Top Text and the disabled buttons if any
         if(allHabits.size() <= 0){                                                      // If there are no habits, show mess. and disable buttons
             ui->H_habitName->setText("There are currently no habits");
@@ -172,32 +181,48 @@ void Habbit_tracker::switchFrame(QFrame* target){
             ui->H_lastWeekButton->setDisabled(true);
             ui->H_monthButton->setDisabled(true);
             ui->H_yearButton->setDisabled(true);
-            historyIndex = -1;
+            ui->H_displayNextButton->setDisabled(true);
+            ui->H_displayPreviousButton->setDisabled(true);
+            habitIndex = -1;
+
+            // Hiding the scroll since there is nothing
+            ui->H_scrollDownButton->show();
+            ui->H_scrollUpButton-> show();
+
+            // Setting date Text to empty
+            ui->H_dateSpan->setText("");
+
         }
         else{                                                                           // If there ARE habits, set to first, and enable buttons
             ui->H_habitName->setText(QString::fromStdString(allHabits[0].getName()));
-            ui->H_upArrow->setDisabled(true);     // Setting up arrow to be disabled because we are at the top already
+            ui->H_upArrow->setDisabled(true);                                  // Setting up arrow to be disabled because we are at the top already
             ui->H_downArrow->setDisabled((allHabits.size() == 1 ? true:false)); // If size = 1, then set down to disable, else to false
             ui->H_lastWeekButton->setDisabled(false);
             ui->H_monthButton->setDisabled(false);
             ui->H_yearButton->setDisabled(false);
-            historyIndex = 0;
+            habitIndex = 0;
+
+            // Setting the Year button to active
+            ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_select_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+
+            // Setting the sending parameters for the update to show the YEAR
+            QDate spanStart = QDate(currentDate.year(), 1, 1);
+            QDate spanEnd = QDate(currentDate.year(), 12, 31);
+            ui->H_dateSpan->setText(QString::number(spanStart.year()));
+
+            // Updating the calendar
+            updateSpanDisplay(spanStart, spanEnd, habitIndex, ui->H_yearButton);
+
+            // Showing the scroll since we are going into the year
+            ui->H_scrollDownButton->show();
+            ui->H_scrollUpButton-> show();
         }
 
-        // Resetting the date span text
-        ui->H_dateSpan->setText("Please select a span.");
 
 
-        ui->H_lastWeekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
-        ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
-        ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
 
-        // Clearing the span display
-        ui->H_spanDisplay->clear();
-        ui->H_spanDisplay->clearSpans();
-        ui->H_spanDisplay->clearSelection();
-        ui->H_spanDisplay->setRowCount(0);
-        ui->H_spanDisplay->setColumnCount(0);
+
+
     }
     target->show();
 }
@@ -512,7 +537,7 @@ void Habbit_tracker::H_backButtonClicked(){
 void Habbit_tracker::H_arrowClicked(){
     QPushButton *pressedButton = qobject_cast<QPushButton*>(sender());
     if (!pressedButton) return;
-    if(historyIndex == -1) return;
+    if(habitIndex == -1) return;
 
     // Clearing the spanDisplay since we switched and resetting the spanButtons
     ui->H_spanDisplay->clear();
@@ -528,23 +553,75 @@ void Habbit_tracker::H_arrowClicked(){
 
 
     // If there was only one, then the two buttons were disabled in the switchframe function
-    if(pressedButton == ui->H_upArrow){
-        historyIndex--;
-        ui->H_habitName->setText(QString::fromStdString(allHabits[historyIndex].getName()));
+    if(pressedButton == ui->H_upArrow)
+        habitIndex--;
+    else if(pressedButton == ui->H_downArrow)
+        habitIndex++;
+
+
+    ui->H_habitName->setText(QString::fromStdString(allHabits[habitIndex].getName()));
+    ui->H_upArrow  ->setDisabled((habitIndex <= 0 ? true:false));
+    ui->H_downArrow->setDisabled((habitIndex >= (allHabits.size()-1) ? true:false));
+
+
+
+    // Determine current span
+    QString spanText = ui->H_dateSpan->text().trimmed();
+    QDate spanStart, spanEnd;
+
+    if (spanText.contains(" - ")) {
+        // Format: "MM/dd/yyyy - MM/dd/yyyy"
+        QStringList parts = spanText.split(" - ");
+        if (parts.size() == 2) {
+            spanStart = QDate::fromString(parts[0], "MM/dd/yyyy");
+            spanEnd = QDate::fromString(parts[1], "MM/dd/yyyy");
+            if (spanStart.isValid() && spanEnd.isValid()) {
+                updateSpanDisplay(spanStart, spanEnd, habitIndex, ui->H_lastWeekButton);
+            }
+        }
     }
-    else if(pressedButton == ui->H_downArrow){
-        historyIndex++;
-        ui->H_habitName->setText(QString::fromStdString(allHabits[historyIndex].getName()));
+    else if (spanText.contains("January") || spanText.contains("February") || spanText.contains("March") ||
+             spanText.contains("April") || spanText.contains("May") || spanText.contains("June") ||
+             spanText.contains("July") || spanText.contains("August") || spanText.contains("September") ||
+             spanText.contains("October") || spanText.contains("November") || spanText.contains("December")) {
+        // Format: "Month yyyy"
+        QDate date = QDate::fromString("01 " + spanText, "dd MMMM yyyy");
+        if (date.isValid()) {
+            spanStart = QDate(date.year(), date.month(), 1);
+            spanEnd = spanStart.addMonths(1).addDays(-1);
+            updateSpanDisplay(spanStart, spanEnd, habitIndex, ui->H_monthButton);
+        }
+    }
+    else if (spanText.length() == 4 && spanText.toInt() > 1900) {
+        // Format: "yyyy"
+        int year = spanText.toInt();
+        spanStart = QDate(year, 1, 1);
+        spanEnd = QDate(year, 12, 31);
+        updateSpanDisplay(spanStart, spanEnd, habitIndex, ui->H_yearButton);
     }
 
-    ui->H_upArrow  ->setDisabled((historyIndex <= 0 ? true:false));
-    ui->H_downArrow->setDisabled((historyIndex >= (allHabits.size()-1) ? true:false));
+
+}
+
+void Habbit_tracker::scrollButtonClicked(){
+    QObject* btn = sender();
+    if (!btn) return;
+
+    int currentValue = ui->H_spanDisplay->verticalScrollBar()->value();
+    int step = 2;
+
+
+    if (btn == ui->H_scrollDownButton) {
+        ui->H_spanDisplay->verticalScrollBar()->setValue(currentValue + step);
+    } else if (btn == ui->H_scrollUpButton) {
+        ui->H_spanDisplay->verticalScrollBar()->setValue(currentValue - step);
+    }
 }
 
 void Habbit_tracker::spanButtonClicked(){
     QPushButton *pressedButton = qobject_cast<QPushButton*>(sender());
     if (!pressedButton) return;
-    if(historyIndex == -1) return;
+    if(habitIndex == -1) return;
 
     // NOTE: If history is empty then it will still paint everything, but it will not print any green
 
@@ -564,18 +641,103 @@ void Habbit_tracker::spanButtonClicked(){
         int currentDayOfWeek = currentDate.dayOfWeek();
         spanStart = currentDate.addDays(-currentDayOfWeek - 6);
         spanEnd = spanStart.addDays(6);
+
+        ui->H_dateSpan->setText(spanStart.toString(dateFormat) + " - " + spanEnd.toString(dateFormat));
     }
     else if(pressedButton == ui->H_monthButton){
         spanStart = QDate(currentDate.year(), currentDate.month(), 1);
         spanEnd = spanStart.addMonths(1).addDays(-1);
+
+        QString monthYear = spanStart.toString("MMMM yyyy");
+        ui->H_dateSpan->setText(monthYear);
     }
     else if(pressedButton == ui->H_yearButton){
         spanStart = QDate(currentDate.year(), 1, 1);
         spanEnd = QDate(currentDate.year(), 12, 31);
+
+        ui->H_dateSpan->setText(QString::number(spanStart.year()));
     }
 
-    ui->H_dateSpan->setText(spanStart.toString(dateFormat) + "-" + spanEnd.toString(dateFormat));
-    updateSpanDisplay(spanStart,spanEnd,historyIndex, pressedButton);
+
+
+    updateSpanDisplay(spanStart,spanEnd, habitIndex, pressedButton);
+
+    // Showing or Hiding the arrows if the year button is the one clicked
+    if(pressedButton == ui->H_yearButton){
+        ui->H_scrollDownButton->show();
+        ui->H_scrollUpButton->show();
+    }
+    else{
+        ui->H_scrollDownButton->hide();
+        ui->H_scrollUpButton->hide();
+    }
+
+    // Setting the next and previous buttons to be enabled
+    ui->H_displayNextButton->setDisabled(false);
+    ui->H_displayPreviousButton->setDisabled(false);
+}
+
+void Habbit_tracker::displayNextPreviousButtonClicked(){
+    QPushButton* button = qobject_cast<QPushButton*>(sender());
+    if (!button) return;
+
+
+    bool isNext = false;
+
+    if (button == ui->H_displayNextButton) {
+        isNext = true;
+    } else if (button == ui->H_displayPreviousButton) {
+        isNext = false;
+    } else {
+        return; // Unknown button, do nothing
+    }
+
+    QString text = ui->H_dateSpan->text();
+    QDate spanStart, spanEnd;
+    QPushButton* pressedButton = nullptr;
+
+    // Check if it's a weekly format like "Jul 21 - Jul 27"
+    if (text.contains("-")) {
+        QStringList parts = text.split("-");
+        if (parts.size() == 2) {
+            QDate start = QDate::fromString(parts[0].trimmed(), dateFormat);
+            if (start.isValid()) {
+                spanStart = start.addDays(isNext ? 7 : -7);
+                spanEnd = spanStart.addDays(6);
+                pressedButton = ui->H_lastWeekButton;
+            }
+        }
+        ui->H_dateSpan->setText(spanStart.toString(dateFormat) + " - " + spanEnd.toString(dateFormat));
+    }
+    // Check if it's a monthly format like "January 2025"
+    else if (QRegularExpression("^[A-Za-z]+ \\d{4}$").match(text).hasMatch()) {
+        QDate start = QDate::fromString(text, "MMMM yyyy");
+        if (start.isValid()) {
+            spanStart = isNext ? start.addMonths(1) : start.addMonths(-1);
+            spanEnd = spanStart.addMonths(1).addDays(-1);
+            pressedButton = ui->H_monthButton;
+        }
+        QString monthYear = spanStart.toString("MMMM yyyy");
+        ui->H_dateSpan->setText(monthYear);
+    }
+    // Otherwise assume it's a year like "2025"
+    else {
+        bool ok;
+        int year = text.toInt(&ok);
+        if (ok && year >= 1000 && year <= 9999) {
+            int newYear = isNext ? year + 1 : year - 1;
+            spanStart = QDate(newYear, 1, 1);
+            spanEnd = QDate(newYear, 12, 31);
+            pressedButton = ui->H_yearButton;
+        }
+        ui->H_dateSpan->setText(QString::number(spanStart.year()));
+    }
+
+
+    if (!spanStart.isValid() || !spanEnd.isValid() || !pressedButton)
+        return;
+
+    updateSpanDisplay(spanStart, spanEnd, habitIndex, pressedButton);
 }
 
 void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habitIndex, QPushButton* pressedButton){
@@ -855,23 +1017,6 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
         ui->H_spanDisplay->setRowHeight(r, rowHeight);
     }
 }
-
-void Habbit_tracker::scrollButtonClicked(){
-    QObject* btn = sender();
-    if (!btn) return;
-
-    int currentValue = ui->H_spanDisplay->verticalScrollBar()->value();
-    int step = 2;
-
-    if (btn == ui->H_scrollDownButton) {
-        ui->H_spanDisplay->verticalScrollBar()->setValue(currentValue + step);
-    } else if (btn == ui->H_scrollUpButton) {
-        ui->H_spanDisplay->verticalScrollBar()->setValue(currentValue - step);
-    }
-}
-
-
-
 
 
 
@@ -1228,7 +1373,8 @@ void Habbit_tracker::paintColors(){
     ui->H_lastWeekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
-
+    ui->H_displayNextButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+    ui->H_displayPreviousButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
 
 
     // Span Display:
