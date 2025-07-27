@@ -3086,7 +3086,7 @@ color:black;
       </property>
      </widget>
     </widget>
-    <widget class="QPushButton" name="H_lastWeekButton">
+    <widget class="QPushButton" name="H_weekButton">
      <property name="geometry">
       <rect>
        <x>284</x>
@@ -3109,7 +3109,7 @@ color:black;
       <string notr="true">background-color: rgb(255, 171, 69);</string>
      </property>
      <property name="text">
-      <string>Last Week</string>
+      <string>Week</string>
      </property>
     </widget>
     <widget class="QFrame" name="H_frame1_2">
@@ -3820,7 +3820,7 @@ color:black;
       <string>V</string>
      </property>
     </widget>
-    <zorder>H_lastWeekButton</zorder>
+    <zorder>H_weekButton</zorder>
     <zorder>H_monthButton</zorder>
     <zorder>H_yearButton</zorder>
     <zorder>H_spanDisplay</zorder>
@@ -3831,8 +3831,8 @@ color:black;
     <zorder>H_frame1_2</zorder>
    </widget>
    <zorder>A_frame</zorder>
-   <zorder>M_frame</zorder>
    <zorder>H_frame</zorder>
+   <zorder>M_frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -39,7 +39,7 @@ private:
     QDate currentDate;
     int habitIndex = 0;
     QString dateFormat = "MM/dd/yyyy";
-    int dayCheckerInterval = 60000; // 60 seconds (60 * 1000ms)
+    int dayCheckerInterval = 5000; // 60 seconds (60 * 1000ms)
 
 
     // Changable Variables: ==========================================
@@ -112,10 +112,11 @@ private:
 
 
     // History Frame Functions:
+    string currentTab = "";
     void H_backButtonClicked();
     void H_arrowClicked();
     void spanButtonClicked();
-    void updateSpanDisplay(QDate spanStart, QDate spanEnd, int habitIndex, QPushButton* pressedButton);
+    void updateSpanDisplay(QDate spanStart, QDate spanEnd, int habitIndex);
     void scrollButtonClicked();
     void displayNextPreviousButtonClicked();
 

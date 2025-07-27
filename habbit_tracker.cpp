@@ -18,15 +18,10 @@
 
 using namespace std;
 
-
-
-
-
+// CONSTRUCTOR AND DESTRUCTOR
 Habbit_tracker::~Habbit_tracker(){
     delete ui;
 }
-
-
 
 Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui::Habbit_tracker){
     ui->setupUi(this);
@@ -83,7 +78,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     connect(ui->H_backButton, &QPushButton::clicked, this, &Habbit_tracker::H_backButtonClicked);
     connect(ui->H_downArrow, &QPushButton::clicked, this, &Habbit_tracker::H_arrowClicked);
     connect(ui->H_upArrow, &QPushButton::clicked, this, &Habbit_tracker::H_arrowClicked);
-    connect(ui->H_lastWeekButton, &QPushButton::clicked, this, &Habbit_tracker::spanButtonClicked);
+    connect(ui->H_weekButton, &QPushButton::clicked, this, &Habbit_tracker::spanButtonClicked);
     connect(ui->H_monthButton, &QPushButton::clicked, this, &Habbit_tracker::spanButtonClicked);
     connect(ui->H_yearButton, &QPushButton::clicked, this, &Habbit_tracker::spanButtonClicked);
     connect(ui->H_scrollDownButton, &QPushButton::clicked, this, &Habbit_tracker::scrollButtonClicked);
@@ -100,21 +95,22 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     currentDate = QDate::currentDate();
     //currentDate = QDate(2025, 7, 27); // <---- Sunday
     connect(dayCheckTimer, &QTimer::timeout, this, [=]() mutable {
-        QDate now = QDate::currentDate();
-        //QDate now = QDate(2025, 7, 28); // <--- Monday | TESTING: moving into a new week
+        //QDate now = QDate::currentDate();
+        QDate now = QDate(2025, 7, 28); // <--- Monday | TESTING: moving into a new week
         if (now != currentDate) {                    // If now has moved to a different date than saved currentDate
-            if (currentDate.dayOfWeek() == 7) {      // If it was sunday, we need to save all past week and set new week up
+            currentDate = now;                       // Updates the currentday to today to get ready for check of tomorrow
+            if (currentDate.dayOfWeek() == 1) {      // If the new day is a MONDAY, then we need to save the previous week
                 for(auto &currHabit:allHabits){
-                    currHabit.saveWeek();            // Pushes week into history (vector of weeks), then resets the week bools to 0
+                    currHabit.saveWeek(currentDate); // Pushes week into history (vector of weeks), then resets the week bools to 0
                     currHabit.writeToFile();         // Saves the week to its file
                 }
             }
-            currentDate = now;                       // Updates the currentday to today to get ready for check of tomorrow
+
             loadHabits();                            // Clears the allHabits and the habitTable and resets again from the files
         }
     });
 
-    dayCheckTimer->start(dayCheckerInterval);                     // every minute check if we are in a new day
+    dayCheckTimer->start(dayCheckerInterval);       // every <intervalAmount>,  check if we are in a new day
 
 
 
@@ -169,7 +165,7 @@ void Habbit_tracker::switchFrame(QFrame* target){
     else if(target == ui->H_frame){
 
         // Reseting the buttons
-        ui->H_lastWeekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+        ui->H_weekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
         ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
         ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
 
@@ -178,7 +174,7 @@ void Habbit_tracker::switchFrame(QFrame* target){
             ui->H_habitName->setText("There are currently no habits");
             ui->H_upArrow->setDisabled(true);
             ui->H_downArrow->setDisabled(true);
-            ui->H_lastWeekButton->setDisabled(true);
+            ui->H_weekButton->setDisabled(true);
             ui->H_monthButton->setDisabled(true);
             ui->H_yearButton->setDisabled(true);
             ui->H_displayNextButton->setDisabled(true);
@@ -186,8 +182,8 @@ void Habbit_tracker::switchFrame(QFrame* target){
             habitIndex = -1;
 
             // Hiding the scroll since there is nothing
-            ui->H_scrollDownButton->show();
-            ui->H_scrollUpButton-> show();
+            ui->H_scrollDownButton->hide();
+            ui->H_scrollUpButton->hide();
 
             // Setting date Text to empty
             ui->H_dateSpan->setText("");
@@ -197,7 +193,7 @@ void Habbit_tracker::switchFrame(QFrame* target){
             ui->H_habitName->setText(QString::fromStdString(allHabits[0].getName()));
             ui->H_upArrow->setDisabled(true);                                  // Setting up arrow to be disabled because we are at the top already
             ui->H_downArrow->setDisabled((allHabits.size() == 1 ? true:false)); // If size = 1, then set down to disable, else to false
-            ui->H_lastWeekButton->setDisabled(false);
+            ui->H_weekButton->setDisabled(false);
             ui->H_monthButton->setDisabled(false);
             ui->H_yearButton->setDisabled(false);
             habitIndex = 0;
@@ -210,13 +206,19 @@ void Habbit_tracker::switchFrame(QFrame* target){
             QDate spanEnd = QDate(currentDate.year(), 12, 31);
             ui->H_dateSpan->setText(QString::number(spanStart.year()));
 
+
+            // Setting the current tab
+            currentTab = "year";
             // Updating the calendar
-            updateSpanDisplay(spanStart, spanEnd, habitIndex, ui->H_yearButton);
+            updateSpanDisplay(spanStart, spanEnd, habitIndex);
 
             // Showing the scroll since we are going into the year
             ui->H_scrollDownButton->show();
             ui->H_scrollUpButton-> show();
+
+
         }
+
 
 
 
@@ -547,7 +549,7 @@ void Habbit_tracker::H_arrowClicked(){
     ui->H_spanDisplay->setColumnCount(0);
 
     // Reseting the colors
-    ui->H_lastWeekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+    ui->H_weekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
 
@@ -569,35 +571,35 @@ void Habbit_tracker::H_arrowClicked(){
     QString spanText = ui->H_dateSpan->text().trimmed();
     QDate spanStart, spanEnd;
 
-    if (spanText.contains(" - ")) {
+    if (currentTab == "week") {
         // Format: "MM/dd/yyyy - MM/dd/yyyy"
         QStringList parts = spanText.split(" - ");
         if (parts.size() == 2) {
             spanStart = QDate::fromString(parts[0], "MM/dd/yyyy");
             spanEnd = QDate::fromString(parts[1], "MM/dd/yyyy");
             if (spanStart.isValid() && spanEnd.isValid()) {
-                updateSpanDisplay(spanStart, spanEnd, habitIndex, ui->H_lastWeekButton);
+                updateSpanDisplay(spanStart, spanEnd, habitIndex);
             }
         }
+        ui->H_weekButton->setStyleSheet("QPushButton { background-color: rgb" + button_select_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     }
-    else if (spanText.contains("January") || spanText.contains("February") || spanText.contains("March") ||
-             spanText.contains("April") || spanText.contains("May") || spanText.contains("June") ||
-             spanText.contains("July") || spanText.contains("August") || spanText.contains("September") ||
-             spanText.contains("October") || spanText.contains("November") || spanText.contains("December")) {
+    else if (currentTab == "month"){
         // Format: "Month yyyy"
         QDate date = QDate::fromString("01 " + spanText, "dd MMMM yyyy");
         if (date.isValid()) {
             spanStart = QDate(date.year(), date.month(), 1);
             spanEnd = spanStart.addMonths(1).addDays(-1);
-            updateSpanDisplay(spanStart, spanEnd, habitIndex, ui->H_monthButton);
+            updateSpanDisplay(spanStart, spanEnd, habitIndex);
         }
+        ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_select_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     }
-    else if (spanText.length() == 4 && spanText.toInt() > 1900) {
+    else if (currentTab == "year") {
         // Format: "yyyy"
         int year = spanText.toInt();
         spanStart = QDate(year, 1, 1);
         spanEnd = QDate(year, 12, 31);
-        updateSpanDisplay(spanStart, spanEnd, habitIndex, ui->H_yearButton);
+        updateSpanDisplay(spanStart, spanEnd, habitIndex);
+        ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_select_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     }
 
 
@@ -626,7 +628,7 @@ void Habbit_tracker::spanButtonClicked(){
     // NOTE: If history is empty then it will still paint everything, but it will not print any green
 
     // Reseting the colors for all the buttons
-    ui->H_lastWeekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+    ui->H_weekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
 
@@ -637,12 +639,13 @@ void Habbit_tracker::spanButtonClicked(){
     QDate spanEnd;
 
     // Setting the color to be set as currently in this tab
-    if(pressedButton == ui->H_lastWeekButton){
+    if(pressedButton == ui->H_weekButton){
         int currentDayOfWeek = currentDate.dayOfWeek();
         spanStart = currentDate.addDays(-currentDayOfWeek - 6);
         spanEnd = spanStart.addDays(6);
 
         ui->H_dateSpan->setText(spanStart.toString(dateFormat) + " - " + spanEnd.toString(dateFormat));
+        currentTab = "week";
     }
     else if(pressedButton == ui->H_monthButton){
         spanStart = QDate(currentDate.year(), currentDate.month(), 1);
@@ -650,17 +653,21 @@ void Habbit_tracker::spanButtonClicked(){
 
         QString monthYear = spanStart.toString("MMMM yyyy");
         ui->H_dateSpan->setText(monthYear);
+
+        currentTab = "month";
     }
     else if(pressedButton == ui->H_yearButton){
         spanStart = QDate(currentDate.year(), 1, 1);
         spanEnd = QDate(currentDate.year(), 12, 31);
 
         ui->H_dateSpan->setText(QString::number(spanStart.year()));
+
+        currentTab = "year";
     }
 
 
 
-    updateSpanDisplay(spanStart,spanEnd, habitIndex, pressedButton);
+    updateSpanDisplay(spanStart,spanEnd, habitIndex);
 
     // Showing or Hiding the arrows if the year button is the one clicked
     if(pressedButton == ui->H_yearButton){
@@ -694,53 +701,53 @@ void Habbit_tracker::displayNextPreviousButtonClicked(){
 
     QString text = ui->H_dateSpan->text();
     QDate spanStart, spanEnd;
-    QPushButton* pressedButton = nullptr;
 
     // Check if it's a weekly format like "Jul 21 - Jul 27"
-    if (text.contains("-")) {
+    if (currentTab == "week") {
         QStringList parts = text.split("-");
         if (parts.size() == 2) {
             QDate start = QDate::fromString(parts[0].trimmed(), dateFormat);
             if (start.isValid()) {
                 spanStart = start.addDays(isNext ? 7 : -7);
                 spanEnd = spanStart.addDays(6);
-                pressedButton = ui->H_lastWeekButton;
             }
         }
         ui->H_dateSpan->setText(spanStart.toString(dateFormat) + " - " + spanEnd.toString(dateFormat));
     }
     // Check if it's a monthly format like "January 2025"
-    else if (QRegularExpression("^[A-Za-z]+ \\d{4}$").match(text).hasMatch()) {
+    else if (currentTab == "month") {
         QDate start = QDate::fromString(text, "MMMM yyyy");
         if (start.isValid()) {
             spanStart = isNext ? start.addMonths(1) : start.addMonths(-1);
             spanEnd = spanStart.addMonths(1).addDays(-1);
-            pressedButton = ui->H_monthButton;
         }
         QString monthYear = spanStart.toString("MMMM yyyy");
         ui->H_dateSpan->setText(monthYear);
     }
     // Otherwise assume it's a year like "2025"
-    else {
+    else if (currentTab == "year"){
         bool ok;
         int year = text.toInt(&ok);
         if (ok && year >= 1000 && year <= 9999) {
             int newYear = isNext ? year + 1 : year - 1;
             spanStart = QDate(newYear, 1, 1);
             spanEnd = QDate(newYear, 12, 31);
-            pressedButton = ui->H_yearButton;
         }
         ui->H_dateSpan->setText(QString::number(spanStart.year()));
     }
+    else{
+        QMessageBox::critical(this, "ERORR", "Error in next/previous, currentTab is: " + QString::fromStdString(currentTab));
+        return;
+    }
 
 
-    if (!spanStart.isValid() || !spanEnd.isValid() || !pressedButton)
+    if (!spanStart.isValid() || !spanEnd.isValid())
         return;
 
-    updateSpanDisplay(spanStart, spanEnd, habitIndex, pressedButton);
+    updateSpanDisplay(spanStart, spanEnd, habitIndex);
 }
 
-void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habitIndex, QPushButton* pressedButton){
+void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habitIndex){
     if (habitIndex < 0 || habitIndex >= allHabits.size()) return;
 
     habit& currentHabit = allHabits[habitIndex];
@@ -763,7 +770,7 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
     QColor completedColor_ = stringToColor(complete_color);
     QColor otherDaysColor_ = stringToColor(other_days_color);
 
-    if (pressedButton == ui->H_lastWeekButton) {
+    if (currentTab == "week") {
         ui->H_spanDisplay->setShowGrid(true);
         ui->H_spanDisplay->horizontalHeader()->setVisible(true);
         columns = 7;
@@ -802,7 +809,7 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
 
 
 
-    else if (pressedButton == ui->H_monthButton) {
+    else if (currentTab == "month") {
         ui->H_spanDisplay->setShowGrid(true);
         ui->H_spanDisplay->horizontalHeader()->setVisible(true);
         int totalDays = spanStart.daysTo(spanEnd) + 1;
@@ -864,7 +871,7 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
 
 
 
-    else {
+    else if (currentTab == "year"){
         ui->H_spanDisplay->clear();
 
         // === Configurable colors ===
@@ -994,6 +1001,10 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
         columns = totalCols;
         rows = totalRows;
     }
+    else{
+        QMessageBox::critical(this, "ERORR", "Error in next/previous, updateSpanDisplay is: " + QString::fromStdString(currentTab));
+        return;
+    }
 
 
 
@@ -1082,10 +1093,14 @@ void Habbit_tracker::loadHabits(){
 
             // Making and loading object using name and filesPath
             habit newHabit(habitName, filesPath);
-            newHabit.makeFromFile();
+            string currentFileResults = newHabit.makeFromFile();
 
-            // Copying the object into the vector
-            allHabits.push_back(newHabit);
+            if(currentFileResults != ""){        // If the entry is invalid, show the error and DO NOT add to the vector
+                QMessageBox::critical(this, "ERROR: Will not add [" + QString::fromStdString(habitName) + "]",
+                                      QString::fromStdString(currentFileResults));
+            }
+            else
+                allHabits.push_back(newHabit);   // If the entry is valid, then add to the vector
         }
     }
 
@@ -1245,7 +1260,6 @@ void Habbit_tracker::onCheckmarkToggled(int state){
 
 
 // COLOR FUNCTIONS:
-
 void Habbit_tracker::paintColors(){
     // Main Frame ===========================================================================================
     // Frame:
@@ -1370,7 +1384,7 @@ void Habbit_tracker::paintColors(){
     ui->H_backButton->setStyleSheet("background-color: rgb" + button_color + ";");
     ui->H_scrollDownButton->setStyleSheet("background-color: rgb" + button_color + ";");
     ui->H_scrollUpButton->setStyleSheet("background-color: rgb" + button_color + ";");
-    ui->H_lastWeekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+    ui->H_weekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
     ui->H_displayNextButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
@@ -1440,39 +1454,52 @@ void Habbit_tracker::loadColorsFromFile(){
     }
 
     // File was found, read and set values from the file
-    string tempString;
-    int count = 1;
-    while(getline(colorFile, tempString)){
-        if(tempString.empty())              // Skipping empty lines
-            continue;
-        if(tempString[0] == '#')            // Skipping lines with # in front
-            continue;
+    try{
+        string tempString;
+        int count = 1;
+
+        while(getline(colorFile, tempString)){
+            if(tempString.empty())              // Skipping empty lines
+                continue;
+            if(tempString[0] == '#')            // Skipping lines with # in front
+                continue;
 
 
-        tempString = tempString.substr(tempString.find('=') + 1); // Removing everything up to inclusive: "="
-        switch(count){
-        case 1 :main_darker_color       = QString::fromStdString(tempString);
-        case 2 :main_lighter_color      = QString::fromStdString(tempString);
-        case 3 :button_color            = QString::fromStdString(tempString);
-        case 4 :button_select_color     = QString::fromStdString(tempString);
-        case 5 :button_disab_color      = QString::fromStdString(tempString);
-        case 6 :keyboard_color          = QString::fromStdString(tempString);
-        case 7 :cancel_button_color     = QString::fromStdString(tempString);
-        case 8 :save_button_color       = QString::fromStdString(tempString);
-        case 9 :current_day_color       = QString::fromStdString(tempString);
-        case 10:is_checked_color        = QString::fromStdString(tempString);
-        case 11:not_checked_color       = QString::fromStdString(tempString);
-        case 12:month_header_color      = QString::fromStdString(tempString);
-        case 13:week_header_color       = QString::fromStdString(tempString);
-        case 14:complete_color          = QString::fromStdString(tempString);
-        case 15:other_days_color        = QString::fromStdString(tempString);
-        case 16:remove_item_selec_color = QString::fromStdString(tempString);
+            tempString = tempString.substr(tempString.find('=') + 1); // Removing everything up to inclusive: "="
+            switch(count){
+            case 1 :main_darker_color       = QString::fromStdString(tempString);
+            case 2 :main_lighter_color      = QString::fromStdString(tempString);
+            case 3 :button_color            = QString::fromStdString(tempString);
+            case 4 :button_select_color     = QString::fromStdString(tempString);
+            case 5 :button_disab_color      = QString::fromStdString(tempString);
+            case 6 :keyboard_color          = QString::fromStdString(tempString);
+            case 7 :cancel_button_color     = QString::fromStdString(tempString);
+            case 8 :save_button_color       = QString::fromStdString(tempString);
+            case 9 :current_day_color       = QString::fromStdString(tempString);
+            case 10:is_checked_color        = QString::fromStdString(tempString);
+            case 11:not_checked_color       = QString::fromStdString(tempString);
+            case 12:month_header_color      = QString::fromStdString(tempString);
+            case 13:week_header_color       = QString::fromStdString(tempString);
+            case 14:complete_color          = QString::fromStdString(tempString);
+            case 15:other_days_color        = QString::fromStdString(tempString);
+            case 16:remove_item_selec_color = QString::fromStdString(tempString);
+            }
+
+            count++;
         }
-
-        count++;
+        colorFile.close();  // Close the file
+    }
+    catch(...){    // IF ANYTHING GOES WRONG DURING READING
+        colorFile.close();
+        QMessageBox::critical(this, "Colors file Error", "Color file was corrupted, resetting all colors to default");
+        if (filesystem::exists(colorsFileName)) {     // Remove the file
+            filesystem::remove(colorsFileName);
+        }
+        loadColorsFromFile();                         // Call this function again to make default file
+        return;
     }
 
-    colorFile.close();
+
 }
 
 void Habbit_tracker::writeColorsToFile(){

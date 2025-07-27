@@ -32,11 +32,11 @@ public:
     QString dateFormat = "MM/dd/yyyy";
 
     // Saves the week into the history (NOTE: this should be called when date goes from SUN to MON)
-    void saveWeek();
+    void saveWeek(QDate today);
 
     // Files Functions:
     bool writeToFile();
-    bool makeFromFile();
+    string makeFromFile();
 
     // Get Functions
     string getName() { return name; }

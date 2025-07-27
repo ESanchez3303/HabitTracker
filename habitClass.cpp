@@ -1,6 +1,8 @@
 #include "habitClass.h"
 #include <iostream>
 #include <fstream>
+#include <QMessageBox>
+
 using namespace std;
 
 // CONSTRUCTOR:
@@ -25,11 +27,19 @@ habit::habit(string newName, string newFilePath){
 
 
 
-void habit::saveWeek(){
-    historyWeek newEntry;
+void habit::saveWeek(QDate today){
 
-    // Get current date
-    QDate today = QDate::currentDate();
+    cout << "History BEFORE: " << endl;
+    for(auto &entry : history){
+        cout << entry.start.toString(dateFormat).toStdString() << " - ";
+        cout << entry.end.toString(dateFormat).toStdString() << " | ";
+        for(auto &value : entry.values)
+            cout << value;
+        cout << endl;
+    }
+
+    // Making new historyWeek object
+    historyWeek newEntry;
 
     // Find the week start date and end date and SET into the history week
     newEntry.start = today.addDays(-today.dayOfWeek() - 6);
@@ -44,6 +54,15 @@ void habit::saveWeek(){
     // Reset the week to all "false"
     for(auto &value : week){
         value = 0;
+    }
+
+    cout << "History AFTER: " << endl;
+    for(auto &entry : history){
+        cout << entry.start.toString(dateFormat).toStdString() << " - ";
+        cout << entry.end.toString(dateFormat).toStdString() << " | ";
+        for(auto &value : entry.values)
+            cout << value;
+        cout << endl;
     }
 
     // Leave the writting for outside of this function by calling the writeToFile() function
@@ -87,7 +106,7 @@ bool habit::writeToFile(){
         for(auto& value:entry.values){
             habitFile << value;
         }
-        cout << endl;
+        habitFile << endl;
     }
 
     habitFile.close();
@@ -95,31 +114,41 @@ bool habit::writeToFile(){
     return true;
 }
 
-bool habit::makeFromFile(){
+string habit::makeFromFile(){
     // Opening file with <name_name>.txt
     ifstream habitFile(fileName);
     if(!habitFile){
-        // ERROR: could not open file when reading
-        return false;
+        // ERROR: could not open file when reading, just return false
+        return "Could not open the file:" + fileName;
     }
 
     string tempString;
 
+    name = "";
+
+    try{
     // Reading to set the name
     getline(habitFile,tempString,':'); // Ignoring the "name:"
     getline(habitFile,name);           // Setting the name
 
 
-    // Reading to set the week
     getline(habitFile,tempString,':'); // Ignoring the "week:"
-    getline(habitFile,tempString);     // Saving the week info
+    }
+    catch(...){
+        habitFile.close();
+        return "Could not read correctly the name/week labels. File:" + fileName;
+    }
 
+    if(name.empty()){
+        habitFile.close();
+        return "Could not set name correctly. File:" + fileName;
+    }
 
     // Parsing the week
+    getline(habitFile,tempString);     // Saving the week info
     if((int)tempString.length() != 7){
-        cerr << "ERROR: the week string is not len:7, cannot parse. File:" << fileName << ":" << endl;
         habitFile.close();
-        return false;
+        return "The current week string len. is not 7. File:" + fileName;
     }
 
     int dayCounter = 0;
@@ -130,15 +159,14 @@ bool habit::makeFromFile(){
         else if(ch == '1')
             week[dayCounter] = 1;
         else{
-            cerr << "ERROR: the week string has invalid characters. File:" << fileName << ":" << tempString << endl;
             habitFile.close();
-            return false;
+            return "The current week has invalid character. File:" + fileName;
         }
         dayCounter++;
     }
 
 
-    // Reading the history file:
+    // Reading the history section:
     history.clear();
     while(getline(habitFile,tempString)){
         if(tempString.empty()) // only the last line should be empty
@@ -148,6 +176,11 @@ bool habit::makeFromFile(){
         string start = tempString.substr(1, 10);
         string end = tempString.substr(12, 10);
         string data  = tempString.substr(tempString.find(']')+1);
+
+        if((int)data.length() != 7){
+            habitFile.close();
+            return "History line len. is not 7. File:" + fileName + " | Line:" + data;
+        }
 
         // Parsing through the data to set newWeek entry
         array<bool,7> newWeek = {0,0,0,0,0,0,0};
@@ -159,9 +192,8 @@ bool habit::makeFromFile(){
             else if(ch == '1')
                 newWeek[dayCounter] = 1;
             else{
-                cerr << "ERROR: history line has invalid characters. File:" << fileName << ":" << tempString << endl;
                 habitFile.close();
-                return false;
+                return "History line has invalid character. File:" + fileName + " | Line:" + tempString;
             }
             dayCounter++;
         }
@@ -170,14 +202,32 @@ bool habit::makeFromFile(){
         newHistWeek.end = QDate::fromString(end.c_str(),dateFormat);
         newHistWeek.values = newWeek;
 
+        if (!newHistWeek.start.isValid() || !newHistWeek.end.isValid()) {
+            habitFile.close();
+            return "History line has invalid dates. File:" + fileName + " | Start:" + start + ", End:" + end;
+        }
+
+        if(newHistWeek.start.addDays(6) != newHistWeek.end){
+            habitFile.close();
+            return "History line is not 7 days. File:" + fileName + " | START:" + newHistWeek.start.toString(dateFormat).toStdString()
+                   + ", END:" + newHistWeek.end.toString(dateFormat).toStdString();
+        }
+
+        if(history.size() != 0){ // If there are currently some entries in the history
+            if(newHistWeek.start <= history[history.size()-1].end){ // If this new entry start is BEFORE the last entry end
+                habitFile.close();
+                return "History lines are not in order. START:" + newHistWeek.start.toString(dateFormat).toStdString() +
+                       " is BEFORE/EQUAL TO the previous END:" + history[history.size()-1].end.toString(dateFormat).toStdString();
+            }
+
+        }
+
         history.push_back(newHistWeek);
     }
 
-
-
     habitFile.close();
 
-    return true;
+    return "";
 }
 
 
