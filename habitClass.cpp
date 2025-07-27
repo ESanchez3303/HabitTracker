@@ -26,9 +26,27 @@ habit::habit(string newName, string newFilePath){
 
 
 void habit::saveWeek(){
-    //history.push_back(week);    // Pushes into the history the current week
-    //for(auto &day:week)         // Resets the week to start a new one
-    //    day = 0;
+    historyWeek newEntry;
+
+    // Get current date
+    QDate today = QDate::currentDate();
+
+    // Find the week start date and end date and SET into the history week
+    newEntry.start = today.addDays(-today.dayOfWeek() - 6);
+    newEntry.end = newEntry.start.addDays(6);
+
+    // Load the values of current week into the historyWeek
+    newEntry.values = week;
+
+    // Push the week into the history
+    history.push_back(newEntry);
+
+    // Reset the week to all "false"
+    for(auto &value : week){
+        value = 0;
+    }
+
+    // Leave the writting for outside of this function by calling the writeToFile() function
 }
 
 

@@ -523,7 +523,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(255, 255, 203);</string>
+     <string notr="true">background-color:rgb(253, 255, 222); color:black;</string>
     </property>
     <property name="frameShape">
      <enum>QFrame::Shape::StyledPanel</enum>
@@ -776,7 +776,7 @@
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">color:black; background-color:rgb(255, 255, 187)</string>
+      <string notr="true">background-color:rgb(255, 255, 187)</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::Shape::Box</enum>
@@ -878,7 +878,8 @@
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">color:black; background-color:rgb(255, 255, 187)</string>
+      <string notr="true">color:black; background-color:rgb(255, 255, 187)
+</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::Shape::Box</enum>
@@ -986,7 +987,7 @@
       <cursorShape>PointingHandCursor</cursorShape>
      </property>
      <property name="styleSheet">
-      <string notr="true">color:black; background-color: rgb(218, 215, 195)</string>
+      <string notr="true">color:black;background-color: rgb(255, 233, 176)</string>
      </property>
      <property name="text">
       <string>Add</string>
@@ -995,9 +996,9 @@
     <widget class="QLabel" name="M_date">
      <property name="geometry">
       <rect>
-       <x>638</x>
-       <y>509</y>
-       <width>374</width>
+       <x>640</x>
+       <y>510</y>
+       <width>278</width>
        <height>35</height>
       </rect>
      </property>
@@ -1008,7 +1009,7 @@
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">color:black; background-color:rgb(255, 255, 187)</string>
+      <string notr="true">background-color: rgb(255, 255, 187)</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::Shape::NoFrame</enum>
@@ -1024,41 +1025,6 @@
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="M_dateTitle">
-     <property name="geometry">
-      <rect>
-       <x>263</x>
-       <y>509</y>
-       <width>385</width>
-       <height>35</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Times New Roman</family>
-       <pointsize>16</pointsize>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color:black; background-color:rgb(255, 255, 187)</string>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Shape::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Shadow::Plain</enum>
-     </property>
-     <property name="lineWidth">
-      <number>1</number>
-     </property>
-     <property name="text">
-      <string>Today's Date:    </string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
     </widget>
     <widget class="QPushButton" name="M_removeButton">
@@ -1081,7 +1047,7 @@
       <cursorShape>PointingHandCursor</cursorShape>
      </property>
      <property name="styleSheet">
-      <string notr="true">color:black; background-color: rgb(218, 215, 195)</string>
+      <string notr="true">color:black;background-color: rgb(255, 233, 176)</string>
      </property>
      <property name="text">
       <string>Remove</string>
@@ -1097,8 +1063,7 @@
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(214, 209, 158);
-color:black;</string>
+      <string notr="true"/>
      </property>
      <property name="frameShape">
       <enum>QFrame::Shape::StyledPanel</enum>
@@ -1282,7 +1247,7 @@ color:black;</string>
       <cursorShape>PointingHandCursor</cursorShape>
      </property>
      <property name="styleSheet">
-      <string notr="true">color:black; background-color: rgb(218, 215, 195)</string>
+      <string notr="true">color:black;background-color: rgb(255, 233, 176)</string>
      </property>
      <property name="text">
       <string>View History</string>
@@ -1291,9 +1256,9 @@ color:black;</string>
     <widget class="QLabel" name="M_buttonFrame_3">
      <property name="geometry">
       <rect>
-       <x>250</x>
+       <x>254</x>
        <y>500</y>
-       <width>771</width>
+       <width>768</width>
        <height>51</height>
       </rect>
      </property>
@@ -1322,7 +1287,7 @@ color:black;</string>
       <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QPushButton" name="M_addHabitButton_2">
+    <widget class="QPushButton" name="M_settingsButton">
      <property name="geometry">
       <rect>
        <x>953</x>
@@ -1344,30 +1309,65 @@ color:black;</string>
       <cursorShape>PointingHandCursor</cursorShape>
      </property>
      <property name="styleSheet">
-      <string notr="true">color:black; background-color: rgb(218, 215, 195)</string>
+      <string notr="true">color:black;background-color: rgb(255, 233, 176)</string>
      </property>
      <property name="text">
       <string>Settings</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="M_dateTitle">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>510</y>
+       <width>350</width>
+       <height>35</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Times New Roman</family>
+       <pointsize>16</pointsize>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 187)</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>1</number>
+     </property>
+     <property name="text">
+      <string>Today's Date:    </string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
     </widget>
     <zorder>M_buttonFrame</zorder>
     <zorder>M_sunLabel</zorder>
     <zorder>M_monLabel</zorder>
     <zorder>M_tueLabel</zorder>
-    <zorder>M_wedLabel</zorder>
     <zorder>M_thuLabel</zorder>
     <zorder>M_friLabel</zorder>
     <zorder>M_satLabel</zorder>
     <zorder>M_addHabitButton</zorder>
     <zorder>M_removeButton</zorder>
     <zorder>M_buttonFrame_2</zorder>
+    <zorder>M_buttonFrame_3</zorder>
+    <zorder>M_date</zorder>
+    <zorder>M_settingsButton</zorder>
+    <zorder>M_habitTable</zorder>
+    <zorder>M_dateTitle</zorder>
+    <zorder>M_wedLabel</zorder>
     <zorder>M_viewHistoryButton</zorder>
     <zorder>M_removeFrame</zorder>
-    <zorder>M_habitTable</zorder>
-    <zorder>M_buttonFrame_3</zorder>
-    <zorder>M_dateTitle</zorder>
-    <zorder>M_date</zorder>
-    <zorder>M_addHabitButton_2</zorder>
    </widget>
    <widget class="QFrame" name="A_frame">
     <property name="geometry">
@@ -1379,7 +1379,7 @@ color:black;</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(216, 216, 209)</string>
+     <string notr="true">background-color: rgb(216, 216, 209); color: black;</string>
     </property>
     <property name="frameShape">
      <enum>QFrame::Shape::StyledPanel</enum>
@@ -1393,7 +1393,7 @@ color:black;</string>
        <x>0</x>
        <y>0</y>
        <width>1024</width>
-       <height>50</height>
+       <height>54</height>
       </rect>
      </property>
      <property name="font">
@@ -1404,16 +1404,16 @@ color:black;</string>
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">color:black; background-color:rgb(255, 255, 187)</string>
+      <string notr="true">color:black; background-color:rgb(255, 255, 187);</string>
      </property>
      <property name="frameShape">
-      <enum>QFrame::Shape::NoFrame</enum>
+      <enum>QFrame::Shape::Box</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Shadow::Plain</enum>
+      <enum>QFrame::Shadow::Raised</enum>
      </property>
      <property name="lineWidth">
-      <number>1</number>
+      <number>2</number>
      </property>
      <property name="text">
       <string>New Habit</string>
@@ -1432,7 +1432,7 @@ color:black;</string>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(246, 248, 229)</string>
+      <string notr="true">background-color: rgb(253, 255, 222);</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::Shape::Box</enum>
@@ -1481,26 +1481,51 @@ color:black;</string>
        <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QFrame" name="A_face">
+     <widget class="QFrame" name="frame">
       <property name="geometry">
        <rect>
         <x>880</x>
-        <y>20</y>
-        <width>100</width>
-        <height>100</height>
+        <y>17</y>
+        <width>108</width>
+        <height>108</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">border-image: url(:/faces/images/nuetralFace.png) 0 0 0 0 stretch stretch;
-
-</string>
+       <string notr="true">background-color:rgb(255, 255, 187);</string>
       </property>
       <property name="frameShape">
-       <enum>QFrame::Shape::NoFrame</enum>
+       <enum>QFrame::Shape::Box</enum>
       </property>
       <property name="frameShadow">
        <enum>QFrame::Shadow::Raised</enum>
       </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <widget class="QFrame" name="A_face">
+       <property name="geometry">
+        <rect>
+         <x>4</x>
+         <y>4</y>
+         <width>100</width>
+         <height>100</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-image: url(:/faces/images/nuetralFace.png) 0 0 0 0 stretch stretch;
+
+</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Shape::Box</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Shadow::Raised</enum>
+       </property>
+       <property name="lineWidth">
+        <number>2</number>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QPushButton" name="A_cancelButton">
@@ -1546,7 +1571,7 @@ color:black;</string>
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(246, 248, 229)</string>
+      <string notr="true">background-color: rgb(253, 255, 222);</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::Shape::NoFrame</enum>
@@ -2340,7 +2365,7 @@ background-color: rgb(255, 170, 0)</string>
        <string>Caps Lock</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="key_A_2">
+     <widget class="QPushButton" name="key_num">
       <property name="geometry">
        <rect>
         <x>93</x>
@@ -2367,6 +2392,36 @@ background-color: rgb(255, 170, 0)</string>
        <string>Num.</string>
       </property>
      </widget>
+     <zorder>key_spacebar</zorder>
+     <zorder>key_E</zorder>
+     <zorder>key_Y</zorder>
+     <zorder>key_A</zorder>
+     <zorder>key_K</zorder>
+     <zorder>key_N</zorder>
+     <zorder>key_W</zorder>
+     <zorder>key_R</zorder>
+     <zorder>key_Q</zorder>
+     <zorder>key_P</zorder>
+     <zorder>key_C</zorder>
+     <zorder>key_F</zorder>
+     <zorder>key_V</zorder>
+     <zorder>key_O</zorder>
+     <zorder>key_U</zorder>
+     <zorder>key_backSpace</zorder>
+     <zorder>key_M</zorder>
+     <zorder>key_Z</zorder>
+     <zorder>key_H</zorder>
+     <zorder>key_T</zorder>
+     <zorder>key_J</zorder>
+     <zorder>key_L</zorder>
+     <zorder>key_G</zorder>
+     <zorder>key_B</zorder>
+     <zorder>key_I</zorder>
+     <zorder>key_S</zorder>
+     <zorder>key_D</zorder>
+     <zorder>key_capps</zorder>
+     <zorder>key_num</zorder>
+     <zorder>key_X</zorder>
     </widget>
     <widget class="QPushButton" name="A_saveButton">
      <property name="geometry">
@@ -2396,11 +2451,11 @@ background-color: rgb(255, 170, 0)</string>
       <string>Save</string>
      </property>
     </widget>
-    <zorder>A_title</zorder>
     <zorder>A_frame1</zorder>
     <zorder>A_keyboard</zorder>
     <zorder>A_cancelButton</zorder>
     <zorder>A_saveButton</zorder>
+    <zorder>A_title</zorder>
    </widget>
    <widget class="QFrame" name="H_frame">
     <property name="geometry">
@@ -2412,8 +2467,10 @@ background-color: rgb(255, 170, 0)</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(214, 209, 158);
-color:black;</string>
+     <string notr="true">background-color: rgb(255, 255, 187);
+color:black;
+
+</string>
     </property>
     <property name="frameShape">
      <enum>QFrame::Shape::StyledPanel</enum>
@@ -2431,7 +2488,7 @@ color:black;</string>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(224, 226, 208)</string>
+      <string notr="true">background-color: rgb(253, 255, 222);</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::Shape::Box</enum>
@@ -2962,13 +3019,13 @@ color:black;</string>
        </font>
       </property>
       <property name="frameShape">
-       <enum>QFrame::Shape::Panel</enum>
+       <enum>QFrame::Shape::Box</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Shadow::Sunken</enum>
+       <enum>QFrame::Shadow::Raised</enum>
       </property>
       <property name="lineWidth">
-       <number>2</number>
+       <number>1</number>
       </property>
       <property name="text">
        <string>&lt;habit name&gt;</string>
@@ -3029,7 +3086,7 @@ color:black;</string>
     <widget class="QPushButton" name="H_lastWeekButton">
      <property name="geometry">
       <rect>
-       <x>50</x>
+       <x>52</x>
        <y>123</y>
        <width>150</width>
        <height>40</height>
@@ -3062,7 +3119,7 @@ color:black;</string>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(224, 226, 208)</string>
+      <string notr="true">background-color: rgb(253, 255, 222);</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::Shape::Box</enum>
@@ -3122,7 +3179,7 @@ color:black;</string>
     <widget class="QPushButton" name="H_monthButton">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>202</x>
        <y>123</y>
        <width>150</width>
        <height>40</height>
@@ -3139,7 +3196,7 @@ color:black;</string>
       <cursorShape>PointingHandCursor</cursorShape>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 233, 176)</string>
+      <string notr="true">background-color: rgb(160, 160, 160)</string>
      </property>
      <property name="text">
       <string>Month</string>
@@ -3148,7 +3205,7 @@ color:black;</string>
     <widget class="QPushButton" name="H_yearButton">
      <property name="geometry">
       <rect>
-       <x>350</x>
+       <x>352</x>
        <y>123</y>
        <width>150</width>
        <height>40</height>
@@ -3181,7 +3238,16 @@ color:black;</string>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(224, 226, 208)</string>
+      <string notr="true">background-color: rgb(253, 255, 222)</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Raised</enum>
+     </property>
+     <property name="lineWidth">
+      <number>2</number>
      </property>
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
@@ -3722,9 +3788,9 @@ color:black;</string>
      </property>
     </widget>
    </widget>
-   <zorder>H_frame</zorder>
    <zorder>A_frame</zorder>
    <zorder>M_frame</zorder>
+   <zorder>H_frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -31,7 +31,7 @@ public:
     // Variables
     QString dateFormat = "MM/dd/yyyy";
 
-    // Saves the week into the history (NOTE: this should be called periodically)
+    // Saves the week into the history (NOTE: this should be called when date goes from SUN to MON)
     void saveWeek();
 
     // Files Functions:

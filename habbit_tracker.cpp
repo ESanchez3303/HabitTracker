@@ -12,9 +12,14 @@
 #include <QTimer>
 #include <QColor>
 #include <QScrollBar>
+#include <fstream>
 
 
 using namespace std;
+
+
+
+
 
 Habbit_tracker::~Habbit_tracker(){
     delete ui;
@@ -29,29 +34,9 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);  // Removing the sizing gadget
 
 
-    // Setting up the habit list for removal apperances
-    ui->M_removeList->setStyleSheet(R"(
-    QListWidget {
-        background: rgb(251, 251, 184);
-    }
 
-    QListWidget::item {
-        padding: 5px;
-    }
-
-    QListWidget::item:selected {
-        background-color: rgb(255, 203, 160);
-        color: black;
-    }
-
-    QListWidget::item:hover {
-        background-color: rgb(255, 203, 160);
-    }
-    )");
-    ui->M_removeFrame->raise(); // Raising since we are going to be messing with the frames in the ui a lot
-
-
-
+    // Raising since we are going to be messing with the frames in the ui a lot
+    ui->M_removeFrame->raise();
 
 
     // Setting up the Habit Tracker Table
@@ -110,10 +95,10 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     // Setting up the day checker timer to keep track of what day it is
     dayCheckTimer = new QTimer(this);
     currentDate = QDate::currentDate();
-    //currentDate = QDate(2025, 7, 27); // <---- TESTING
+    //currentDate = QDate(2025, 7, 27); // <---- Sunday
     connect(dayCheckTimer, &QTimer::timeout, this, [=]() mutable {
         QDate now = QDate::currentDate();
-        //QDate now = QDate(2025, 7, 28); // <--- TESTING
+        //QDate now = QDate(2025, 7, 28); // <--- Monday | TESTING: moving into a new week
         if (now != currentDate) {                    // If now has moved to a different date than saved currentDate
             if (currentDate.dayOfWeek() == 7) {      // If it was sunday, we need to save all past week and set new week up
                 for(auto &currHabit:allHabits){
@@ -128,8 +113,17 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
     dayCheckTimer->start(dayCheckerInterval);                     // every minute check if we are in a new day
 
+
+
+    // Paint all Colors
+    loadColorsFromFile();
+    paintColors();
+
+
     // Switching to the Main Frame
     switchFrame(ui->M_frame);
+
+
 }
 
 
@@ -193,22 +187,10 @@ void Habbit_tracker::switchFrame(QFrame* target){
         // Resetting the date span text
         ui->H_dateSpan->setText("Please select a span.");
 
-        // Setting up the history buttons apperance when disabled and enabled
-        ui->H_upArrow->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
-        ui->H_downArrow->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
-        ui->H_lastWeekButton->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
-        ui->H_monthButton->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
-        ui->H_yearButton->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
+
+        ui->H_lastWeekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+        ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+        ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
 
         // Clearing the span display
         ui->H_spanDisplay->clear();
@@ -219,6 +201,10 @@ void Habbit_tracker::switchFrame(QFrame* target){
     }
     target->show();
 }
+
+
+
+
 
 
 
@@ -295,11 +281,19 @@ void Habbit_tracker::M_confirmButtonClicked(){
     switchFrame(ui->M_frame);
 }
 
-
 void Habbit_tracker::M_viewHistoryButtonClicked(){
     ui->M_removeFrame->hide();
     switchFrame(ui->H_frame);
 }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -476,7 +470,7 @@ void Habbit_tracker::A_saveButtonClicked() {
     // Add radio buttons for each day (columns 1 to 7)
     for (int col = 1; col <= 7; ++col) {
         QCheckBox *check = new QCheckBox(this);
-        check->setStyleSheet(checkBoxStyleSheet);
+        check->setStyleSheet("QCheckBox::indicator {width: " + checkBox_width + "px; height: " + checkBox_height + "px;}");
 
         connect(check, &QCheckBox::stateChanged, this, &Habbit_tracker::onCheckmarkToggled);
         QWidget *container = new QWidget(this);
@@ -526,19 +520,11 @@ void Habbit_tracker::H_arrowClicked(){
     ui->H_spanDisplay->clearSelection();
     ui->H_spanDisplay->setRowCount(0);
     ui->H_spanDisplay->setColumnCount(0);
-    ui->H_lastWeekButton->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; })");
-    ui->H_monthButton->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
-    ui->H_yearButton->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
 
-    pressedButton->setStyleSheet(R"(
-            QPushButton { background-color: rgb(255, 171, 69); }
-            QPushButton:disabled { background-color: #a0a0a0; })");
+    // Reseting the colors
+    ui->H_lastWeekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+    ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+    ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
 
 
     // If there was only one, then the two buttons were disabled in the switchframe function
@@ -550,6 +536,7 @@ void Habbit_tracker::H_arrowClicked(){
         historyIndex++;
         ui->H_habitName->setText(QString::fromStdString(allHabits[historyIndex].getName()));
     }
+
     ui->H_upArrow  ->setDisabled((historyIndex <= 0 ? true:false));
     ui->H_downArrow->setDisabled((historyIndex >= (allHabits.size()-1) ? true:false));
 }
@@ -558,25 +545,16 @@ void Habbit_tracker::spanButtonClicked(){
     QPushButton *pressedButton = qobject_cast<QPushButton*>(sender());
     if (!pressedButton) return;
     if(historyIndex == -1) return;
-    if(allHabits[historyIndex].getHistorySize() == 0){   // If history is empty return
-        ui->H_dateSpan->setText("Not Enough Data to Generate.");
-        return;
-    }
+
+    // NOTE: If history is empty then it will still paint everything, but it will not print any green
 
     // Reseting the colors for all the buttons
-    ui->H_lastWeekButton->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; })");
-    ui->H_monthButton->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
-    ui->H_yearButton->setStyleSheet(R"(
-        QPushButton { background-color: rgb(255, 233, 176); }
-        QPushButton:disabled { background-color: #a0a0a0; } )");
+    ui->H_lastWeekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+    ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+    ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
 
-    pressedButton->setStyleSheet(R"(
-            QPushButton { background-color: rgb(255, 171, 69); }
-            QPushButton:disabled { background-color: #a0a0a0; })");
+    // Setting current pressed to the color of button_select_color which is what makes it look "active"
+    pressedButton->setStyleSheet("QPushButton { background-color: rgb" + button_select_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
 
     QDate spanStart;
     QDate spanEnd;
@@ -611,13 +589,17 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
     int colCount = ui->H_spanDisplay->columnCount();
     for (int r = 0; r < rowCount; ++r) {
         for (int c = 0; c < colCount; ++c) {
-            ui->H_spanDisplay->setSpan(r, c, 1, 1);
+            if (ui->H_spanDisplay->rowSpan(r, c) > 1 || ui->H_spanDisplay->columnSpan(r, c) > 1) {
+                ui->H_spanDisplay->setSpan(r, c, 1, 1);
+            }
         }
     }
 
 
     int columns = 0;
     int rows = 1;
+    QColor completedColor_ = stringToColor(complete_color);
+    QColor otherDaysColor_ = stringToColor(other_days_color);
 
     if (pressedButton == ui->H_lastWeekButton) {
         ui->H_spanDisplay->setShowGrid(true);
@@ -647,9 +629,9 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
             item->setText(QString::number(currentDay.day()));
             item->setTextAlignment(Qt::AlignCenter);
             if (targetWeek && targetWeek->values[i]) {
-                item->setBackground(Qt::green);
+                item->setBackground(completedColor_);
             } else {
-                item->setBackground(Qt::white);
+                item->setBackground(otherDaysColor_);
             }
             ui->H_spanDisplay->setItem(0, i, item);
         }
@@ -659,7 +641,7 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
 
 
     else if (pressedButton == ui->H_monthButton) {
-         ui->H_spanDisplay->setShowGrid(true);
+        ui->H_spanDisplay->setShowGrid(true);
         ui->H_spanDisplay->horizontalHeader()->setVisible(true);
         int totalDays = spanStart.daysTo(spanEnd) + 1;
         columns = 7;
@@ -704,10 +686,10 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
                     item->setTextAlignment(Qt::AlignCenter);
 
                     if (progressMap.count(currentDay) && progressMap[currentDay]) {
-                        item->setBackground(Qt::green);
+                        item->setBackground(completedColor_);
                     }
                     else {
-                        item->setBackground(Qt::white);
+                        item->setBackground(otherDaysColor_);
                     }
 
                     dayNumber++;
@@ -724,11 +706,12 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
         ui->H_spanDisplay->clear();
 
         // === Configurable colors ===
-        QColor monthHeaderColor = QColor(255, 171, 69);     // Month Header
-        QColor weekdayHeaderColor = QColor(230, 230, 230);  // Slightly darker for weekdays
-        QColor spacerColor = QColor(214, 209, 158);         // Space Color
-        QColor dateBackgroundColor = QColor(255, 255, 255); // Default white for days
-        QColor completedColor = QColor(100, 200, 100);      // Green for completed
+
+        QColor monthHeaderColor = stringToColor(month_header_color);    // Month Header
+        QColor weekdayHeaderColor = stringToColor(week_header_color);   // Slightly darker for weekdays
+        QColor spacerColor = stringToColor(main_lighter_color);         // Space Color (right now same color as the background)
+        QColor dateBackgroundColor = stringToColor(other_days_color); // Default white for days
+        QColor completedColor = stringToColor(complete_color);          // Green for completed
 
         // === Layout config: 3×4 grid of months ===
         const int monthsPerRow = 3;
@@ -873,7 +856,6 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
     }
 }
 
-
 void Habbit_tracker::scrollButtonClicked(){
     QObject* btn = sender();
     if (!btn) return;
@@ -963,7 +945,7 @@ void Habbit_tracker::loadHabits(){
     }
 
 
-    //// Loading from already filled vector into the habit table
+    // Loading from already filled vector into the habit table
     int habitCount = 0;
     for(auto &currHabit:allHabits){
         array<bool,7> week = currHabit.getWeek();
@@ -978,7 +960,7 @@ void Habbit_tracker::loadHabits(){
             else
                 check->setChecked(false);
 
-            check->setStyleSheet(checkBoxStyleSheet);
+            check->setStyleSheet("QCheckBox::indicator {width: " + checkBox_width + "px; height: " + checkBox_height + "px;}");
 
             connect(check, &QCheckBox::stateChanged, this, &Habbit_tracker::onCheckmarkToggled);
             QWidget *container = new QWidget(this);
@@ -1017,11 +999,11 @@ void Habbit_tracker::loadHabits(){
 
                     if (isPast) {
                         // Color past days
-                        QString color = (check->isChecked() ? isCheckedColor : notCheckedColor);
-                        cellWidget->setStyleSheet("background-color: " + color + ";");
+                        QString color = (check->isChecked() ? is_checked_color : not_checked_color);
+                        cellWidget->setStyleSheet("background-color: rgb" + color + ";");
                     } else if (isToday) {
                         // Color current day
-                        cellWidget->setStyleSheet("background-color: " + currentDayColor + ";");
+                        cellWidget->setStyleSheet("background-color: rgb" + current_day_color + ";");
                     } else {
                         // Future days — no color
                         cellWidget->setStyleSheet("");
@@ -1036,29 +1018,48 @@ void Habbit_tracker::loadHabits(){
     // SETTTING THE CURRENT DAY PAINT:
 
     // Reseting the top sections to normal looks
-    ui->M_monLabel->setStyleSheet("color:black; background-color:rgb(255, 255, 187)");
-    ui->M_tueLabel->setStyleSheet("color:black; background-color:rgb(255, 255, 187)");
-    ui->M_wedLabel->setStyleSheet("color:black; background-color:rgb(255, 255, 187)");
-    ui->M_thuLabel->setStyleSheet("color:black; background-color:rgb(255, 255, 187)");
-    ui->M_friLabel->setStyleSheet("color:black; background-color:rgb(255, 255, 187)");
-    ui->M_satLabel->setStyleSheet("color:black; background-color:rgb(255, 255, 187)");
-    ui->M_sunLabel->setStyleSheet("color:black; background-color:rgb(255, 255, 187)");
+    ui->M_monLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
+    ui->M_tueLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
+    ui->M_wedLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
+    ui->M_thuLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
+    ui->M_friLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
+    ui->M_satLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
+    ui->M_sunLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
 
 
     // Setting the current date to the currentDayColor that we define in class
     switch(todaysDay){
-    case 1: ui->M_monLabel->setStyleSheet("color:black; background-color:" + currentDayColor); break;
-    case 2: ui->M_tueLabel->setStyleSheet("color:black; background-color:" + currentDayColor); break;
-    case 3: ui->M_wedLabel->setStyleSheet("color:black; background-color:" + currentDayColor); break;
-    case 4: ui->M_thuLabel->setStyleSheet("color:black; background-color:" + currentDayColor); break;
-    case 5: ui->M_friLabel->setStyleSheet("color:black; background-color:" + currentDayColor); break;
-    case 6: ui->M_satLabel->setStyleSheet("color:black; background-color:" + currentDayColor); break;
-    case 7: ui->M_sunLabel->setStyleSheet("color:black; background-color:" + currentDayColor); break;
+    case 1: ui->M_monLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 2: ui->M_tueLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 3: ui->M_wedLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 4: ui->M_thuLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 5: ui->M_friLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 6: ui->M_satLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 7: ui->M_sunLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
     }
 
     // Setting the date on the mainpage
     ui->M_date->setText(currentDate.toString());
 }
+
+QColor Habbit_tracker::stringToColor(QString input){
+    string inputString = input.toStdString();
+    int red = 0;
+    int green = 0;
+    int blue = 0;
+
+
+    red = stoi(inputString.substr(1,inputString.find(',')-1));
+        inputString = inputString.substr(inputString.find(',')+1);
+    green = stoi(inputString.substr(0,inputString.find(',')));
+        inputString = inputString.substr(inputString.find(',')+1);
+    blue = stoi(inputString.substr(0,inputString.size()-1));
+
+    QColor rValue = QColor(red,green,blue);
+    return rValue;
+}
+
+
 
 
 
@@ -1089,6 +1090,289 @@ void Habbit_tracker::onCheckmarkToggled(int state){
     }
 
 }
+
+
+
+
+
+
+
+
+
+// COLOR FUNCTIONS:
+
+void Habbit_tracker::paintColors(){
+    // Main Frame ===========================================================================================
+    // Frame:
+    ui->M_frame->setStyleSheet("background-color: rgb" + main_darker_color + "; color:black;");
+
+    // Week Days Labels
+    ui->M_monLabel->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_tueLabel->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_wedLabel->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_thuLabel->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_friLabel->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_satLabel->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_sunLabel->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+
+    // Week Day Current Day Label
+    switch(currentDate.dayOfWeek()){
+    case 1: ui->M_monLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 2: ui->M_tueLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 3: ui->M_wedLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 4: ui->M_thuLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 5: ui->M_friLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 6: ui->M_satLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    case 7: ui->M_sunLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
+    }
+
+    // Buttons
+    ui->M_removeButton->setStyleSheet("background-color: rgb" + button_color + ";");
+    ui->M_addHabitButton->setStyleSheet("background-color: rgb" + button_color + ";");
+    ui->M_viewHistoryButton->setStyleSheet("background-color: rgb" + button_color + ";");
+    ui->M_settingsButton->setStyleSheet("background-color: rgb" + button_color + ";");
+
+    // Other Frames:
+    ui->M_buttonFrame->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_buttonFrame_2->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_buttonFrame_3->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+
+    // Date Text
+    ui->M_dateTitle->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_date->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+
+    // Habit Table
+    ui->M_habitTable->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+
+
+    // Removing Frame:
+    ui->M_removeFrame->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->M_cancelButton->setStyleSheet("background-color: rgb" + cancel_button_color + ";");
+    ui->M_confirmButton->setStyleSheet("background-color: rgb" + save_button_color + ";");
+    ui->M_removeList->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_removeTitle->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_removeList->setStyleSheet("QListWidget { background-color: rgb" + main_darker_color + "; }"
+                                                                                                "QListWidget::item { padding: 5px; }"
+                                                                                                "QListWidget::item:selected { background-color: rgb" + remove_item_selec_color + "; color: black; }"
+                                                                "QListWidget::item:hover { background-color: rgb" + remove_item_selec_color + "; }");
+
+
+
+    // Adding Frame ===========================================================================================
+    // Frame
+    ui->A_frame->setStyleSheet("background-color: rgb" + main_darker_color + "; color:black;");
+
+    // Title
+    ui->A_title->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+
+    // Other Frames:
+    ui->A_frame1  ->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->A_keyboard->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+
+    // Buttons:
+    ui->A_cancelButton->setStyleSheet("background-color: rgb" + cancel_button_color + ";");
+    ui->A_saveButton->setStyleSheet("background-color: rgb" + save_button_color + ";");
+
+    // Keyboard Buttons:
+    ui->key_Q->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_W->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_E->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_R->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_T->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_Y->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_U->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_I->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_O->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_P->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_A->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_S->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_D->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_F->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_G->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_H->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_J->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_K->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_L->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_Z->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_X->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_C->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_V->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_B->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_N->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_M->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_spacebar->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_backSpace->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_capps->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    ui->key_num->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+
+
+
+
+
+    // History Frame ===========================================================================================
+    // Frame:
+    ui->H_frame->setStyleSheet("background-color: rgb" + main_darker_color + "; color:black;");
+
+    // Other Frames:
+    ui->H_frame1->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->H_frame1_2->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->H_frame1_3->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+
+
+    // Buttons:
+    ui->H_upArrow->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->H_downArrow->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->H_backButton->setStyleSheet("background-color: rgb" + button_color + ";");
+    ui->H_scrollDownButton->setStyleSheet("background-color: rgb" + button_color + ";");
+    ui->H_scrollUpButton->setStyleSheet("background-color: rgb" + button_color + ";");
+    ui->H_lastWeekButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+    ui->H_monthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+    ui->H_yearButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + ";}" );
+
+
+
+    // Span Display:
+    ui->H_spanDisplay->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+}
+
+void Habbit_tracker::loadColorsFromFile(){
+    ifstream colorFile(colorsFileName);
+    if(!colorFile){  // If file does not open
+
+        // Write new file with default colors
+        ofstream newColorFile(colorsFileName);
+        newColorFile << "#WARNING: Do not put spaces inside the ()" << endl;
+        newColorFile << endl;
+        newColorFile << "#Main Colors:" << endl;
+        newColorFile << "main_darker_color=(255,255,187)" << endl;
+        newColorFile << "main_lighter_color=(253,255,222)" << endl;
+        newColorFile << endl;
+        newColorFile << "#Buttons Colors:" << endl;
+        newColorFile << "button_color=(255,233,176)" << endl;
+        newColorFile << "button_select_color=(255,171,69)" << endl;
+        newColorFile << "button_disab_color=(160,160,160)" << endl;
+        newColorFile << endl;
+        newColorFile << "#Add Habit Colors:" << endl;
+        newColorFile << "keyboard_color=(255,170,0)" << endl;
+        newColorFile << "cancel_button_color=(255,126,126)" << endl;
+        newColorFile << "save_button_color=(165,255,171)" << endl;
+        newColorFile << endl;
+        newColorFile << "#Main Display Colors:" << endl;
+        newColorFile << "current_day_color=(255,203,160)" << endl;
+        newColorFile << "is_checked_color=(168,230,163)" << endl;
+        newColorFile << "not_checked_color=(245,163,163)" << endl;
+        newColorFile << endl;
+        newColorFile << "#Calendar Colors:" << endl;
+        newColorFile << "month_header_color=(255,171,69)" << endl;
+        newColorFile << "week_header_color=(230,230,230)" << endl;
+        newColorFile << "complete_color=(100,200,100)" << endl;
+        newColorFile << "other_days_color=(255,255,255)" << endl;
+        newColorFile << endl;
+        newColorFile << "#Remove Habit Colors:" << endl;
+        newColorFile << "remove_item_selec_color=(255,203,160)" << endl;
+        newColorFile.close();
+
+        // Setting variables to default colors
+        main_darker_color  = "(255,255,187)";
+        main_lighter_color = "(253,255,222)";
+        button_color       = "(255,233,176)";
+        button_select_color= "(255,171,69)";
+        button_disab_color = "(160,160,160)";
+        keyboard_color     = "(255,170,0)";
+        cancel_button_color= "(255,126,126)";
+        save_button_color  = "(165,255,171)";
+        current_day_color  = "(255,203,160)";
+        is_checked_color   = "(168,230,163)";
+        not_checked_color  = "(245,163,163)";
+        month_header_color = "(255,171,69)";
+        week_header_color  = "(230,230,230)";
+        complete_color     = "(100,200,100)";
+        other_days_color   = "(255,255,255)";
+        remove_item_selec_color = "(255,203,160)";
+
+        return;
+    }
+
+    // File was found, read and set values from the file
+    string tempString;
+    int count = 1;
+    while(getline(colorFile, tempString)){
+        if(tempString.empty())              // Skipping empty lines
+            continue;
+        if(tempString[0] == '#')            // Skipping lines with # in front
+            continue;
+
+
+        tempString = tempString.substr(tempString.find('=') + 1); // Removing everything up to inclusive: "="
+        switch(count){
+        case 1 :main_darker_color       = QString::fromStdString(tempString);
+        case 2 :main_lighter_color      = QString::fromStdString(tempString);
+        case 3 :button_color            = QString::fromStdString(tempString);
+        case 4 :button_select_color     = QString::fromStdString(tempString);
+        case 5 :button_disab_color      = QString::fromStdString(tempString);
+        case 6 :keyboard_color          = QString::fromStdString(tempString);
+        case 7 :cancel_button_color     = QString::fromStdString(tempString);
+        case 8 :save_button_color       = QString::fromStdString(tempString);
+        case 9 :current_day_color       = QString::fromStdString(tempString);
+        case 10:is_checked_color        = QString::fromStdString(tempString);
+        case 11:not_checked_color       = QString::fromStdString(tempString);
+        case 12:month_header_color      = QString::fromStdString(tempString);
+        case 13:week_header_color       = QString::fromStdString(tempString);
+        case 14:complete_color          = QString::fromStdString(tempString);
+        case 15:other_days_color        = QString::fromStdString(tempString);
+        case 16:remove_item_selec_color = QString::fromStdString(tempString);
+        }
+
+        count++;
+    }
+
+    colorFile.close();
+}
+
+void Habbit_tracker::writeColorsToFile(){
+    ofstream newColorFile(colorsFileName);
+    newColorFile << "#WARNING: Do not put spaces inside the ()" << endl;
+    newColorFile << endl;
+    newColorFile << "#Main Colors:" << endl;
+    newColorFile << "main_darker_color=" << main_darker_color.toStdString() << endl;
+    newColorFile << "main_lighter_color=" << main_lighter_color.toStdString() << endl;
+    newColorFile << endl;
+    newColorFile << "#Buttons Colors:" << endl;
+    newColorFile << "button_color=" << button_color.toStdString() << endl;
+    newColorFile << "button_select_color=" << button_select_color.toStdString() << endl;
+    newColorFile << "button_disab_color=" << button_disab_color.toStdString() << endl;
+    newColorFile << endl;
+    newColorFile << "#Add Habit Colors:" << endl;
+    newColorFile << "keyboard_color=" << keyboard_color.toStdString() << endl;
+    newColorFile << "cancel_button_color=" << cancel_button_color.toStdString() << endl;
+    newColorFile << "save_button_color=" << save_button_color.toStdString() << endl;
+    newColorFile << endl;
+    newColorFile << "#Main Display Colors:" << endl;
+    newColorFile << "current_day_color=" << current_day_color.toStdString() << endl;
+    newColorFile << "is_checked_color=" << is_checked_color.toStdString() << endl;
+    newColorFile << "not_checked_color=" << not_checked_color.toStdString() << endl;
+    newColorFile << endl;
+    newColorFile << "#Calendar Colors:" << endl;
+    newColorFile << "month_header_color=" << month_header_color.toStdString() << endl;
+    newColorFile << "week_header_color=" << week_header_color.toStdString() << endl;
+    newColorFile << "complete_color=" << complete_color.toStdString() << endl;
+    newColorFile << "other_days_color=" << other_days_color.toStdString() << endl;
+    newColorFile << endl;
+    newColorFile << "#Remove Habit Colors:" << endl;
+    newColorFile << "remove_item_selec_color=" << remove_item_selec_color.toStdString() << endl;
+    newColorFile.close();
+}
+
+void Habbit_tracker::resetColors(){
+    if (filesystem::exists(colorsFileName)) {
+        filesystem::remove(colorsFileName);
+    }
+    loadColorsFromFile();
+}
+
+
+
+
 
 
 
