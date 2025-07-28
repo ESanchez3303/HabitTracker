@@ -3905,14 +3905,20 @@ color:black;
     <property name="frameShadow">
      <enum>QFrame::Shadow::Raised</enum>
     </property>
-    <widget class="QListWidget" name="listWidget">
+    <widget class="QListWidget" name="S_savedThemesBox">
      <property name="geometry">
       <rect>
-       <x>51</x>
+       <x>50</x>
        <y>105</y>
        <width>381</width>
-       <height>378</height>
+       <height>283</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Times New Roman</family>
+       <pointsize>14</pointsize>
+      </font>
      </property>
      <property name="styleSheet">
       <string notr="true">background-color:rgb(253,255,222)</string>
@@ -3932,6 +3938,65 @@ color:black;
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
      </property>
+     <property name="autoScroll">
+      <bool>false</bool>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>No Bitting Nails</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Go Running In The Morning</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Go Running In The Morning</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Go Running In The Morning</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Go Running In The Morning</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Go Running In The Morning</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Go Running In The Morning</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Go Running In The Morning</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Go Running In The Morning</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string/>
+      </property>
+     </item>
     </widget>
     <widget class="QFrame" name="frame_2">
      <property name="geometry">
@@ -3986,7 +4051,7 @@ color:black;
       <rect>
        <x>172</x>
        <y>10</y>
-       <width>800</width>
+       <width>675</width>
        <height>60</height>
       </rect>
      </property>
@@ -4002,23 +4067,23 @@ color:black;
      <property name="lineWidth">
       <number>2</number>
      </property>
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="S_currentTheme">
       <property name="geometry">
        <rect>
-        <x>7</x>
-        <y>14</y>
-        <width>686</width>
-        <height>31</height>
+        <x>10</x>
+        <y>10</y>
+        <width>655</width>
+        <height>40</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Times New Roman</family>
-        <pointsize>22</pointsize>
+        <pointsize>18</pointsize>
        </font>
       </property>
       <property name="frameShape">
-       <enum>QFrame::Shape::NoFrame</enum>
+       <enum>QFrame::Shape::Box</enum>
       </property>
       <property name="frameShadow">
        <enum>QFrame::Shadow::Raised</enum>
@@ -4027,17 +4092,17 @@ color:black;
        <number>2</number>
       </property>
       <property name="text">
-       <string>Theme Selection</string>
+       <string>&lt; Current Theme &gt;</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
     </widget>
-    <widget class="QLabel" name="label_2">
+    <widget class="QLabel" name="S_savedThemeBoxTitle">
      <property name="geometry">
       <rect>
-       <x>51</x>
+       <x>50</x>
        <y>75</y>
        <width>381</width>
        <height>28</height>
@@ -4068,13 +4133,13 @@ color:black;
       <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QPushButton" name="S_backButton_2">
+    <widget class="QPushButton" name="S_deleteButton">
      <property name="geometry">
       <rect>
-       <x>53</x>
-       <y>490</y>
-       <width>185</width>
-       <height>47</height>
+       <x>51</x>
+       <y>397</y>
+       <width>381</width>
+       <height>45</height>
       </rect>
      </property>
      <property name="font">
@@ -4091,42 +4156,16 @@ color:black;
       <string notr="true">background-color: rgb(255, 233, 176)</string>
      </property>
      <property name="text">
-      <string>Delete Theme</string>
+      <string>Delete</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="S_backButton_3">
-     <property name="geometry">
-      <rect>
-       <x>245</x>
-       <y>490</y>
-       <width>185</width>
-       <height>47</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Times New Roman</family>
-       <pointsize>12</pointsize>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 233, 176)</string>
-     </property>
-     <property name="text">
-      <string>Add New Theme</string>
-     </property>
-    </widget>
-    <widget class="QFrame" name="frame_4">
+    <widget class="QFrame" name="S_selectedThemeFrame">
      <property name="geometry">
       <rect>
        <x>440</x>
        <y>105</y>
        <width>531</width>
-       <height>262</height>
+       <height>284</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -4141,11 +4180,11 @@ color:black;
      <property name="lineWidth">
       <number>2</number>
      </property>
-     <widget class="QPushButton" name="S_backButton_8">
+     <widget class="QPushButton" name="S_mainDarkerButton">
       <property name="geometry">
        <rect>
         <x>343</x>
-        <y>16</y>
+        <y>11</y>
         <width>130</width>
         <height>23</height>
        </rect>
@@ -4167,11 +4206,11 @@ color:black;
        <string>Main Darker</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_9">
+     <widget class="QPushButton" name="S_mainLighterButton">
       <property name="geometry">
        <rect>
         <x>209</x>
-        <y>16</y>
+        <y>11</y>
         <width>130</width>
         <height>23</height>
        </rect>
@@ -4193,11 +4232,11 @@ color:black;
        <string>Main Ligther</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_10">
+     <widget class="QPushButton" name="S_allButtonsButton">
       <property name="geometry">
        <rect>
         <x>209</x>
-        <y>51</y>
+        <y>44</y>
         <width>85</width>
         <height>23</height>
        </rect>
@@ -4219,11 +4258,11 @@ color:black;
        <string>All</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_11">
+     <widget class="QPushButton" name="S_selectedButtonsButton">
       <property name="geometry">
        <rect>
         <x>298</x>
-        <y>51</y>
+        <y>44</y>
         <width>85</width>
         <height>23</height>
        </rect>
@@ -4245,11 +4284,11 @@ color:black;
        <string>Selected</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_12">
+     <widget class="QPushButton" name="S_disableButtonsButton">
       <property name="geometry">
        <rect>
         <x>387</x>
-        <y>51</y>
+        <y>44</y>
         <width>85</width>
         <height>23</height>
        </rect>
@@ -4271,11 +4310,11 @@ color:black;
        <string>Disabled</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_13">
+     <widget class="QPushButton" name="S_homeCurrentButton">
       <property name="geometry">
        <rect>
         <x>209</x>
-        <y>169</y>
+        <y>150</y>
         <width>85</width>
         <height>23</height>
        </rect>
@@ -4297,11 +4336,11 @@ color:black;
        <string>Current Day</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_14">
+     <widget class="QPushButton" name="S_homeCompletedButton">
       <property name="geometry">
        <rect>
         <x>298</x>
-        <y>169</y>
+        <y>150</y>
         <width>85</width>
         <height>23</height>
        </rect>
@@ -4323,11 +4362,11 @@ color:black;
        <string>Completed</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_15">
+     <widget class="QPushButton" name="S_homeIncompletedButton">
       <property name="geometry">
        <rect>
         <x>387</x>
-        <y>169</y>
+        <y>150</y>
         <width>85</width>
         <height>23</height>
        </rect>
@@ -4349,11 +4388,11 @@ color:black;
        <string>Incompleted</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_16">
+     <widget class="QPushButton" name="S_calendarCompletedButton">
       <property name="geometry">
        <rect>
         <x>209</x>
-        <y>207</y>
+        <y>185</y>
         <width>130</width>
         <height>23</height>
        </rect>
@@ -4375,11 +4414,11 @@ color:black;
        <string>Completed</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_17">
+     <widget class="QPushButton" name="S_keyboardButton">
       <property name="geometry">
        <rect>
         <x>209</x>
-        <y>89</y>
+        <y>79</y>
         <width>85</width>
         <height>23</height>
        </rect>
@@ -4401,11 +4440,11 @@ color:black;
        <string>Keyboard</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_18">
+     <widget class="QPushButton" name="S_cancelButton">
       <property name="geometry">
        <rect>
         <x>298</x>
-        <y>89</y>
+        <y>79</y>
         <width>85</width>
         <height>23</height>
        </rect>
@@ -4427,11 +4466,11 @@ color:black;
        <string>Cancel</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_19">
+     <widget class="QPushButton" name="S_saveButton">
       <property name="geometry">
        <rect>
         <x>387</x>
-        <y>89</y>
+        <y>79</y>
         <width>85</width>
         <height>23</height>
        </rect>
@@ -4453,11 +4492,11 @@ color:black;
        <string>Save</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_20">
+     <widget class="QPushButton" name="S_calendarWeekdayButton">
       <property name="geometry">
        <rect>
         <x>343</x>
-        <y>233</y>
+        <y>211</y>
         <width>130</width>
         <height>23</height>
        </rect>
@@ -4479,11 +4518,11 @@ color:black;
        <string>Weekday</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_21">
+     <widget class="QPushButton" name="S_calendarMonthButton">
       <property name="geometry">
        <rect>
         <x>209</x>
-        <y>233</y>
+        <y>211</y>
         <width>130</width>
         <height>23</height>
        </rect>
@@ -4505,11 +4544,11 @@ color:black;
        <string>Month</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_22">
+     <widget class="QPushButton" name="S_calendarIncompletedButton">
       <property name="geometry">
        <rect>
         <x>343</x>
-        <y>207</y>
+        <y>185</y>
         <width>130</width>
         <height>23</height>
        </rect>
@@ -4535,7 +4574,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>4</x>
-        <y>17</y>
+        <y>12</y>
         <width>190</width>
         <height>17</height>
        </rect>
@@ -4570,7 +4609,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>4</x>
-        <y>53</y>
+        <y>46</y>
         <width>190</width>
         <height>17</height>
        </rect>
@@ -4605,7 +4644,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>4</x>
-        <y>91</y>
+        <y>81</y>
         <width>190</width>
         <height>17</height>
        </rect>
@@ -4640,7 +4679,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>4</x>
-        <y>170</y>
+        <y>152</y>
         <width>190</width>
         <height>17</height>
        </rect>
@@ -4675,7 +4714,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>4</x>
-        <y>211</y>
+        <y>189</y>
         <width>190</width>
         <height>43</height>
        </rect>
@@ -4706,11 +4745,11 @@ color:black;
        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_23">
+     <widget class="QPushButton" name="S_itemSelectedButton">
       <property name="geometry">
        <rect>
         <x>209</x>
-        <y>128</y>
+        <y>115</y>
         <width>264</width>
         <height>23</height>
        </rect>
@@ -4736,7 +4775,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>4</x>
-        <y>130</y>
+        <y>117</y>
         <width>190</width>
         <height>17</height>
        </rect>
@@ -4767,14 +4806,75 @@ color:black;
        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
      </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>4</x>
+        <y>246</y>
+        <width>190</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>14</pointsize>
+        <underline>false</underline>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:rgb(253,255,222)</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Shape::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Shadow::Raised</enum>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <property name="text">
+       <string>Background Image:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="S_backgroundButton">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>247</y>
+        <width>264</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 233, 176)</string>
+      </property>
+      <property name="text">
+       <string>&lt;background image name&gt;</string>
+      </property>
+     </widget>
     </widget>
-    <widget class="QPushButton" name="S_backButton_4">
+    <widget class="QPushButton" name="S_setThemeButton">
      <property name="geometry">
       <rect>
        <x>711</x>
-       <y>490</y>
+       <y>516</y>
        <width>260</width>
-       <height>47</height>
+       <height>30</height>
       </rect>
      </property>
      <property name="font">
@@ -4794,13 +4894,13 @@ color:black;
       <string>Set Theme</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="S_backButton_5">
+    <widget class="QPushButton" name="S_saveThemeButton">
      <property name="geometry">
       <rect>
-       <x>442</x>
-       <y>490</y>
+       <x>441</x>
+       <y>516</y>
        <width>260</width>
-       <height>47</height>
+       <height>30</height>
       </rect>
      </property>
      <property name="font">
@@ -4817,16 +4917,16 @@ color:black;
       <string notr="true">background-color: rgb(255, 233, 176)</string>
      </property>
      <property name="text">
-      <string>Save Changes</string>
+      <string>Save This Theme</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="S_backButton_6">
+    <widget class="QPushButton" name="S_scrollUpButton">
      <property name="geometry">
       <rect>
        <x>14</x>
-       <y>111</y>
+       <y>113</y>
        <width>31</width>
-       <height>170</height>
+       <height>110</height>
       </rect>
      </property>
      <property name="font">
@@ -4846,13 +4946,13 @@ color:black;
       <string>^</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="S_backButton_7">
+    <widget class="QPushButton" name="S_scrollDownButton">
      <property name="geometry">
       <rect>
        <x>14</x>
-       <y>312</y>
+       <y>254</y>
        <width>31</width>
-       <height>170</height>
+       <height>110</height>
       </rect>
      </property>
      <property name="font">
@@ -4872,13 +4972,13 @@ color:black;
       <string>V</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="S_selectedThemeTitle">
      <property name="geometry">
       <rect>
        <x>440</x>
-       <y>75</y>
+       <y>74</y>
        <width>531</width>
-       <height>28</height>
+       <height>29</height>
       </rect>
      </property>
      <property name="font">
@@ -4906,11 +5006,11 @@ color:black;
       <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QFrame" name="frame_5">
+    <widget class="QFrame" name="S_selectedThemeDemoFrame">
      <property name="geometry">
       <rect>
        <x>440</x>
-       <y>370</y>
+       <y>399</y>
        <width>531</width>
        <height>113</height>
       </rect>
@@ -4931,7 +5031,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>9</x>
-        <y>47</y>
+        <y>46</y>
         <width>62</width>
         <height>59</height>
        </rect>
@@ -4963,7 +5063,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>75</x>
-        <y>24</y>
+        <y>17</y>
         <width>60</width>
         <height>39</height>
        </rect>
@@ -4989,7 +5089,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>75</x>
-        <y>67</y>
+        <y>65</y>
         <width>61</width>
         <height>39</height>
        </rect>
@@ -5015,7 +5115,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>67</y>
+        <y>65</y>
         <width>61</width>
         <height>39</height>
        </rect>
@@ -5041,7 +5141,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>139</x>
-        <y>24</y>
+        <y>17</y>
         <width>61</width>
         <height>39</height>
        </rect>
@@ -5087,8 +5187,8 @@ color:black;
      <widget class="QRadioButton" name="radioButton">
       <property name="geometry">
        <rect>
-        <x>8</x>
-        <y>24</y>
+        <x>9</x>
+        <y>17</y>
         <width>65</width>
         <height>21</height>
        </rect>
@@ -5097,13 +5197,13 @@ color:black;
        <string>Disable</string>
       </property>
      </widget>
-     <widget class="QTableWidget" name="tableWidget">
+     <widget class="QTableWidget" name="S_show">
       <property name="geometry">
        <rect>
         <x>211</x>
-        <y>24</y>
+        <y>15</y>
         <width>310</width>
-        <height>81</height>
+        <height>92</height>
        </rect>
       </property>
       <property name="font">
@@ -5119,7 +5219,7 @@ color:black;
        <enum>QFrame::Shadow::Raised</enum>
       </property>
       <property name="lineWidth">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
@@ -5349,11 +5449,11 @@ color:black;
       </item>
      </widget>
     </widget>
-    <widget class="QLabel" name="label_10">
+    <widget class="QLabel" name="S_selectedThemeDemoTitle">
      <property name="geometry">
       <rect>
        <x>438</x>
-       <y>372</y>
+       <y>393</y>
        <width>536</width>
        <height>17</height>
       </rect>
@@ -5383,6 +5483,229 @@ color:black;
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
+    </widget>
+    <widget class="QFrame" name="frame_6">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>348</y>
+       <width>381</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color:rgb(253,255,222)</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Raised</enum>
+     </property>
+     <property name="lineWidth">
+      <number>2</number>
+     </property>
+     <widget class="QLineEdit" name="S_renameInput">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>8</y>
+        <width>276</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:white;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+      <property name="placeholderText">
+       <string>Choose a file above to rename</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="S_renameButton">
+      <property name="geometry">
+       <rect>
+        <x>291</x>
+        <y>8</y>
+        <width>84</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 233, 176)</string>
+      </property>
+      <property name="text">
+       <string>Rename</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QFrame" name="frame_7">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>501</y>
+       <width>381</width>
+       <height>44</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color:rgb(253,255,222)</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Raised</enum>
+     </property>
+     <property name="lineWidth">
+      <number>2</number>
+     </property>
+     <widget class="QLineEdit" name="S_addThemeInput">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>10</y>
+        <width>276</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:white;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+      <property name="placeholderText">
+       <string>Enter Name To Add a New Theme</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="S_addThemeButton">
+      <property name="geometry">
+       <rect>
+        <x>291</x>
+        <y>10</y>
+        <width>84</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 233, 176)</string>
+      </property>
+      <property name="text">
+       <string>Add New</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QPushButton" name="S_duplicateButton">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>451</y>
+       <width>381</width>
+       <height>45</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Times New Roman</family>
+       <pointsize>12</pointsize>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 233, 176)</string>
+     </property>
+     <property name="text">
+      <string>Duplicate</string>
+     </property>
+    </widget>
+    <widget class="QFrame" name="frame_4">
+     <property name="geometry">
+      <rect>
+       <x>850</x>
+       <y>10</y>
+       <width>120</width>
+       <height>60</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color:rgb(253,255,222)</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Raised</enum>
+     </property>
+     <property name="lineWidth">
+      <number>2</number>
+     </property>
+     <widget class="QPushButton" name="S_setDefaultButton">
+      <property name="geometry">
+       <rect>
+        <x>8</x>
+        <y>7</y>
+        <width>106</width>
+        <height>47</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 233, 176)</string>
+      </property>
+      <property name="text">
+       <string>Set Default</string>
+      </property>
+     </widget>
     </widget>
    </widget>
    <zorder>A_frame</zorder>

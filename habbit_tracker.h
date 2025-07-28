@@ -36,10 +36,10 @@ private:
 
     // FILES ==========================================================================================================================
     string const filesPath = "habits";
-    string const colorsPath = "themes";
-    string const currentThemeFileName = colorsPath + "/selectedTheme.txt";
-    string const defaultColorsFileName = colorsPath + "/default.txt";
-    string targetThemeFileName = colorsPath + "/default.txt";
+    string const themesPath = "themes";
+    string const currentThemeFileName = themesPath + "/selectedTheme.txt";
+    string const defaultColorsFileName = themesPath + "/default.txt";
+    string targetThemeFileName = themesPath + "/default.txt";
 
 
     // TIME KEEPING ==================================================================================================================
@@ -101,6 +101,7 @@ private:
 
     // Setings Frame Functions =========================================================================================================
     void S_backButtonClicked();
+    void loadThemesIntoBox();
 
 
 

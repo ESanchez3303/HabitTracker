@@ -229,6 +229,25 @@ void Habbit_tracker::switchFrame(QFrame* target){
 
     }
     else if(target == ui->S_frame){
+        // Stop the timer that checks the current date
+        dayCheckTimer->stop();
+
+        // Upload the current themes from theme folder, also hides everything on the right side
+        loadThemesIntoBox();
+
+        // Getting the current them from saved target theme file name
+        string currentTheme = targetThemeFileName.substr(targetThemeFileName.find('/')+1);
+        currentTheme = currentTheme.substr(0,currentTheme.find('.'));
+
+        // Cleaning the underscores and setting them to spaces instead
+        string cleanedCurrentTheme = "";
+        for(auto& ch:currentTheme)
+            cleanedCurrentTheme += (ch == '_' ? ' ' : ch);
+
+        if(cleanedCurrentTheme == "default")
+            cleanedCurrentTheme = "Default Theme";
+
+        ui->S_currentTheme->setText("Current Theme: " + QString::fromStdString(cleanedCurrentTheme));
 
     }
     target->show();
@@ -1046,7 +1065,71 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
 
 // SETTINGS FRAME FUNCTIONS:
 void Habbit_tracker::S_backButtonClicked(){
+    // Start up the timer again
+    dayCheckTimer->start(dayCheckerInterval);
     switchFrame(ui->M_frame);
+}
+
+void Habbit_tracker::loadThemesIntoBox(){
+    // Making sure that the folder exists
+    if (!filesystem::exists(themesPath)) {
+        QMessageBox::critical(this, "ERROR", "Theme folder does not exist. Please contact ema for a reset.");
+        S_backButtonClicked();
+        return;
+    }
+
+
+    ui->S_savedThemesBox->clear();
+    // Adding all the files into the theme box after parsing/cleaning their names
+    for (const auto& entry : filesystem::recursive_directory_iterator(themesPath)) {
+        if (entry.is_regular_file()) {
+            string habitNameWith_ = entry.path().filename().string();
+            habitNameWith_ = habitNameWith_.substr(0, habitNameWith_.length() - 4);
+
+            string habitName = "";
+            for (auto& ch : habitNameWith_) {
+                habitName += (ch == '_') ? ' ' : ch;
+            }
+
+            // Checking if its the selectedTheme file
+            if(habitName == "selectedTheme" || habitName == "default")
+                continue;
+
+            ui->S_savedThemesBox->addItem(QString::fromStdString(habitName));
+        }
+    }
+
+
+    // Setting the index to -1 so that nothing is being selected at the moment
+    ui->S_savedThemesBox->setCurrentRow(-1);
+
+
+    // Showing scroll buttons when they are needed and hidding when not
+    if(ui->S_savedThemesBox->count() > 9){
+        ui->S_scrollUpButton->show();
+        ui->S_scrollDownButton->show();
+    }else{
+        ui->S_scrollUpButton->hide();
+        ui->S_scrollDownButton->hide();
+    }
+
+    // Hiding the whole selected theme section
+    ui->S_selectedThemeTitle->hide();
+    ui->S_selectedThemeFrame->hide();
+    ui->S_selectedThemeDemoTitle->hide();
+    ui->S_selectedThemeDemoFrame->hide();
+    ui->S_saveThemeButton->hide();
+    ui->S_setThemeButton->hide();
+
+
+    // Disabeling the buttons that would need an index from the themeselectionbox
+    ui->S_renameButton->setDisabled(true);
+    ui->S_deleteButton->setDisabled(true);
+    ui->S_duplicateButton->setDisabled(true);
+
+    // Cleaning the input for the rename section
+    ui->S_renameInput->setText("");
+
 }
 
 
@@ -1328,7 +1411,6 @@ void Habbit_tracker::paintTheme(){
                                     "QListWidget::item { padding: 5px; }"
                                     "QListWidget::item:selected { background-color: rgb" + remove_item_selec_color + "; color: black; }"
                                     "QListWidget::item:hover { background-color: rgb" + remove_item_selec_color + "; }");
-    cout << background_image.toStdString() << endl;
     ui->M_removeBackground->setStyleSheet(background_image);
 
 
@@ -1410,13 +1492,64 @@ void Habbit_tracker::paintTheme(){
 
     // Span Display:
     ui->H_spanDisplay->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+
+
+    // Settings Frame ===========================================================================================
+    // Frame:
+    ui->S_frame->setStyleSheet("background-color: rgb" + main_darker_color + "; color:black;");
+
+    // Other Frames:
+    ui->frame_2->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->frame_3->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->S_savedThemeBoxTitle->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->S_selectedThemeTitle->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->S_selectedThemeFrame->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->frame_6->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->frame_7->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+
+    // Buttons:
+    ui->S_backButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_scrollUpButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_scrollDownButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_renameButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_deleteButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_duplicateButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_addThemeButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_saveThemeButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_setThemeButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_mainDarkerButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_mainLighterButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_allButtonsButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_selectedButtonsButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_disableButtonsButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_keyboardButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_cancelButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_saveButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_itemSelectedButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_homeCurrentButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_homeCompletedButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_homeIncompletedButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_calendarCompletedButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_calendarIncompletedButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_calendarMonthButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_calendarWeekdayButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_backgroundButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_setDefaultButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+
+    // Saved Theme box:
+    ui->S_savedThemesBox->setStyleSheet("QListWidget { background-color: rgb" + main_lighter_color + "; }"
+                                        "QListWidget::item { padding: 5px; }"
+                                        "QListWidget::item:selected { background-color: rgb" + remove_item_selec_color + "; color: black; }"
+                                        "QListWidget::item:hover { background-color: rgb" + remove_item_selec_color + "; }");
+
+
 }
 
 void Habbit_tracker::loadColorsFromFile(){
 
     // Making path if path for colors if it does not exists
-    if(!filesystem::exists(colorsPath)){
-        filesystem::create_directories(colorsPath);
+    if(!filesystem::exists(themesPath)){
+        filesystem::create_directories(themesPath);
     }
 
 
@@ -1545,7 +1678,7 @@ void Habbit_tracker::loadColorsFromFile(){
         }
         colorFile.close();  // Close the file
 
-        cout << background_image.toStdString() << endl;
+
         // Checking if background_image is a valid image:
         if(!possible_backgrounds.contains(background_image)){
             throw 1;
