@@ -1232,7 +1232,8 @@ void Habbit_tracker::loadHabits() {
     case 7: ui->M_sunLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
     }
 
-    ui->M_date->setText(currentDate.toString());
+    // ui->M_date->setText(currentDate.toString("dddd, MM/dd/yyyy"));  //Sunday, 07/27/2025
+    ui->M_date->setText(currentDate.toString("dddd: MMMM d, yyyy"));  //sunday, july 27, 2025
 }
 
 QColor Habbit_tracker::stringToColor(QString input){
