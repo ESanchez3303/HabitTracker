@@ -56,9 +56,9 @@ private:
 
     // Main Frame Functions ===========================================================================================================
     // ----------------------------
-    bool    const showGrid = true;
-    QString const checkBox_width  = "30";
-    QString const checkBox_height = "30";
+    bool    const showGrid = false;
+    int     const checkBox_width  = 30;
+    int     const checkBox_height = 30;
     int     const initRowCount = 9;
     int     const rowHeight = 50;
     // -----------------------------
@@ -122,8 +122,23 @@ private:
     QString current_day_color, is_checked_color, not_checked_color;
     QString month_header_color,week_header_color,complete_color,other_days_color;
     QString remove_item_selec_color;
+    QString background_image;
+    QStringList const possible_backgrounds = {
+        "none",
+        "background-image:url(:/faces/images/nuetralFace.png)",
+        "background-image:url(:/backgrounds/images/blue_stars.png)",
+        "background-image:url(:/backgrounds/images/hearts.png)",
+        "background-image:url(:/backgrounds/images/leaves.png)",
+        "background-image:url(:/backgrounds/images/uniformSquiggles.png)",
+        "background-image:url(:/backgrounds/images/coolHalloween.png)",
+        "background-image:url(:/backgrounds/images/orangePumpkins.png)",
+        "background-image:url(:/backgrounds/images/peepingPumpkins.png)",
+        "background-image:url(:/backgrounds/images/nutCrackers.png)",
+        "background-image:url(:/backgrounds/images/hohoho.png)",
+        "background-image:url(:/backgrounds/images/cuteChristmas.png)"
+    };
 
-    void paintColors();        // Paints all the objects their colors set in variables
+    void paintTheme();        // Paints all the objects their colors set in variables
     void writeColorsToFile();  // Writes current colors in program mem. to file
     void loadColorsFromFile(); // Reads information from file saved in targetThemeFileName
 

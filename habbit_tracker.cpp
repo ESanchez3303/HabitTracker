@@ -117,7 +117,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
     // Paint all Colors
     loadColorsFromFile();
-    paintColors();
+    paintTheme();
 
 
     // Switching to the Main Frame
@@ -505,7 +505,10 @@ void Habbit_tracker::A_saveButtonClicked() {
     // Add radio buttons for each day (columns 1 to 7)
     for (int col = 1; col <= 7; ++col) {
         QCheckBox *check = new QCheckBox(this);
-        check->setStyleSheet("QCheckBox::indicator {width: " + checkBox_width + "px; height: " + checkBox_height + "px;}");
+        check->setFixedSize(checkBox_width, checkBox_height);
+        check->setStyleSheet("QCheckBox::indicator {width: " +
+                             QString::fromStdString(to_string(checkBox_width)) + "px; height: " +
+                             QString::fromStdString(to_string(checkBox_height) + "px;}"));
 
         connect(check, &QCheckBox::stateChanged, this, &Habbit_tracker::onCheckmarkToggled);
         QWidget *container = new QWidget(this);
@@ -1079,110 +1082,131 @@ bool Habbit_tracker::validString(QString &input) {
     return hasLetterOrDigit;
 }
 
-void Habbit_tracker::loadHabits(){
+void Habbit_tracker::loadHabits() {
     ui->M_habitTable->clear();
     allHabits.clear();
 
-    // Make folder if the folder does not exist
-    if(!filesystem::exists(filesPath)){
+    if (!filesystem::exists(filesPath)) {
         filesystem::create_directories(filesPath);
     }
 
-
-    // Looking through all the folders in the filesPath folder, for every entry get the name and load it into the vector
     for (const auto& entry : filesystem::recursive_directory_iterator(filesPath)) {
         if (entry.is_regular_file()) {
-            // Getting the name in <name_name.txt> and fixing to <name_name>
-            string habitNameWith_ = entry.path().filename().string(); // e.g., "<name_name>.txt"
-            habitNameWith_ = habitNameWith_.substr(0, habitNameWith_.length() - 4); // Remove ".txt"
+            string habitNameWith_ = entry.path().filename().string();
+            habitNameWith_ = habitNameWith_.substr(0, habitNameWith_.length() - 4);
 
-            // Fixing <name_name> to <name name>
             string habitName = "";
-            for(auto &ch:habitNameWith_){
-                if(ch == '_'){
-                    habitName += ' ';
-                }
-                else
-                    habitName += ch;
+            for (auto& ch : habitNameWith_) {
+                habitName += (ch == '_') ? ' ' : ch;
             }
 
-
-            // Making and loading object using name and filesPath
             habit newHabit(habitName, filesPath);
             string currentFileResults = newHabit.makeFromFile();
 
-            if(currentFileResults != ""){        // If the entry is invalid, show the error and DO NOT add to the vector
+            if (!currentFileResults.empty()) {
                 QMessageBox::critical(this, "ERROR: Will not add [" + QString::fromStdString(habitName) + "]",
                                       QString::fromStdString(currentFileResults));
+            } else {
+                allHabits.push_back(newHabit);
             }
-            else
-                allHabits.push_back(newHabit);   // If the entry is valid, then add to the vector
         }
     }
 
 
-    // Loading from already filled vector into the habit table
     int habitCount = 0;
-    for(auto &currHabit:allHabits){
-        array<bool,7> week = currHabit.getWeek();
-        QTableWidgetItem *nameItem = new QTableWidgetItem(QString::fromStdString(currHabit.getName()));
+    for (auto& currHabit : allHabits) {
+        array<bool, 7> week = currHabit.getWeek();
+        QTableWidgetItem* nameItem = new QTableWidgetItem(QString::fromStdString(currHabit.getName()));
         ui->M_habitTable->setItem(habitCount, 0, nameItem);
 
-        // Add check box buttons for each day (columns 1 to 7)
         for (int col = 1; col <= 7; ++col) {
-            QCheckBox *check = new QCheckBox(this);
-            if (week[col - 1])
-                check->setChecked(true);
-            else
-                check->setChecked(false);
+            QCheckBox* check = new QCheckBox(this);
+            check->setChecked(week[col - 1]);
 
-            check->setStyleSheet("QCheckBox::indicator {width: " + checkBox_width + "px; height: " + checkBox_height + "px;}");
+            check->setFixedSize(checkBox_width, checkBox_height);
+            check->setStyleSheet("QCheckBox::indicator {width: " +
+                                 QString::fromStdString(to_string(checkBox_width)) + "px; height: " +
+                                 QString::fromStdString(to_string(checkBox_height) + "px;}"));
 
             connect(check, &QCheckBox::stateChanged, this, &Habbit_tracker::onCheckmarkToggled);
-            QWidget *container = new QWidget(this);
-            QHBoxLayout *layout = new QHBoxLayout(container);
+
+            QWidget* container = new QWidget();
+            QHBoxLayout* layout = new QHBoxLayout(container);
             layout->addWidget(check);
             layout->setAlignment(Qt::AlignCenter);
             layout->setContentsMargins(0, 0, 0, 0);
-            container->setLayout(layout);
+            layout->setSpacing(0);
 
             ui->M_habitTable->setCellWidget(habitCount, col, container);
         }
         habitCount++;
     }
 
-    // SETTING ROW HEIGHT: ============================================================================================
+
+
+    QString colorString = main_darker_color;
+    colorString.remove('(');
+    colorString.remove(')');
+
+    QStringList rgbList = colorString.split(',');
+
+    if (rgbList.size() == 3) {
+        int r = rgbList[0].trimmed().toInt();
+        int g = rgbList[1].trimmed().toInt();
+        int b = rgbList[2].trimmed().toInt();
+
+        QColor cellColor(r, g, b);
+        int colCount = ui->M_habitTable->columnCount();
+
+        for (int row = 0; row < initRowCount; ++row) {
+            for (int col = 0; col < colCount; ++col) {
+                if (col == 0) {
+                    QTableWidgetItem* item = ui->M_habitTable->item(row, col);
+                    if (!item) {
+                        item = new QTableWidgetItem();
+                        item->setTextAlignment(Qt::AlignCenter);
+                        ui->M_habitTable->setItem(row, col, item);
+                    }
+                    item->setBackground(cellColor);
+                } else {
+                    QWidget* cellWidget = ui->M_habitTable->cellWidget(row, col);
+                    if (!cellWidget) {
+                        cellWidget = new QWidget();
+                        QHBoxLayout* layout = new QHBoxLayout(cellWidget);
+                        layout->setContentsMargins(0, 0, 0, 0);
+                        layout->setSpacing(0);
+                        layout->addStretch();
+                        ui->M_habitTable->setCellWidget(row, col, cellWidget);
+                    }
+                    cellWidget->setStyleSheet("background: transparent;");
+                    cellWidget->setAttribute(Qt::WA_TranslucentBackground);
+                }
+            }
+        }
+    }
+
     for (int row = 0; row < ui->M_habitTable->rowCount(); ++row) {
         ui->M_habitTable->setRowHeight(row, rowHeight);
     }
 
 
-    // VISUALS (PAINTING) =============================================================================================
-    // Update current day
+
     int todaysDay = currentDate.dayOfWeek();
-
-
-    // SETTING THE PAST DAYS PAINT
     for (int row = 0; row < ui->M_habitTable->rowCount(); ++row) {
-
         for (int col = 1; col <= 7; ++col) {
-            QWidget *cellWidget = ui->M_habitTable->cellWidget(row, col);
+            QWidget* cellWidget = ui->M_habitTable->cellWidget(row, col);
             if (cellWidget) {
-                QCheckBox *check = cellWidget->findChild<QCheckBox*>();
+                QCheckBox* check = cellWidget->findChild<QCheckBox*>();
                 if (check) {
                     bool isToday = (col == todaysDay);
                     bool isPast = (col < todaysDay);
 
                     if (isPast) {
-                        // Color past days
                         QString color = (check->isChecked() ? is_checked_color : not_checked_color);
                         cellWidget->setStyleSheet("background-color: rgb" + color + ";");
                     } else if (isToday) {
-                        // Color current day
                         cellWidget->setStyleSheet("background-color: rgb" + current_day_color + ";");
                     } else {
-                        // Future days — no color
-                        cellWidget->setStyleSheet("");
                         check->setDisabled(true);
                     }
                 }
@@ -1190,10 +1214,6 @@ void Habbit_tracker::loadHabits(){
         }
     }
 
-
-    // SETTTING THE CURRENT DAY PAINT:
-
-    // Reseting the top sections to normal looks
     ui->M_monLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
     ui->M_tueLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
     ui->M_wedLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
@@ -1202,9 +1222,7 @@ void Habbit_tracker::loadHabits(){
     ui->M_satLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
     ui->M_sunLabel->setStyleSheet("color:black; background-color:rgb" + main_darker_color + ";");
 
-
-    // Setting the current date to the currentDayColor that we define in class
-    switch(todaysDay){
+    switch (todaysDay) {
     case 1: ui->M_monLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
     case 2: ui->M_tueLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
     case 3: ui->M_wedLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
@@ -1214,7 +1232,6 @@ void Habbit_tracker::loadHabits(){
     case 7: ui->M_sunLabel->setStyleSheet("color:black; background-color:rgb" + current_day_color + ";"); break;
     }
 
-    // Setting the date on the mainpage
     ui->M_date->setText(currentDate.toString());
 }
 
@@ -1253,12 +1270,14 @@ QColor Habbit_tracker::stringToColor(QString input){
 
 
 // COLOR FUNCTIONS:
-void Habbit_tracker::paintColors(){
+void Habbit_tracker::paintTheme(){
+
     // Main Frame ===========================================================================================
     // Frame:
     ui->M_frame->setStyleSheet("background-color: rgb" + main_darker_color + "; color:black;");
 
     // Week Days Labels
+    ui->M_monLabel->setAutoFillBackground(false);
     ui->M_monLabel->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_tueLabel->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_wedLabel->setStyleSheet("background-color: rgb" + main_darker_color + ";");
@@ -1288,25 +1307,28 @@ void Habbit_tracker::paintColors(){
     ui->M_buttonFrame->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_buttonFrame_2->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_buttonFrame_3->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_line->setStyleSheet("background-color: rgb" + main_darker_color + ";");
 
     // Date Text
     ui->M_dateTitle->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_date->setStyleSheet("background-color: rgb" + main_darker_color + ";");
 
     // Habit Table
-    ui->M_habitTable->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->M_habitTable->setStyleSheet("background-color: rgb" + main_lighter_color + ";" + background_image + ";");
 
 
     // Removing Frame:
     ui->M_removeFrame->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
-    ui->M_cancelButton->setStyleSheet("background-color: rgb" + cancel_button_color + ";");
+    ui->M_cancelButton->setStyleSheet("background-color: rgb" + cancel_button_color + "; background-image: none;");
     ui->M_confirmButton->setStyleSheet("background-color: rgb" + save_button_color + ";");
     ui->M_removeList->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_removeTitle->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_removeList->setStyleSheet("QListWidget { background-color: rgb" + main_darker_color + "; }"
-                                                                                                "QListWidget::item { padding: 5px; }"
-                                                                                                "QListWidget::item:selected { background-color: rgb" + remove_item_selec_color + "; color: black; }"
-                                                                "QListWidget::item:hover { background-color: rgb" + remove_item_selec_color + "; }");
+                                    "QListWidget::item { padding: 5px; }"
+                                    "QListWidget::item:selected { background-color: rgb" + remove_item_selec_color + "; color: black; }"
+                                    "QListWidget::item:hover { background-color: rgb" + remove_item_selec_color + "; }");
+    cout << background_image.toStdString() << endl;
+    ui->M_removeBackground->setStyleSheet(background_image);
 
 
 
@@ -1369,6 +1391,7 @@ void Habbit_tracker::paintColors(){
     ui->H_frame1->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->H_frame1_2->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->H_frame1_3->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->H_background->setStyleSheet(background_image);
 
 
     // Buttons:
@@ -1446,6 +1469,9 @@ void Habbit_tracker::loadColorsFromFile(){
                 newColorFile << endl;
                 newColorFile << "#Remove Habit Colors:" << endl;
                 newColorFile << "remove_item_selec_color=(255,203,160)" << endl;
+                newColorFile << endl;
+                newColorFile << "#Background Image:" << endl;
+                newColorFile << "background_image=none" << endl;
             newColorFile.close();
 
             // Setting variables to default colors
@@ -1465,6 +1491,7 @@ void Habbit_tracker::loadColorsFromFile(){
             complete_color     = "(100,200,100)";
             other_days_color   = "(255,255,255)";
             remove_item_selec_color = "(255,203,160)";
+            background_image = "none";
 
             return;
         }
@@ -1510,22 +1537,34 @@ void Habbit_tracker::loadColorsFromFile(){
             case 14:complete_color          = QString::fromStdString(tempString);
             case 15:other_days_color        = QString::fromStdString(tempString);
             case 16:remove_item_selec_color = QString::fromStdString(tempString);
+            case 17:background_image        = QString::fromStdString(tempString);
             }
 
             count++;
         }
         colorFile.close();  // Close the file
+
+        cout << background_image.toStdString() << endl;
+        // Checking if background_image is a valid image:
+        if(!possible_backgrounds.contains(background_image)){
+            throw 1;
+        }
+
     }
-    catch(...){    // IF ANYTHING GOES WRONG DURING READING AND CONVERTING
+    catch(...){    // IF ANYTHING GOES WRONG DURING READING
         colorFile.close();
-        QMessageBox::critical(this, "Theme file Error", "Theme file was corrupted, Please check file. Setting all colors to default. File"
+        QMessageBox::critical(this, "Theme file Error", "Theme file was corrupted, Please check file. Setting theme to default. File"
                                                         ":" + QString::fromStdString(targetThemeFileName));
         if(filesystem::exists(currentThemeFileName))   // Remove the current theme so when the loadColors is called again it can make it
-            filesystem::remove(currentThemeFileName);  // We are removing in case its not DEFAULT and can be handled
+            filesystem::remove(currentThemeFileName);
+        if(filesystem::exists(defaultColorsFileName))  // Remove the default colors file so that the loadColords can make it again
+            filesystem::remove(defaultColorsFileName);
 
         loadColorsFromFile();                          // Call this function again to make default file
         return;
     }
+
+
 
 
 }
@@ -1561,6 +1600,9 @@ void Habbit_tracker::writeColorsToFile(){
         newColorFile << endl;
         newColorFile << "#Remove Habit Colors:" << endl;
         newColorFile << "remove_item_selec_color=" << remove_item_selec_color.toStdString() << endl;
+        newColorFile << endl;
+        newColorFile << "#Background Image:" << endl;
+        newColorFile << "background_image=none" << endl;
     newColorFile.close();
 }
 

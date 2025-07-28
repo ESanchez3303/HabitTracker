@@ -4,4 +4,16 @@
         <file>images/sadFace.png</file>
         <file>images/nuetralFace.png</file>
     </qresource>
+    <qresource prefix="/backgrounds">
+        <file>images/blue_stars.png</file>
+        <file>images/hearts.png</file>
+        <file>images/leaves.png</file>
+        <file>images/uniformSquiggles.png</file>
+        <file>images/coolHalloween.png</file>
+        <file>images/orangePumpkins.png</file>
+        <file>images/peepingPumpkins.png</file>
+        <file>images/cuteChristmas.png</file>
+        <file>images/hohoho.png</file>
+        <file>images/nutCrackers.png</file>
+    </qresource>
 </RCC>
