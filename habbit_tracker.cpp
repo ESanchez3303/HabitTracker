@@ -31,8 +31,13 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
 
 
-    // Raising since we are going to be messing with the frames in the ui a lot
+    // Raising frames
     ui->M_removeFrame->raise();
+    ui->S_keyboard->raise();
+
+
+    // Moving frames where they are suppose to be
+    ui->S_keyboard->move(QPoint(50,7));
 
 
     // Setting up the Habit Tracker Table
@@ -50,9 +55,16 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     ui->M_habitTable->setRowCount(initRowCount);
 
 
-    // Connecting all the keyboard keys and Setting their Focus Policy
+    // Connecting all the keyboard keys and Setting their Focus Policy   ------ ADDING KEYBOARD
     QList<QPushButton*> keys = ui->A_keyboard->findChildren<QPushButton*>();
     for (auto &key : keys) {
+        connect(key, &QPushButton::clicked, this, &Habbit_tracker::insertKey);
+        key->setFocusPolicy(Qt::NoFocus);
+    }
+
+    // Connecting all the keyboard keys and Setting their Focus Policy    ----- SETTINGS KEYBOARD
+    QList<QPushButton*> keys_S = ui->S_keyboard->findChildren<QPushButton*>();
+    for (auto &key : keys_S) {
         connect(key, &QPushButton::clicked, this, &Habbit_tracker::insertKey);
         key->setFocusPolicy(Qt::NoFocus);
     }
@@ -63,6 +75,9 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     ui->A_saveButton->setFocusPolicy(Qt::NoFocus);
     ui->M_habitTable->setFocusPolicy(Qt::NoFocus);
     ui->H_spanDisplay->setFocusPolicy(Qt::NoFocus);
+    ui->A_keyboard->setFocusPolicy(Qt::NoFocus);
+    ui->S_keyboardToggleButton->setFocusPolicy(Qt::NoFocus);
+
 
 
     // Connections
@@ -88,6 +103,10 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     connect(ui->H_displayNextButton, &QPushButton::clicked, this, &Habbit_tracker::displayNextPreviousButtonClicked);
 
     connect(ui->S_backButton, &QPushButton::clicked, this, &Habbit_tracker::S_backButtonClicked);
+    connect(ui->S_addThemeButton, &QPushButton::clicked, this, &Habbit_tracker::S_addThemeButtonClicked);
+    connect(ui->S_keyboardToggleButton, &QPushButton::clicked, this, &Habbit_tracker::S_keyboardToggleButtonClicked);
+
+
 
 
 
@@ -145,11 +164,12 @@ void Habbit_tracker::switchFrame(QFrame* target){
     }
     else if(target == ui->A_frame){
 
+        target->show(); // Calling this first to be able to use it in the set capps
         // Hiding the numbers
-        showNums = false;
+        showNums_A = false;
 
         // Setting keyboard to Capital Letters
-        showCapps = false;
+        showCapps_A = false;
         setCapps();
 
 
@@ -248,6 +268,18 @@ void Habbit_tracker::switchFrame(QFrame* target){
             cleanedCurrentTheme = "Default Theme";
 
         ui->S_currentTheme->setText("Current Theme: " + QString::fromStdString(cleanedCurrentTheme));
+
+        // Hiding the keyboard until the show keyboard button is pressed and SETTTING UP THE KEYBOARD
+        ui->S_keyboard->hide();
+        ui->S_keyboardToggleButton->setText("Show\nKeyboard");
+
+        target->show(); // Calling this first to be able to use in set capps
+        // Resetting the variables and setting to all capps
+        showNums_S = false;
+        showCapps_S = false;
+        setCapps();
+
+
 
     }
     target->show();
@@ -358,124 +390,6 @@ void Habbit_tracker::A_cancelButtonClicked(){
     QApplication::processEvents();   // Forcing the stylesheet to update before going to sleep for the second
     QThread::sleep(1);
     switchFrame(ui->M_frame);
-}
-
-void Habbit_tracker::setCapps(){
-    // When starting, isCapps is true. So it will enter the first section
-    if(showCapps){
-        ui->key_Q->setText("Q"); ui->key_A->setText("A"); ui->key_Z->setText("Z");
-        ui->key_W->setText("W"); ui->key_S->setText("S"); ui->key_X->setText("X");
-        ui->key_E->setText("E"); ui->key_D->setText("D"); ui->key_C->setText("C");
-        ui->key_R->setText("R"); ui->key_F->setText("F"); ui->key_V->setText("V");
-        ui->key_T->setText("T"); ui->key_G->setText("G"); ui->key_B->setText("B");
-        ui->key_Y->setText("Y"); ui->key_H->setText("H"); ui->key_N->setText("N");
-        ui->key_U->setText("U"); ui->key_J->setText("J"); ui->key_M->setText("M");
-        ui->key_I->setText("I"); ui->key_K->setText("K");
-        ui->key_O->setText("O"); ui->key_L->setText("L");
-        ui->key_P->setText("P");
-    }
-    else{
-        ui->key_Q->setText("q"); ui->key_A->setText("a"); ui->key_Z->setText("z");
-        ui->key_W->setText("w"); ui->key_S->setText("s"); ui->key_X->setText("x");
-        ui->key_E->setText("e"); ui->key_D->setText("d"); ui->key_C->setText("c");
-        ui->key_R->setText("r"); ui->key_F->setText("f"); ui->key_V->setText("v");
-        ui->key_T->setText("t"); ui->key_G->setText("g"); ui->key_B->setText("b");
-        ui->key_Y->setText("y"); ui->key_H->setText("h"); ui->key_N->setText("n");
-        ui->key_U->setText("u"); ui->key_J->setText("j"); ui->key_M->setText("m");
-        ui->key_I->setText("i"); ui->key_K->setText("k");
-        ui->key_O->setText("o"); ui->key_L->setText("l");
-        ui->key_P->setText("p");
-    }
-
-    // Change state of capps locked
-    showCapps = !showCapps;
-    showNums = false;
-}
-
-void Habbit_tracker::setNumbers(){
-    if(!showNums){
-        ui->key_Q->setText("1");
-        ui->key_W->setText("2");
-        ui->key_E->setText("3");
-        ui->key_R->setText("4");
-        ui->key_T->setText("5");
-        ui->key_Y->setText("6");
-        ui->key_U->setText("7");
-        ui->key_I->setText("8");
-        ui->key_O->setText("9");
-        ui->key_P->setText("0");
-    }
-    else{
-        if(!showCapps){
-            ui->key_Q->setText("Q");
-            ui->key_W->setText("W");
-            ui->key_E->setText("E");
-            ui->key_R->setText("R");
-            ui->key_T->setText("T");
-            ui->key_Y->setText("Y");
-            ui->key_U->setText("U");
-            ui->key_I->setText("I");
-            ui->key_O->setText("O");
-            ui->key_P->setText("P");
-        }
-        else{
-            ui->key_Q->setText("q");
-            ui->key_W->setText("w");
-            ui->key_E->setText("e");
-            ui->key_R->setText("r");
-            ui->key_T->setText("t");
-            ui->key_Y->setText("y");
-            ui->key_U->setText("u");
-            ui->key_I->setText("i");
-            ui->key_O->setText("o");
-            ui->key_P->setText("p");
-        }
-    }
-
-    showNums = !showNums;
-}
-
-void Habbit_tracker::insertKey(){
-    QPushButton* btn = qobject_cast<QPushButton*>(sender());
-    if (!btn) return;
-
-    QString keyText = btn->text();
-    QWidget* widget = QApplication::focusWidget();
-
-
-    if (keyText == "Backspace") {
-        if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {
-            QString text = lineEdit->text();
-            text.chop(1);
-            lineEdit->setText(text);
-        }
-        return;
-    }
-
-    if(keyText == "Space Bar"){
-        if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {
-            QString text = lineEdit->text();
-            text = text + " ";
-            lineEdit->setText(text);
-        }
-        return;
-    }
-
-    if(keyText == "Caps Lock"){
-        setCapps();
-        return;
-    }
-
-    if(keyText == "Num."){
-        setNumbers();
-        return;
-    }
-
-
-    // Handle normal key input (A–Z)
-    if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {
-        lineEdit->insert(keyText);
-    }
 }
 
 void Habbit_tracker::A_saveButtonClicked() {
@@ -1070,6 +984,17 @@ void Habbit_tracker::S_backButtonClicked(){
     switchFrame(ui->M_frame);
 }
 
+void Habbit_tracker::S_keyboardToggleButtonClicked(){
+    if(ui->S_keyboard->isVisible()){
+        ui->S_keyboard->hide();
+        ui->S_keyboardToggleButton->setText("Show\nKeyboard");
+    }
+    else{
+        ui->S_keyboard->show();
+        ui->S_keyboardToggleButton->setText("Hide\nKeyboard");
+    }
+}
+
 void Habbit_tracker::loadThemesIntoBox(){
     // Making sure that the folder exists
     if (!filesystem::exists(themesPath)) {
@@ -1132,6 +1057,85 @@ void Habbit_tracker::loadThemesIntoBox(){
 
 }
 
+void Habbit_tracker::S_addThemeButtonClicked(){
+    // Catching when the new theme name is invalid
+    if(!validString(ui->S_addThemeInput->text())){
+        QMessageBox::information(this, "Name is invalid.","Please fix name format. Name has to have at least 1 character. Valid Characters: Numbers, Letters, Spaces.");
+        ui->S_addThemeInput->setText("");
+        return;
+    }
+
+    // Name was valid, replacing the spaces with underscores
+    string currentThemeName = ui->S_addThemeInput->text().toStdString();
+    string cleanedThemeName = "";
+    for(auto& ch: currentThemeName)
+        cleanedThemeName += (ch == ' ' ? '_':ch);
+
+
+    // Catching when the name is already used
+    if(!ui->S_savedThemesBox->findItems(QString::fromStdString(currentThemeName), Qt::MatchFixedString).isEmpty()){
+        QMessageBox::information(this, "Theme Name is Used.","This theme name has already been used. Please choose a different name.");
+        ui->S_addThemeInput->setText("");
+        return;
+    }
+
+
+    // Catching when the name is "Default" since we never want to rewrite that file
+    if(cleanedThemeName == "default"){
+        QMessageBox::information(this, "Name Cannot Be Default","Theme name cannot be default. This file name is used in the backend for other reasons.");
+        ui->S_addThemeInput->setText("");
+        return;
+    }
+
+
+    // Make a copy of the default file and name it to the cleanedThemeName
+    ofstream newThemeFile(themesPath + "/" + cleanedThemeName + ".txt");
+        newThemeFile << "#WARNING: Do not put spaces inside the ()" << endl;
+        newThemeFile << endl;
+        newThemeFile << "#Main Colors:" << endl;
+        newThemeFile << "main_darker_color=(255,255,187)" << endl;
+        newThemeFile << "main_lighter_color=(253,255,222)" << endl;
+        newThemeFile << endl;
+        newThemeFile << "#Buttons Colors:" << endl;
+        newThemeFile << "button_color=(255,233,176)" << endl;
+        newThemeFile << "button_select_color=(255,171,69)" << endl;
+        newThemeFile << "button_disab_color=(160,160,160)" << endl;
+        newThemeFile << endl;
+        newThemeFile << "#Add Habit Colors:" << endl;
+        newThemeFile << "keyboard_color=(255,170,0)" << endl;
+        newThemeFile << "cancel_button_color=(255,126,126)" << endl;
+        newThemeFile << "save_button_color=(165,255,171)" << endl;
+        newThemeFile << endl;
+        newThemeFile << "#Main Display Colors:" << endl;
+        newThemeFile << "current_day_color=(255,203,160)" << endl;
+        newThemeFile << "is_checked_color=(168,230,163)" << endl;
+        newThemeFile << "not_checked_color=(245,163,163)" << endl;
+        newThemeFile << endl;
+        newThemeFile << "#Calendar Colors:" << endl;
+        newThemeFile << "month_header_color=(255,171,69)" << endl;
+        newThemeFile << "week_header_color=(230,230,230)" << endl;
+        newThemeFile << "complete_color=(100,200,100)" << endl;
+        newThemeFile << "other_days_color=(255,255,255)" << endl;
+        newThemeFile << endl;
+        newThemeFile << "#Remove Habit Colors:" << endl;
+        newThemeFile << "remove_item_selec_color=(255,203,160)" << endl;
+        newThemeFile << endl;
+        newThemeFile << "#Background Image:" << endl;
+        newThemeFile << "background_image=none" << endl;
+    newThemeFile.close();
+
+    // Resetting the input section for the new theme
+    ui->S_addThemeInput->setText("");
+
+    // Sending to loadThemes so that it can be loaded
+    loadThemesIntoBox();
+}
+
+
+
+
+
+
 
 
 
@@ -1139,7 +1143,7 @@ void Habbit_tracker::loadThemesIntoBox(){
 
 
 // HELPER FUNCTIONS:
-bool Habbit_tracker::validString(QString &input) {
+bool Habbit_tracker::validString(QString input) {
     // Step 1: Remove leading spaces
     int firstCharIndex = 0;
     while (firstCharIndex < input.length() && input[firstCharIndex].isSpace()) {
@@ -1340,6 +1344,204 @@ QColor Habbit_tracker::stringToColor(QString input){
 
 
 
+// KEYBOARD FUNCTIONS:
+void Habbit_tracker::setCapps(){
+    if(ui->A_frame->isVisible()){
+        // When starting, isCapps is true. So it will enter the first section
+        if(showCapps_A){
+            ui->key_Q->setText("Q"); ui->key_A->setText("A"); ui->key_Z->setText("Z");
+            ui->key_W->setText("W"); ui->key_S->setText("S"); ui->key_X->setText("X");
+            ui->key_E->setText("E"); ui->key_D->setText("D"); ui->key_C->setText("C");
+            ui->key_R->setText("R"); ui->key_F->setText("F"); ui->key_V->setText("V");
+            ui->key_T->setText("T"); ui->key_G->setText("G"); ui->key_B->setText("B");
+            ui->key_Y->setText("Y"); ui->key_H->setText("H"); ui->key_N->setText("N");
+            ui->key_U->setText("U"); ui->key_J->setText("J"); ui->key_M->setText("M");
+            ui->key_I->setText("I"); ui->key_K->setText("K");
+            ui->key_O->setText("O"); ui->key_L->setText("L");
+            ui->key_P->setText("P");
+        }
+        else{
+            ui->key_Q->setText("q"); ui->key_A->setText("a"); ui->key_Z->setText("z");
+            ui->key_W->setText("w"); ui->key_S->setText("s"); ui->key_X->setText("x");
+            ui->key_E->setText("e"); ui->key_D->setText("d"); ui->key_C->setText("c");
+            ui->key_R->setText("r"); ui->key_F->setText("f"); ui->key_V->setText("v");
+            ui->key_T->setText("t"); ui->key_G->setText("g"); ui->key_B->setText("b");
+            ui->key_Y->setText("y"); ui->key_H->setText("h"); ui->key_N->setText("n");
+            ui->key_U->setText("u"); ui->key_J->setText("j"); ui->key_M->setText("m");
+            ui->key_I->setText("i"); ui->key_K->setText("k");
+            ui->key_O->setText("o"); ui->key_L->setText("l");
+            ui->key_P->setText("p");
+        }
+
+        // Change state of capps locked
+        showCapps_A = !showCapps_A;
+        showNums_A = false;
+    }
+    else if(ui->S_frame->isVisible()){
+        // When starting, isCapps is true. So it will enter the first section
+        if(showCapps_S){
+            ui->key_Q_S->setText("Q"); ui->key_A_S->setText("A"); ui->key_Z_S->setText("Z");
+            ui->key_W_S->setText("W"); ui->key_S_S->setText("S"); ui->key_X_S->setText("X");
+            ui->key_E_S->setText("E"); ui->key_D_S->setText("D"); ui->key_C_S->setText("C");
+            ui->key_R_S->setText("R"); ui->key_F_S->setText("F"); ui->key_V_S->setText("V");
+            ui->key_T_S->setText("T"); ui->key_G_S->setText("G"); ui->key_B_S->setText("B");
+            ui->key_Y_S->setText("Y"); ui->key_H_S->setText("H"); ui->key_N_S->setText("N");
+            ui->key_U_S->setText("U"); ui->key_J_S->setText("J"); ui->key_M_S->setText("M");
+            ui->key_I_S->setText("I"); ui->key_K_S->setText("K");
+            ui->key_O_S->setText("O"); ui->key_L_S->setText("L");
+            ui->key_P_S->setText("P");
+        }
+        else{
+            ui->key_Q_S->setText("q"); ui->key_A_S->setText("a"); ui->key_Z_S->setText("z");
+            ui->key_W_S->setText("w"); ui->key_S_S->setText("s"); ui->key_X_S->setText("x");
+            ui->key_E_S->setText("e"); ui->key_D_S->setText("d"); ui->key_C_S->setText("c");
+            ui->key_R_S->setText("r"); ui->key_F_S->setText("f"); ui->key_V_S->setText("v");
+            ui->key_T_S->setText("t"); ui->key_G_S->setText("g"); ui->key_B_S->setText("b");
+            ui->key_Y_S->setText("y"); ui->key_H_S->setText("h"); ui->key_N_S->setText("n");
+            ui->key_U_S->setText("u"); ui->key_J_S->setText("j"); ui->key_M_S->setText("m");
+            ui->key_I_S->setText("i"); ui->key_K_S->setText("k");
+            ui->key_O_S->setText("o"); ui->key_L_S->setText("l");
+            ui->key_P_S->setText("p");
+        }
+
+        // Change state of capps locked
+        showCapps_S = !showCapps_S;
+        showNums_S = false;
+    }
+}
+
+void Habbit_tracker::setNumbers(){
+    if(ui->A_frame->isVisible()){
+        if(!showNums_A){
+            ui->key_Q->setText("1");
+            ui->key_W->setText("2");
+            ui->key_E->setText("3");
+            ui->key_R->setText("4");
+            ui->key_T->setText("5");
+            ui->key_Y->setText("6");
+            ui->key_U->setText("7");
+            ui->key_I->setText("8");
+            ui->key_O->setText("9");
+            ui->key_P->setText("0");
+        }
+        else{
+            if(!showCapps_A){
+                ui->key_Q->setText("Q");
+                ui->key_W->setText("W");
+                ui->key_E->setText("E");
+                ui->key_R->setText("R");
+                ui->key_T->setText("T");
+                ui->key_Y->setText("Y");
+                ui->key_U->setText("U");
+                ui->key_I->setText("I");
+                ui->key_O->setText("O");
+                ui->key_P->setText("P");
+            }
+            else{
+                ui->key_Q->setText("q");
+                ui->key_W->setText("w");
+                ui->key_E->setText("e");
+                ui->key_R->setText("r");
+                ui->key_T->setText("t");
+                ui->key_Y->setText("y");
+                ui->key_U->setText("u");
+                ui->key_I->setText("i");
+                ui->key_O->setText("o");
+                ui->key_P->setText("p");
+            }
+        }
+
+        showNums_A = !showNums_A;
+    }else{
+        if(!showNums_S){
+            ui->key_Q_S->setText("1");
+            ui->key_W_S->setText("2");
+            ui->key_E_S->setText("3");
+            ui->key_R_S->setText("4");
+            ui->key_T_S->setText("5");
+            ui->key_Y_S->setText("6");
+            ui->key_U_S->setText("7");
+            ui->key_I_S->setText("8");
+            ui->key_O_S->setText("9");
+            ui->key_P_S->setText("0");
+        }
+        else{
+            if(!showCapps_S){
+                ui->key_Q_S->setText("Q");
+                ui->key_W_S->setText("W");
+                ui->key_E_S->setText("E");
+                ui->key_R_S->setText("R");
+                ui->key_T_S->setText("T");
+                ui->key_Y_S->setText("Y");
+                ui->key_U_S->setText("U");
+                ui->key_I_S->setText("I");
+                ui->key_O_S->setText("O");
+                ui->key_P_S->setText("P");
+            }
+            else{
+                ui->key_Q_S->setText("q");
+                ui->key_W_S->setText("w");
+                ui->key_E_S->setText("e");
+                ui->key_R_S->setText("r");
+                ui->key_T_S->setText("t");
+                ui->key_Y_S->setText("y");
+                ui->key_U_S->setText("u");
+                ui->key_I_S->setText("i");
+                ui->key_O_S->setText("o");
+                ui->key_P_S->setText("p");
+            }
+        }
+
+        showNums_S = !showNums_S;
+    }
+}
+
+void Habbit_tracker::insertKey(){
+    QPushButton* btn = qobject_cast<QPushButton*>(sender());
+    if (!btn) return;
+
+    QString keyText = btn->text();
+    QWidget* widget = QApplication::focusWidget();
+
+
+    if (keyText == "Backspace") {
+        if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {
+            QString text = lineEdit->text();
+            text.chop(1);
+            lineEdit->setText(text);
+        }
+        return;
+    }
+
+    if(keyText == "Space Bar"){
+        if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {
+            QString text = lineEdit->text();
+            text = text + " ";
+            lineEdit->setText(text);
+        }
+        return;
+    }
+
+    if(keyText == "Caps Lock"){
+        setCapps();
+        return;
+    }
+
+    if(keyText == "Num."){
+        setNumbers();
+        return;
+    }
+
+    if(keyText == "Hide Keyboard"){
+        return;
+    }
+
+
+    // Handle normal key input (A–Z)
+    if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {
+        lineEdit->insert(keyText);
+    }
+}
 
 
 

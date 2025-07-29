@@ -74,11 +74,8 @@ private:
 
 
     // Add Frame Functions ============================================================================================================
-    bool showCapps = false;
-    bool showNums = false;
-    void setNumbers();
-    void setCapps();
-    void insertKey();
+    bool showCapps_A = false;
+    bool showNums_A = false;
     void A_cancelButtonClicked();
     void A_saveButtonClicked();
 
@@ -100,19 +97,27 @@ private:
 
 
     // Setings Frame Functions =========================================================================================================
+    bool showCapps_S = false;
+    bool showNums_S = false;
     void S_backButtonClicked();
+    void S_keyboardToggleButtonClicked();
     void loadThemesIntoBox();
+    void S_addThemeButtonClicked();
 
 
 
 
     // Helper Functions ===============================================================================================================
-    bool validString(QString &input);
+    bool validString(QString input);
     void loadHabits();
     QColor stringToColor(QString input);
 
 
 
+    // Keybaord Functions ===============================================================================================================
+    void setNumbers();
+    void setCapps();
+    void insertKey();
 
 
 

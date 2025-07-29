@@ -4136,9 +4136,9 @@ color:black;
     <widget class="QPushButton" name="S_deleteButton">
      <property name="geometry">
       <rect>
-       <x>51</x>
+       <x>170</x>
        <y>397</y>
-       <width>381</width>
+       <width>260</width>
        <height>45</height>
       </rect>
      </property>
@@ -4867,6 +4867,30 @@ color:black;
        <string>&lt;background image name&gt;</string>
       </property>
      </widget>
+     <zorder>S_mainDarkerButton</zorder>
+     <zorder>S_mainLighterButton</zorder>
+     <zorder>S_allButtonsButton</zorder>
+     <zorder>S_selectedButtonsButton</zorder>
+     <zorder>S_disableButtonsButton</zorder>
+     <zorder>S_homeCurrentButton</zorder>
+     <zorder>S_homeCompletedButton</zorder>
+     <zorder>S_homeIncompletedButton</zorder>
+     <zorder>S_calendarCompletedButton</zorder>
+     <zorder>S_keyboardButton</zorder>
+     <zorder>S_cancelButton</zorder>
+     <zorder>S_saveButton</zorder>
+     <zorder>S_calendarWeekdayButton</zorder>
+     <zorder>S_calendarMonthButton</zorder>
+     <zorder>S_calendarIncompletedButton</zorder>
+     <zorder>label_4</zorder>
+     <zorder>label_5</zorder>
+     <zorder>label_7</zorder>
+     <zorder>label_8</zorder>
+     <zorder>S_itemSelectedButton</zorder>
+     <zorder>label_9</zorder>
+     <zorder>label_10</zorder>
+     <zorder>S_backgroundButton</zorder>
+     <zorder>label_6</zorder>
     </widget>
     <widget class="QPushButton" name="S_setThemeButton">
      <property name="geometry">
@@ -5512,7 +5536,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>9</x>
-        <y>8</y>
+        <y>9</y>
         <width>276</width>
         <height>25</height>
        </rect>
@@ -5537,7 +5561,7 @@ color:black;
       <property name="geometry">
        <rect>
         <x>291</x>
-        <y>8</y>
+        <y>9</y>
         <width>84</width>
         <height>26</height>
        </rect>
@@ -5636,9 +5660,9 @@ color:black;
     <widget class="QPushButton" name="S_duplicateButton">
      <property name="geometry">
       <rect>
-       <x>50</x>
+       <x>169</x>
        <y>451</y>
-       <width>381</width>
+       <width>260</width>
        <height>45</height>
       </rect>
      </property>
@@ -5707,10 +5731,892 @@ color:black;
       </property>
      </widget>
     </widget>
+    <widget class="QFrame" name="S_keyboard">
+     <property name="geometry">
+      <rect>
+       <x>980</x>
+       <y>170</y>
+       <width>922</width>
+       <height>322</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(253, 255, 222);</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Raised</enum>
+     </property>
+     <property name="lineWidth">
+      <number>2</number>
+     </property>
+     <widget class="QPushButton" name="key_spacebar_2">
+      <property name="geometry">
+       <rect>
+        <x>42</x>
+        <y>242</y>
+        <width>841</width>
+        <height>59</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>14</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>Space Bar</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_E_S">
+      <property name="geometry">
+       <rect>
+        <x>232</x>
+        <y>25</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>E</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_Y_S">
+      <property name="geometry">
+       <rect>
+        <x>466</x>
+        <y>25</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>Y</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_A_S">
+      <property name="geometry">
+       <rect>
+        <x>115</x>
+        <y>97</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>A</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_K_S">
+      <property name="geometry">
+       <rect>
+        <x>661</x>
+        <y>97</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>K</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_N_S">
+      <property name="geometry">
+       <rect>
+        <x>583</x>
+        <y>169</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>N</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_W_S">
+      <property name="geometry">
+       <rect>
+        <x>154</x>
+        <y>25</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>W</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_R_S">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>25</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>R</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_Q_S">
+      <property name="geometry">
+       <rect>
+        <x>76</x>
+        <y>25</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>Q</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_P_S">
+      <property name="geometry">
+       <rect>
+        <x>778</x>
+        <y>25</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>P</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_C_S">
+      <property name="geometry">
+       <rect>
+        <x>349</x>
+        <y>169</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>C</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_F_S">
+      <property name="geometry">
+       <rect>
+        <x>349</x>
+        <y>97</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>F</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_V_S">
+      <property name="geometry">
+       <rect>
+        <x>427</x>
+        <y>169</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>V</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_O_S">
+      <property name="geometry">
+       <rect>
+        <x>700</x>
+        <y>25</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>O</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_U_S">
+      <property name="geometry">
+       <rect>
+        <x>544</x>
+        <y>25</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>U</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_backSpace_S">
+      <property name="geometry">
+       <rect>
+        <x>739</x>
+        <y>169</y>
+        <width>143</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>Backspace</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_M_S">
+      <property name="geometry">
+       <rect>
+        <x>661</x>
+        <y>169</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>M</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_Z_S">
+      <property name="geometry">
+       <rect>
+        <x>193</x>
+        <y>169</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>Z</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_H_S">
+      <property name="geometry">
+       <rect>
+        <x>505</x>
+        <y>97</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>H</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_T_S">
+      <property name="geometry">
+       <rect>
+        <x>388</x>
+        <y>25</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>T</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_J_S">
+      <property name="geometry">
+       <rect>
+        <x>583</x>
+        <y>97</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>J</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_L_S">
+      <property name="geometry">
+       <rect>
+        <x>739</x>
+        <y>97</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>L</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_G_S">
+      <property name="geometry">
+       <rect>
+        <x>427</x>
+        <y>97</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>G</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_B_S">
+      <property name="geometry">
+       <rect>
+        <x>505</x>
+        <y>169</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>B</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_I_S">
+      <property name="geometry">
+       <rect>
+        <x>622</x>
+        <y>25</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>I</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_X_S">
+      <property name="geometry">
+       <rect>
+        <x>271</x>
+        <y>169</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>X</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_S_S">
+      <property name="geometry">
+       <rect>
+        <x>193</x>
+        <y>97</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>S</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_D_S">
+      <property name="geometry">
+       <rect>
+        <x>271</x>
+        <y>97</y>
+        <width>70</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>D</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_capps_S">
+      <property name="geometry">
+       <rect>
+        <x>42</x>
+        <y>169</y>
+        <width>143</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>Caps Lock</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="key_num_S">
+      <property name="geometry">
+       <rect>
+        <x>42</x>
+        <y>97</y>
+        <width>65</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Palatino Linotype</family>
+        <pointsize>15</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black;
+background-color: rgb(255, 170, 0)</string>
+      </property>
+      <property name="text">
+       <string>Num.</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QPushButton" name="S_keyboardToggleButton">
+     <property name="geometry">
+      <rect>
+       <x>53</x>
+       <y>396</y>
+       <width>108</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Times New Roman</family>
+       <pointsize>12</pointsize>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 233, 176)</string>
+     </property>
+     <property name="text">
+      <string>Keyboard</string>
+     </property>
+    </widget>
+    <zorder>frame_2</zorder>
+    <zorder>frame_3</zorder>
+    <zorder>S_deleteButton</zorder>
+    <zorder>S_setThemeButton</zorder>
+    <zorder>S_saveThemeButton</zorder>
+    <zorder>S_scrollUpButton</zorder>
+    <zorder>S_scrollDownButton</zorder>
+    <zorder>S_selectedThemeDemoFrame</zorder>
+    <zorder>S_selectedThemeDemoTitle</zorder>
+    <zorder>frame_7</zorder>
+    <zorder>S_duplicateButton</zorder>
+    <zorder>frame_4</zorder>
+    <zorder>S_selectedThemeFrame</zorder>
+    <zorder>S_savedThemesBox</zorder>
+    <zorder>S_savedThemeBoxTitle</zorder>
+    <zorder>S_selectedThemeTitle</zorder>
+    <zorder>frame_6</zorder>
+    <zorder>S_keyboard</zorder>
+    <zorder>S_keyboardToggleButton</zorder>
    </widget>
-   <zorder>A_frame</zorder>
    <zorder>H_frame</zorder>
    <zorder>M_frame</zorder>
+   <zorder>A_frame</zorder>
    <zorder>S_frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
