@@ -995,9 +995,9 @@
     <widget class="QLabel" name="M_date">
      <property name="geometry">
       <rect>
-       <x>640</x>
+       <x>600</x>
        <y>510</y>
-       <width>278</width>
+       <width>260</width>
        <height>35</height>
       </rect>
      </property>
@@ -1278,7 +1278,7 @@ color:black;</string>
       <rect>
        <x>254</x>
        <y>500</y>
-       <width>768</width>
+       <width>770</width>
        <height>51</height>
       </rect>
      </property>
@@ -1332,15 +1332,15 @@ color:black;</string>
       <string notr="true">color:black;background-color: rgb(255, 233, 176)</string>
      </property>
      <property name="text">
-      <string>Settings</string>
+      <string>Theme</string>
      </property>
     </widget>
     <widget class="QLabel" name="M_dateTitle">
      <property name="geometry">
       <rect>
-       <x>270</x>
+       <x>266</x>
        <y>510</y>
-       <width>350</width>
+       <width>333</width>
        <height>35</height>
       </rect>
      </property>
@@ -1389,6 +1389,34 @@ color:black;</string>
       <number>2</number>
      </property>
     </widget>
+    <widget class="QPushButton" name="M_themeButton">
+     <property name="geometry">
+      <rect>
+       <x>889</x>
+       <y>508</y>
+       <width>61</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Times New Roman</family>
+       <pointsize>11</pointsize>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+      </font>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color:black;background-color: rgb(255, 233, 176)</string>
+     </property>
+     <property name="text">
+      <string>Settings</string>
+     </property>
+    </widget>
     <zorder>M_buttonFrame</zorder>
     <zorder>M_sunLabel</zorder>
     <zorder>M_monLabel</zorder>
@@ -1408,6 +1436,7 @@ color:black;</string>
     <zorder>M_line</zorder>
     <zorder>M_date</zorder>
     <zorder>M_dateTitle</zorder>
+    <zorder>M_themeButton</zorder>
    </widget>
    <widget class="QFrame" name="A_frame">
     <property name="geometry">
@@ -3880,12 +3909,12 @@ color:black;
     <zorder>H_frame1</zorder>
     <zorder>H_monthButton</zorder>
     <zorder>H_weekButton</zorder>
-    <zorder>H_frame1_2</zorder>
     <zorder>H_scrollUpButton</zorder>
     <zorder>H_frame1_3</zorder>
     <zorder>H_yearButton</zorder>
     <zorder>H_scrollDownButton</zorder>
     <zorder>H_spanDisplay</zorder>
+    <zorder>H_frame1_2</zorder>
    </widget>
    <widget class="QFrame" name="S_frame">
     <property name="geometry">
@@ -6614,9 +6643,9 @@ background-color: rgb(255, 170, 0)</string>
     <zorder>S_keyboard</zorder>
     <zorder>S_keyboardToggleButton</zorder>
    </widget>
-   <zorder>H_frame</zorder>
-   <zorder>M_frame</zorder>
    <zorder>A_frame</zorder>
+   <zorder>M_frame</zorder>
+   <zorder>H_frame</zorder>
    <zorder>S_frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">

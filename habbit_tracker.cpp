@@ -1065,6 +1065,7 @@ void Habbit_tracker::S_addThemeButtonClicked(){
         return;
     }
 
+
     // Name was valid, replacing the spaces with underscores
     string currentThemeName = ui->S_addThemeInput->text().toStdString();
     string cleanedThemeName = "";

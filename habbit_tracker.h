@@ -141,7 +141,8 @@ private:
         "background-image:url(:/backgrounds/images/peepingPumpkins.png)",
         "background-image:url(:/backgrounds/images/nutCrackers.png)",
         "background-image:url(:/backgrounds/images/hohoho.png)",
-        "background-image:url(:/backgrounds/images/cuteChristmas.png)"
+        "background-image:url(:/backgrounds/images/cuteChristmas.png)",
+        "background-image:url(:/backgrounds/images/bowCherry.png)"
     };
 
     void paintTheme();        // Paints all the objects their colors set in variables
