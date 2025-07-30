@@ -108,11 +108,23 @@ private:
     bool showNums_S = false;
     void S_backButtonClicked();
     void S_keyboardToggleButtonClicked();
+    void S_resetButtonClicked();
+    void S_renameButtonClicked();
     void loadThemesIntoBox();
     void S_addThemeButtonClicked();
     void S_displayRadioButtonToggled();
     void S_displayMainButtonClicked();
     void S_savedThemeBoxIndexChanged();
+    void paintDemo();
+    void settingsChangeThemeButtonClicked();
+    void S_setDefaultButtonClicked();
+    void S_deleteButtonClicked();
+    void S_duplicateButtonClicked();
+    void S_saveThemeButtonClicked();
+    void S_setThemeButtonClicked();
+    void S_backgroundButtonClicked();
+    void S_backSelectionConfirmButtonClicked();
+    void S_backgroundSelectionScrollButtonClicked();
 
 
 
@@ -141,7 +153,6 @@ private:
     QString background_image;
     QStringList const possible_backgrounds = {
         "none",
-        "background-image:url(:/faces/images/nuetralFace.png)",
         "background-image:url(:/backgrounds/images/blue_stars.png)",
         "background-image:url(:/backgrounds/images/hearts.png)",
         "background-image:url(:/backgrounds/images/leaves.png)",
@@ -156,7 +167,7 @@ private:
     };
 
     void paintTheme();        // Paints all the objects their colors set in variables
-    void writeColorsToFile();  // Writes current colors in program mem. to file
+
     void loadColorsFromFile(); // Reads information from file saved in targetThemeFileName
 
 

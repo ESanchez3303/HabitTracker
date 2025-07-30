@@ -14,6 +14,7 @@
 #include <QScrollBar>
 #include <fstream>
 #include <QRegularExpression>
+#include <QColorDialog>
 
 
 using namespace std;
@@ -34,10 +35,12 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     // Raising frames
     ui->M_removeFrame->raise();
     ui->S_keyboard->raise();
+    ui->S_backgroundSelectionFrame->raise();
 
 
     // Moving frames where they are suppose to be
     ui->S_keyboard->move(QPoint(50,7));
+    ui->S_backgroundSelectionFrame->move(QPoint(4,4));
 
 
     // Setting up the Habit Tracker Table
@@ -53,6 +56,21 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     ui->M_habitTable->setShowGrid(showGrid);
     ui->M_habitTable->setGridStyle(Qt::SolidLine);
     ui->M_habitTable->setRowCount(initRowCount);
+
+
+    // Setting up the table for the backgrounds in settings
+    ui->S_backgroundSelectionBox->clear();
+    string backTempString;
+    for(auto &item:possible_backgrounds){
+        if(item == "none"){
+            ui->S_backgroundSelectionBox->addItem("NONE");
+            continue;
+        }
+        backTempString = item.toStdString();
+        backTempString = backTempString.substr(backTempString.find("images/") + 7);
+        backTempString = backTempString.substr(0,backTempString.size()-1);
+        ui->S_backgroundSelectionBox->addItem(QString::fromStdString(backTempString));
+    }
 
 
     // Setting up the display table for the settings
@@ -154,7 +172,24 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     connect(ui->S_savedThemesBox,&QListWidget::currentRowChanged, this, &Habbit_tracker::S_savedThemeBoxIndexChanged);
     connect(ui->S_displayRadioButton, &QRadioButton::toggled, this, &Habbit_tracker::S_displayRadioButtonToggled);
     connect(ui->S_displayMainButton, &QPushButton::clicked, this, &Habbit_tracker::S_displayMainButtonClicked);
+    connect(ui->S_resetButton, &QPushButton::clicked, this, &Habbit_tracker::S_resetButtonClicked);
+    connect(ui->S_renameButton, &QPushButton::clicked, this, &Habbit_tracker::S_renameButtonClicked);
+    connect(ui->S_deleteButton, &QPushButton::clicked, this, &Habbit_tracker::S_deleteButtonClicked);
+    connect(ui->S_duplicateButton, &QPushButton::clicked, this, &Habbit_tracker::S_duplicateButtonClicked);
+    connect(ui->S_saveThemeButton, &QPushButton::clicked, this, &Habbit_tracker::S_saveThemeButtonClicked);
+    connect(ui->S_setThemeButton, &QPushButton::clicked, this, &Habbit_tracker::S_setThemeButtonClicked);
+    connect(ui->S_backgroundButton, &QPushButton::clicked, this, &Habbit_tracker::S_backgroundButtonClicked);
+    connect(ui->S_setDefaultButton, &QPushButton::clicked, this, &Habbit_tracker::S_setDefaultButtonClicked);
+    connect(ui->S_backgroundSelectionScrollUp, &QPushButton::clicked, this, &Habbit_tracker::S_backgroundSelectionScrollButtonClicked);
+    connect(ui->S_backgroundSelectionScrollDown, &QPushButton::clicked, this, &Habbit_tracker::S_backgroundSelectionScrollButtonClicked);
+    connect(ui->S_backgroundSelectionConfirmButton, &QPushButton::clicked, this, &Habbit_tracker::S_backSelectionConfirmButtonClicked);
 
+    QList<QPushButton*> themeRecolorButtons = ui->S_selectedThemeFrame->findChildren<QPushButton*>();
+    for (auto &button : themeRecolorButtons) {
+        if(button->text() == "Select Background") continue;
+        if(button->text() == "V" ||  button->text() == "^") continue;
+        connect(button, &QPushButton::clicked, this, &Habbit_tracker::settingsChangeThemeButtonClicked);
+    }
 
 
 
@@ -871,7 +906,7 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
 
         QColor monthHeaderColor = stringToColor(month_header_color);    // Month Header
         QColor weekdayHeaderColor = stringToColor(week_header_color);   // Slightly darker for weekdays
-        QColor spacerColor = stringToColor(main_lighter_color);         // Space Color (right now same color as the background)
+        QColor spacerColor = stringToColor(week_header_color);         // Space Color (right now same color as the background)
         QColor dateBackgroundColor = stringToColor(other_days_color); // Default white for days
         QColor completedColor = stringToColor(complete_color);          // Green for completed
 
@@ -1044,6 +1079,93 @@ void Habbit_tracker::S_keyboardToggleButtonClicked(){
     }
 }
 
+void Habbit_tracker::S_resetButtonClicked(){
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this,"Resetting Changes", "Are you sure you want to delete changes made to this theme?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    // Returning if user decided to cancel the reset
+    if (reply == QMessageBox::No) {
+        return;
+    }
+
+    S_savedThemeBoxIndexChanged();
+}
+
+void Habbit_tracker::S_renameButtonClicked(){
+    string savingName = ui->S_renameInput->text().toStdString();
+
+
+    // Checking if the name did not change at all
+    if(ui->S_renameInput->text() == ui->S_savedThemesBox->currentItem()->text())
+        return;
+
+    // Checking if the format is correct and if the string is empty
+    if(!validString(QString::fromStdString(savingName))){
+        QMessageBox::information(this, "Name is invalid.","Please fix name format. Name has to have at least 1 character. Valid Characters: Numbers, Letters, Spaces.");
+        ui->S_renameInput->setText(ui->S_savedThemesBox->currentItem()->text());
+        return;
+    }
+
+    // Making sure they cant rename it to default
+    if(savingName == "default"){
+        QMessageBox::information(this, "Name Cannot Be Default","Theme name cannot be default. This file name is used in the backend for other reasons.");
+        ui->S_renameInput->setText(ui->S_savedThemesBox->currentItem()->text());
+        return;
+    }
+
+    // Making sure they cant rename it to selectedTheme
+    if(savingName == "selectedTheme"){
+        QMessageBox::information(this, "Name Cannot Be selectedTheme","Theme name cannot be selectedTheme. This file name is used in the backend for other reasons.");
+        ui->S_renameInput->setText(ui->S_savedThemesBox->currentItem()->text());
+        return;
+    }
+
+    // Checking if this name has been used before
+    int currentRow = ui->S_savedThemesBox->currentRow();
+    int count = ui->S_savedThemesBox->count();
+
+    for (int i = 0; i < count; ++i) {
+        if (i == currentRow) continue; // Skip the currently selected item
+
+        QListWidgetItem* item = ui->S_savedThemesBox->item(i);
+        if (item->text().toLower() == QString::fromStdString(savingName).toLower()) {
+            QMessageBox::information(this, "Theme Name is Used.",
+                                     "This theme name has already been used. Please choose a different name.");
+            ui->S_renameInput->setText(ui->S_savedThemesBox->currentItem()->text());
+            return;
+        }
+    }
+
+    // Changing the name of the theme file now that it passed all checks
+    string savingFileName = "";
+    for(auto &ch:savingName)
+        savingFileName += (ch == ' ' ? '_':ch);
+    savingFileName = themesPath + "/" + savingFileName + ".txt";
+
+
+    // Getting original file name
+    string originalName = ui->S_savedThemesBox->currentItem()->text().toStdString();
+    string originalFileName = "";
+    for(auto& ch:originalName)
+        originalFileName += (ch == ' ' ? '_':ch);
+    originalFileName = themesPath + "/" + originalFileName + ".txt";
+
+
+    // Rename the file
+    try {
+        filesystem::rename(originalFileName, savingFileName);
+    } catch (const filesystem::filesystem_error& e) {
+        QMessageBox::critical(this,"ERORR RENAMING FILE", "Could not rename the file. Please contact ema.");
+        ui->S_renameInput->setText(ui->S_savedThemesBox->currentItem()->text());
+        return;
+    }
+
+    // Reload the themes box
+    loadThemesIntoBox();
+
+}
+
 void Habbit_tracker::loadThemesIntoBox(){
     // Making sure that the folder exists
     if (!filesystem::exists(themesPath)) {
@@ -1094,12 +1216,15 @@ void Habbit_tracker::loadThemesIntoBox(){
     ui->S_selectedThemeDemoFrame->hide();
     ui->S_saveThemeButton->hide();
     ui->S_setThemeButton->hide();
+    ui->S_resetButton->hide();
+    ui->S_backgroundSelectionFrame->hide();
 
 
     // Disabeling the buttons that would need an index from the themeselectionbox
     ui->S_renameButton->setDisabled(true);
     ui->S_deleteButton->setDisabled(true);
     ui->S_duplicateButton->setDisabled(true);
+    ui->S_renameInput->setDisabled(true);
 
     // Cleaning the input for the rename section
     ui->S_renameInput->setText("");
@@ -1133,6 +1258,13 @@ void Habbit_tracker::S_addThemeButtonClicked(){
     // Catching when the name is "Default" since we never want to rewrite that file
     if(cleanedThemeName == "default"){
         QMessageBox::information(this, "Name Cannot Be Default","Theme name cannot be default. This file name is used in the backend for other reasons.");
+        ui->S_addThemeInput->setText("");
+        return;
+    }
+
+    // Making sure they cant rename it to selectedTheme
+    if(cleanedThemeName == "selectedTheme"){
+        QMessageBox::information(this, "Name Cannot Be selectedTheme","Theme name cannot be selectedTheme. This file name is used in the backend for other reasons.");
         ui->S_addThemeInput->setText("");
         return;
     }
@@ -1330,6 +1462,7 @@ void Habbit_tracker::S_savedThemeBoxIndexChanged(){
     ui->S_renameButton->setDisabled(false);
     ui->S_duplicateButton->setDisabled(false);
     ui->S_deleteButton->setDisabled(false);
+    ui->S_renameInput->setDisabled(false);
 
     // Showing the right side
     ui->S_selectedThemeTitle->show();
@@ -1338,8 +1471,13 @@ void Habbit_tracker::S_savedThemeBoxIndexChanged(){
     ui->S_selectedThemeDemoFrame->show();
     ui->S_saveThemeButton->show();
     ui->S_setThemeButton->show();
+    ui->S_resetButton->show();
 
+    paintDemo(); // This paints the demo with the saved information
 
+}
+
+void Habbit_tracker::paintDemo(){
     // UPDATING THE DISPLAY DEMO ----------------------------------------------------------------------------------------------------
     // Setting the main background color
     ui->S_selectedThemeDemoFrame->setStyleSheet("background-color: rgb" + T_main_lighter_color + "; color:black;");
@@ -1353,22 +1491,28 @@ void Habbit_tracker::S_savedThemeBoxIndexChanged(){
     ui->S_displaySaveButton->setStyleSheet("background-color: rgb" + T_save_button_color + ";");                             // Save Button
     ui->S_displayKeyboardButton->setStyleSheet("background-color: rgb" + T_keyboard_color + ";");                            // Keyboard Button
     ui->S_displaySelection->setStyleSheet("QListWidget { background-color: rgb" + T_main_darker_color + "; }"                // Selection List
-                                          "QListWidget::item:selected { background-color: rgb" + T_remove_item_selec_color + "; color: black; }"
-                                          "QListWidget::item:hover { background-color: rgb" + T_remove_item_selec_color + "; }");
+                                                                                                        "QListWidget::item:selected { background-color: rgb" + T_remove_item_selec_color + "; color: black; }"
+                                                                        "QListWidget::item:hover { background-color: rgb" + T_remove_item_selec_color + "; }");
     ui->S_displayMainButton->setStyleSheet("QPushButton { background-color: rgb" + T_button_color + "; } QPushButton:disabled { background-color: rgb" + T_button_disab_color + "}"); // Main Button (when is enabled)
 
     // Painting the background image into the displayBackgroundImage
     string backgroundUrl_string = T_background_image.toStdString();
     if(backgroundUrl_string == "none"){ // If the image is none, then set it to the image of none
         ui->S_displayBackground->setStyleSheet("border-image:url(:/none/images/none.png);"); // Background Image
+        ui->S_backgroundButton->setText("NONE");
     }
     else{ // If there is an actual background image selected, then parse for it and set the displaybackground using BORDER-IMAGE to show the full image
         backgroundUrl_string = backgroundUrl_string.substr(backgroundUrl_string.find(':')+1);
         ui->S_displayBackground->setStyleSheet("border-image:" + QString::fromStdString(backgroundUrl_string)); // Background Image
+
+        // Getting only the name of the file with the .png tag at the end for cleaner presentation
+        backgroundUrl_string = backgroundUrl_string.substr(backgroundUrl_string.find("images/") + 7);
+        backgroundUrl_string = backgroundUrl_string.substr(0,backgroundUrl_string.size()-1);
+        ui->S_backgroundButton->setText(QString::fromStdString(backgroundUrl_string));
     }
 
-    // Painting the display section of the QTableWidget ------------------------------------------------------
 
+    // Painting the display section of the QTableWidget ------------------------------------------------------
 
     // Chaning the colors of the checkmarks that represent the ones in the home screen
     QWidget* cellWidget1 = ui->S_displayTable->cellWidget(0,0);
@@ -1399,11 +1543,308 @@ void Habbit_tracker::S_savedThemeBoxIndexChanged(){
 
 }
 
+void Habbit_tracker::settingsChangeThemeButtonClicked(){
+    QPushButton* clickedButton = qobject_cast<QPushButton*>(sender());
+    if (!clickedButton) return;
+
+    // If the button pressed was the background image button, then show something different and return
+    if(clickedButton == ui->S_backgroundButton){
+        // Show the list of the avaliable images
+        return;
+    }
+
+
+    // Show the message that gets the color from the user and save that
+    QColor inputColor = QColorDialog::getColor(Qt::white,this,"Select a color.");
+    if(!inputColor.isValid()){
+        QMessageBox::critical(this,"No Color Chosen","There was no color chosen from input.");
+        return;
+    }
+
+
+    // Parse the saved color to get it in the format of (x[xx],x[xx],x[xx]) -- (x,x,x) ; x ranges from lit. amount of 1-3
+    int r = inputColor.red();
+    int g = inputColor.green();
+    int b = inputColor.blue();
+    QString inputColorQString = QString("(%1,%2,%3)").arg(r).arg(g).arg(b);
 
 
 
+    // Finding out which button is pressed and setting the screen display accordingly
+    if(clickedButton == ui->S_mainDarkerButton)               T_main_darker_color = inputColorQString;
+    else if(clickedButton == ui->S_mainLighterButton)         T_main_lighter_color = inputColorQString;
+    else if(clickedButton == ui->S_allButtonsButton)          T_button_color = inputColorQString;
+    else if(clickedButton == ui->S_selectedButtonsButton)     T_button_select_color = inputColorQString;
+    else if(clickedButton == ui->S_disableButtonsButton)      T_button_disab_color = inputColorQString;
+    else if(clickedButton == ui->S_keyboardButton)            T_keyboard_color = inputColorQString;
+    else if(clickedButton == ui->S_cancelButton)              T_cancel_button_color = inputColorQString;
+    else if(clickedButton == ui->S_saveButton)                T_save_button_color = inputColorQString;
+    else if(clickedButton == ui->S_itemSelectedButton)        T_remove_item_selec_color = inputColorQString;
+    else if(clickedButton == ui->S_homeCurrentButton)         T_current_day_color = inputColorQString;
+    else if(clickedButton == ui->S_homeCompletedButton)       T_is_checked_color = inputColorQString;
+    else if(clickedButton == ui->S_homeIncompletedButton)     T_not_checked_color = inputColorQString;
+    else if(clickedButton == ui->S_calendarCompletedButton)   T_complete_color = inputColorQString;
+    else if(clickedButton == ui->S_calendarIncompletedButton) T_other_days_color = inputColorQString;
+    else if(clickedButton == ui->S_calendarMonthButton)       T_month_header_color = inputColorQString;
+    else if(clickedButton == ui->S_calendarWeekdayButton)     T_week_header_color = inputColorQString;
 
 
+    // Paint the demo with the new information, since some information interlaps with other widgets
+    paintDemo();
+}
+
+void Habbit_tracker::S_setDefaultButtonClicked(){
+    // Confirm with the user that we are going to switch the current set theme
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this,"Setting Program Theme", "Are you sure you want to set the theme to 'DEFAULT THEME'?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    // Returning if user decided to cancel the the setting to default
+    if (reply == QMessageBox::No) {
+        return;
+    }
+
+    // Saving the new current theme
+    ofstream newSelectedTheme(currentThemeFileName);
+    newSelectedTheme << defaultColorsFileName;
+    newSelectedTheme.close();
+
+    // Loading the data from the file
+    loadColorsFromFile();
+
+    // Re-painting the program
+    paintTheme();
+
+    // Re-sending back into this frame to fix up everything
+    switchFrame(ui->S_frame);
+
+}
+
+void Habbit_tracker::S_deleteButtonClicked(){
+    // Just in case to make sure that we have selected an item
+    if(ui->S_savedThemesBox->currentRow() == -1){
+        return;
+    }
+
+    // Confirm with the user that we are going to delete the selected theme
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this,"Deleting theme", "Are you sure you want to delete '" + ui->S_savedThemesBox->currentItem()->text() + "'?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    // Returning if user decided to cancel the deletion
+    if (reply == QMessageBox::No) {
+        return;
+    }
+
+    // Making the file Name
+    string themeName = ui->S_savedThemesBox->currentItem()->text().toStdString();
+    string themeFileName = "";
+    for(auto&ch:themeName)
+        themeFileName += (ch==' ' ? '_':ch);
+    themeFileName = themesPath + "/" + themeFileName + ".txt";
+
+
+    // Checking if we are removing the current theme that we have set
+    if(targetThemeFileName == themeFileName){
+        ofstream resettingThemeFile(currentThemeFileName);
+        resettingThemeFile << defaultColorsFileName;
+        resettingThemeFile.close();
+        QMessageBox::information(this,"Setting theme to default.","Removed theme was the set theme. Changing set theme back to default theme");
+        loadColorsFromFile();
+        paintTheme();
+    }
+
+    // Removing the file
+    if(filesystem::exists(themeFileName))
+        filesystem::remove(themeFileName);
+
+    // Reloading the themes from the files
+    switchFrame(ui->S_frame);
+}
+
+void Habbit_tracker::S_duplicateButtonClicked(){
+    if(ui->S_savedThemesBox->currentRow() < 0)
+        return;
+
+    // Getting the name of the current theme in the qlistwidget that is selected
+    string themeName = ui->S_savedThemesBox->currentItem()->text().toStdString();
+    string themeFileName = "";
+    for(auto &ch:themeName)
+        themeFileName += (ch == ' ' ? '_':ch);
+
+
+    // Adding this to the end of the file name to show its a duplicate
+    string timestamp = QDateTime::currentDateTime().toString("MddyyHmmss").toStdString();
+    string duplicateFileName = themesPath + "/" + themeFileName + "_DUPLI_" + timestamp + ".txt";
+
+    // Making the file name an actual path of the original file
+    themeFileName = themesPath + "/" + themeFileName +  ".txt";
+
+    // Copying everything from original file to the new file
+    ifstream originalFile(themeFileName);
+    ofstream newFile(duplicateFileName);
+    try{
+        if(!originalFile) throw 0;
+        if(!newFile) throw 0;
+
+        string tempString;
+        while(getline(originalFile,tempString))
+            newFile << tempString << endl;
+
+        originalFile.close();
+        newFile.close();
+    }
+    catch(...){
+        if(originalFile) originalFile.close();
+        if(newFile) newFile.close();
+        QMessageBox::critical(this,"ERROR DUPLICATING","Could not duplicate file, contact ema.");
+        return;
+    }
+
+    // Reloading the themes box to grab new box
+    loadThemesIntoBox();
+}
+
+void Habbit_tracker::S_saveThemeButtonClicked(){
+    // This function ONLY saves the theme from the temp values into the theme file
+    if(ui->S_savedThemesBox->currentRow() < 0)
+        return;
+
+    // Getting the filename of the theme
+    string themeName = ui->S_savedThemesBox->currentItem()->text().toStdString();
+    string themeFileName = "";
+    for(auto& ch : themeName)
+        themeFileName += (ch == ' ' ? '_':ch);
+    themeFileName = themesPath + "/" + themeFileName + ".txt";
+
+
+
+    // Rewritting the file that is selected using the T_ values that have been using for the demo
+    ofstream themeFile(themeFileName);
+    if(!themeFile){
+        QMessageBox::critical(this,"ERROR SAVING FILE", "There was an error in saving the file, please conctact ema.");
+        switchFrame(ui->S_frame);
+        return;
+    }
+
+    // Writting the file
+    themeFile << "#WARNING: Do not put spaces inside the ()" << endl;
+    themeFile << endl;
+    themeFile << "#Main Colors:" << endl;
+    themeFile << "main_darker_color=" << T_main_darker_color.toStdString() << endl;
+    themeFile << "main_lighter_color=" << T_main_lighter_color.toStdString() << endl;
+    themeFile << endl;
+    themeFile << "#Buttons Colors:" << endl;
+    themeFile << "button_color=" << T_button_color.toStdString() << endl;
+    themeFile << "button_select_color=" << T_button_select_color.toStdString() << endl;
+    themeFile << "button_disab_color=" << T_button_disab_color.toStdString() << endl;
+    themeFile << endl;
+    themeFile << "#Add Habit Colors:" << endl;
+    themeFile << "keyboard_color=" << T_keyboard_color.toStdString() << endl;
+    themeFile << "cancel_button_color=" << T_cancel_button_color.toStdString() << endl;
+    themeFile << "save_button_color=" << T_save_button_color.toStdString() << endl;
+    themeFile << endl;
+    themeFile << "#Main Display Colors:" << endl;
+    themeFile << "current_day_color=" << T_current_day_color.toStdString() << endl;
+    themeFile << "is_checked_color=" << T_is_checked_color.toStdString() << endl;
+    themeFile << "not_checked_color=" << T_not_checked_color.toStdString() << endl;
+    themeFile << endl;
+    themeFile << "#Calendar Colors:" << endl;
+    themeFile << "month_header_color=" << T_month_header_color.toStdString() << endl;
+    themeFile << "week_header_color=" << T_week_header_color.toStdString() << endl;
+    themeFile << "complete_color=" << T_complete_color.toStdString() << endl;
+    themeFile << "other_days_color=" << T_other_days_color.toStdString() << endl;
+    themeFile << endl;
+    themeFile << "#Remove Habit Colors:" << endl;
+    themeFile << "remove_item_selec_color=" << T_remove_item_selec_color.toStdString() << endl;
+    themeFile << endl;
+    themeFile << "#Background Image:" << endl;
+    themeFile << "background_image=" << T_background_image.toStdString() << endl;
+
+    themeFile.close();
+
+    QMessageBox::information(this, "Successfully Saved Theme.", "Theme has been saved into files.");
+
+    if(themeFileName == targetThemeFileName){
+        loadColorsFromFile();
+        paintTheme();
+    }
+
+}
+
+void Habbit_tracker::S_setThemeButtonClicked(){
+    // Saving the theme to the file
+    S_saveThemeButtonClicked();
+
+    // Setting the target theme file
+    ofstream themeSelectionFile(currentThemeFileName);
+    if(!themeSelectionFile){
+        QMessageBox::critical(this, "ERROR OPENING THEME SELEC FILE.","Could not open theme selection file. Please restart program.");
+        return;
+    }
+
+    // Getting the new target file
+    string themeName = ui->S_savedThemesBox->currentItem()->text().toStdString();
+    string themeFileName = "";
+    for(auto& ch : themeName)
+        themeFileName += (ch == ' ' ? '_':ch);
+    themeFileName = themesPath + "/" + themeFileName + ".txt";
+
+
+    // Writting the new selected theme into the currentThemeFileName file
+    themeSelectionFile << themeFileName << endl;
+    themeSelectionFile.close();
+
+    // Loading theme from file (which is the file above now)
+    loadColorsFromFile();
+
+    // Repainting the program (using the target theme)
+    paintTheme();
+
+    // Resetting completely the frame
+    switchFrame(ui->S_frame);
+}
+
+void Habbit_tracker::S_backgroundButtonClicked(){
+    ui->S_backgroundSelectionFrame->show();
+    int indexOfSelectedBackground = 0;
+    for(auto &item : possible_backgrounds){
+        if(item == T_background_image)
+            break;
+        indexOfSelectedBackground++;
+    }
+
+    ui->S_backgroundSelectionBox->setCurrentRow(indexOfSelectedBackground);
+}
+
+void Habbit_tracker::S_backSelectionConfirmButtonClicked(){
+    if(ui->S_backgroundSelectionBox->currentRow() == -1)
+        return;
+
+    // Setting the temp value for the background
+    T_background_image = "background-image:url(:/backgrounds/images/" + ui->S_backgroundSelectionBox->currentItem()->text() + ")";
+
+    // Painting the demo again
+    paintDemo();
+
+    // Hiding again the background selection frame
+    ui->S_backgroundSelectionFrame->hide();
+}
+
+void Habbit_tracker::S_backgroundSelectionScrollButtonClicked(){
+    QObject* btn = sender();
+    if (!btn) return;
+
+    int currentValue = ui->S_backgroundSelectionBox->verticalScrollBar()->value();
+    int step = 2;
+
+
+    if (btn == ui->S_backgroundSelectionScrollDown) {
+        ui->S_backgroundSelectionBox->verticalScrollBar()->setValue(currentValue + step);
+    } else if (btn == ui->S_backgroundSelectionScrollUp) {
+        ui->S_backgroundSelectionBox->verticalScrollBar()->setValue(currentValue - step);
+    }
+}
 
 
 
@@ -1497,7 +1938,7 @@ void Habbit_tracker::loadHabits() {
 
 
 
-    QString colorString = main_darker_color;
+    QString colorString = main_lighter_color;
     colorString.remove('(');
     colorString.remove(')');
 
@@ -1508,7 +1949,7 @@ void Habbit_tracker::loadHabits() {
         int g = rgbList[1].trimmed().toInt();
         int b = rgbList[2].trimmed().toInt();
 
-        QColor cellColor(r, g, b);
+        QColor habitBackgroundColor(r, g, b);
         int colCount = ui->M_habitTable->columnCount();
 
         for (int row = 0; row < initRowCount; ++row) {
@@ -1520,7 +1961,7 @@ void Habbit_tracker::loadHabits() {
                         item->setTextAlignment(Qt::AlignCenter);
                         ui->M_habitTable->setItem(row, col, item);
                     }
-                    item->setBackground(cellColor);
+                    item->setBackground(habitBackgroundColor);
                 } else {
                     QWidget* cellWidget = ui->M_habitTable->cellWidget(row, col);
                     if (!cellWidget) {
@@ -1974,6 +2415,8 @@ void Habbit_tracker::paintTheme(){
     ui->S_selectedThemeFrame->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->frame_6->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->frame_7->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->S_backgroundSelectionFrame->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->frame_4->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
 
     // Buttons:
     ui->S_backButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
@@ -2003,12 +2446,23 @@ void Habbit_tracker::paintTheme(){
     ui->S_calendarWeekdayButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
     ui->S_backgroundButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
     ui->S_setDefaultButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_resetButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_backgroundSelectionConfirmButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_backgroundSelectionScrollDown->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_backgroundSelectionScrollUp->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_keyboardToggleButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
 
     // Saved Theme box:
     ui->S_savedThemesBox->setStyleSheet("QListWidget { background-color: rgb" + main_lighter_color + "; }"
                                         "QListWidget::item { padding: 5px; }"
                                         "QListWidget::item:selected { background-color: rgb" + remove_item_selec_color + "; color: black; }"
                                         "QListWidget::item:hover { background-color: rgb" + remove_item_selec_color + "; }");
+
+    // Possible background box:
+    ui->S_backgroundSelectionBox->setStyleSheet("QListWidget { background-color: rgb" + main_lighter_color + "; }"
+                                                "QListWidget::item:selected { background-color: rgb" + remove_item_selec_color + "; color: black; }"
+                                                "QListWidget::item:hover { background-color: rgb" + remove_item_selec_color + "; }");
+
 
 
 }
@@ -2210,43 +2664,6 @@ void Habbit_tracker::loadColorsFromFile(){
 
 
 
-}
-
-void Habbit_tracker::writeColorsToFile(){
-    ofstream newColorFile(targetThemeFileName);
-        newColorFile << "#WARNING: Do not put spaces inside the ()" << endl;
-        newColorFile << endl;
-        newColorFile << "#Main Colors:" << endl;
-        newColorFile << "main_darker_color=" << main_darker_color.toStdString() << endl;
-        newColorFile << "main_lighter_color=" << main_lighter_color.toStdString() << endl;
-        newColorFile << endl;
-        newColorFile << "#Buttons Colors:" << endl;
-        newColorFile << "button_color=" << button_color.toStdString() << endl;
-        newColorFile << "button_select_color=" << button_select_color.toStdString() << endl;
-        newColorFile << "button_disab_color=" << button_disab_color.toStdString() << endl;
-        newColorFile << endl;
-        newColorFile << "#Add Habit Colors:" << endl;
-        newColorFile << "keyboard_color=" << keyboard_color.toStdString() << endl;
-        newColorFile << "cancel_button_color=" << cancel_button_color.toStdString() << endl;
-        newColorFile << "save_button_color=" << save_button_color.toStdString() << endl;
-        newColorFile << endl;
-        newColorFile << "#Main Display Colors:" << endl;
-        newColorFile << "current_day_color=" << current_day_color.toStdString() << endl;
-        newColorFile << "is_checked_color=" << is_checked_color.toStdString() << endl;
-        newColorFile << "not_checked_color=" << not_checked_color.toStdString() << endl;
-        newColorFile << endl;
-        newColorFile << "#Calendar Colors:" << endl;
-        newColorFile << "month_header_color=" << month_header_color.toStdString() << endl;
-        newColorFile << "week_header_color=" << week_header_color.toStdString() << endl;
-        newColorFile << "complete_color=" << complete_color.toStdString() << endl;
-        newColorFile << "other_days_color=" << other_days_color.toStdString() << endl;
-        newColorFile << endl;
-        newColorFile << "#Remove Habit Colors:" << endl;
-        newColorFile << "remove_item_selec_color=" << remove_item_selec_color.toStdString() << endl;
-        newColorFile << endl;
-        newColorFile << "#Background Image:" << endl;
-        newColorFile << "background_image=none" << endl;
-    newColorFile.close();
 }
 
 
