@@ -4841,7 +4841,7 @@ color:black;
         <x>4</x>
         <y>246</y>
         <width>190</width>
-        <height>20</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="font">
@@ -4896,6 +4896,25 @@ color:black;
        <string>&lt;background image name&gt;</string>
       </property>
      </widget>
+     <widget class="QFrame" name="S_displayBackground">
+      <property name="geometry">
+       <rect>
+        <x>477</x>
+        <y>229</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Shape::Box</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Shadow::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+     </widget>
      <zorder>S_mainDarkerButton</zorder>
      <zorder>S_mainLighterButton</zorder>
      <zorder>S_allButtonsButton</zorder>
@@ -4920,6 +4939,7 @@ color:black;
      <zorder>label_10</zorder>
      <zorder>S_backgroundButton</zorder>
      <zorder>label_6</zorder>
+     <zorder>S_displayBackground</zorder>
     </widget>
     <widget class="QPushButton" name="S_setThemeButton">
      <property name="geometry">
@@ -5080,7 +5100,7 @@ color:black;
      <property name="lineWidth">
       <number>2</number>
      </property>
-     <widget class="QPushButton" name="S_backButton_25">
+     <widget class="QPushButton" name="S_displayMainButton">
       <property name="geometry">
        <rect>
         <x>9</x>
@@ -5112,7 +5132,7 @@ color:black;
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_27">
+     <widget class="QPushButton" name="S_displayKeyboardButton">
       <property name="geometry">
        <rect>
         <x>75</x>
@@ -5138,7 +5158,7 @@ color:black;
        <string>E</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_28">
+     <widget class="QPushButton" name="S_displayCancelButton">
       <property name="geometry">
        <rect>
         <x>75</x>
@@ -5164,7 +5184,7 @@ color:black;
        <string>Cancel</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S_backButton_29">
+     <widget class="QPushButton" name="S_displaySaveButton">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -5190,7 +5210,7 @@ color:black;
        <string>Save</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="listWidget_2">
+     <widget class="QListWidget" name="S_displaySelection">
       <property name="geometry">
        <rect>
         <x>139</x>
@@ -5237,7 +5257,7 @@ color:black;
        </property>
       </item>
      </widget>
-     <widget class="QRadioButton" name="radioButton">
+     <widget class="QRadioButton" name="S_displayRadioButton">
       <property name="geometry">
        <rect>
         <x>9</x>
@@ -5250,7 +5270,7 @@ color:black;
        <string>Disable</string>
       </property>
      </widget>
-     <widget class="QTableWidget" name="S_show">
+     <widget class="QTableWidget" name="S_displayTable">
       <property name="geometry">
        <rect>
         <x>211</x>
@@ -5286,8 +5306,17 @@ color:black;
       <property name="editTriggers">
        <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
       </property>
+      <property name="tabKeyNavigation">
+       <bool>false</bool>
+      </property>
+      <property name="showDropIndicator" stdset="0">
+       <bool>false</bool>
+      </property>
       <property name="dragDropOverwriteMode">
        <bool>false</bool>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
        <number>120</number>
@@ -5296,7 +5325,7 @@ color:black;
        <number>10</number>
       </attribute>
       <attribute name="verticalHeaderDefaultSectionSize">
-       <number>12</number>
+       <number>14</number>
       </attribute>
       <row>
        <property name="text">
@@ -5364,6 +5393,9 @@ color:black;
        </property>
       </column>
       <item row="0" column="0">
+       <property name="text">
+        <string/>
+       </property>
        <property name="textAlignment">
         <set>AlignCenter</set>
        </property>
@@ -5377,6 +5409,9 @@ color:black;
        </property>
       </item>
       <item row="1" column="0">
+       <property name="text">
+        <string/>
+       </property>
        <property name="textAlignment">
         <set>AlignCenter</set>
        </property>
@@ -5391,7 +5426,7 @@ color:black;
       </item>
       <item row="2" column="0">
        <property name="text">
-        <string>Saturday</string>
+        <string/>
        </property>
        <property name="textAlignment">
         <set>AlignCenter</set>
@@ -5764,7 +5799,7 @@ color:black;
      <property name="geometry">
       <rect>
        <x>980</x>
-       <y>170</y>
+       <y>-40</y>
        <width>922</width>
        <height>322</height>
       </rect>

@@ -55,6 +55,51 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     ui->M_habitTable->setRowCount(initRowCount);
 
 
+    // Setting up the display table for the settings
+    QCheckBox* displayTableCompleted   = new QCheckBox(this);
+    displayTableCompleted->setChecked(true);
+    displayTableCompleted->setDisabled(true);
+    QWidget* DTCompletedContainer = new QWidget();
+    QHBoxLayout* DTCompletedLayout = new QHBoxLayout(DTCompletedContainer);
+    DTCompletedLayout->addWidget(displayTableCompleted);
+    DTCompletedLayout->setAlignment(Qt::AlignCenter);
+    DTCompletedLayout->setContentsMargins(0, 0, 0, 0);
+    DTCompletedLayout->setSpacing(0);
+    ui->S_displayTable->setCellWidget(0,0,DTCompletedContainer);
+    DTCompletedContainer->setStyleSheet("background: transparent;");
+    DTCompletedContainer->setAttribute(Qt::WA_TranslucentBackground);
+
+
+    QCheckBox* displayTableIncompleted = new QCheckBox(this);
+    displayTableIncompleted->setChecked(false);
+    displayTableIncompleted->setDisabled(true);
+    QWidget* DTIncompletedContainer = new QWidget();
+    QHBoxLayout* DTIncompletedLayout = new QHBoxLayout(DTIncompletedContainer);
+    DTIncompletedLayout->addWidget(displayTableIncompleted);
+    DTIncompletedLayout->setAlignment(Qt::AlignCenter);
+    DTIncompletedLayout->setContentsMargins(0, 0, 0, 0);
+    DTIncompletedLayout->setSpacing(0);
+    ui->S_displayTable->setCellWidget(1,0,DTIncompletedContainer);
+    DTIncompletedContainer->setStyleSheet("background: transparent;");
+    DTIncompletedContainer->setAttribute(Qt::WA_TranslucentBackground);
+
+
+    QCheckBox* displayTableCurrent = new QCheckBox(this);
+    displayTableCurrent->setChecked(false);
+    displayTableCurrent->setDisabled(true);
+    QWidget* DTCurrentContainer = new QWidget();
+    QHBoxLayout* DTCurrentLayout = new QHBoxLayout(DTCurrentContainer);
+    DTCurrentLayout->addWidget(displayTableCurrent);
+    DTCurrentLayout->setAlignment(Qt::AlignCenter);
+    DTCurrentLayout->setContentsMargins(0, 0, 0, 0);
+    DTCurrentLayout->setSpacing(0);
+    ui->S_displayTable->setCellWidget(2,0,DTCurrentContainer);
+    DTCurrentContainer->setStyleSheet("background: transparent;");
+    DTCurrentContainer->setAttribute(Qt::WA_TranslucentBackground);
+
+
+
+
     // Connecting all the keyboard keys and Setting their Focus Policy   ------ ADDING KEYBOARD
     QList<QPushButton*> keys = ui->A_keyboard->findChildren<QPushButton*>();
     for (auto &key : keys) {
@@ -77,6 +122,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     ui->H_spanDisplay->setFocusPolicy(Qt::NoFocus);
     ui->A_keyboard->setFocusPolicy(Qt::NoFocus);
     ui->S_keyboardToggleButton->setFocusPolicy(Qt::NoFocus);
+    ui->S_displayTable->setFocusPolicy(Qt::NoFocus);
 
 
 
@@ -105,6 +151,9 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     connect(ui->S_backButton, &QPushButton::clicked, this, &Habbit_tracker::S_backButtonClicked);
     connect(ui->S_addThemeButton, &QPushButton::clicked, this, &Habbit_tracker::S_addThemeButtonClicked);
     connect(ui->S_keyboardToggleButton, &QPushButton::clicked, this, &Habbit_tracker::S_keyboardToggleButtonClicked);
+    connect(ui->S_savedThemesBox,&QListWidget::currentRowChanged, this, &Habbit_tracker::S_savedThemeBoxIndexChanged);
+    connect(ui->S_displayRadioButton, &QRadioButton::toggled, this, &Habbit_tracker::S_displayRadioButtonToggled);
+    connect(ui->S_displayMainButton, &QPushButton::clicked, this, &Habbit_tracker::S_displayMainButtonClicked);
 
 
 
@@ -1038,7 +1087,7 @@ void Habbit_tracker::loadThemesIntoBox(){
         ui->S_scrollDownButton->hide();
     }
 
-    // Hiding the whole selected theme section
+    // Hiding the whole selected theme section (rigth section)
     ui->S_selectedThemeTitle->hide();
     ui->S_selectedThemeFrame->hide();
     ui->S_selectedThemeDemoTitle->hide();
@@ -1132,7 +1181,223 @@ void Habbit_tracker::S_addThemeButtonClicked(){
     loadThemesIntoBox();
 }
 
+void Habbit_tracker::S_displayRadioButtonToggled(){
+    if(ui->S_displayRadioButton->isChecked()){
+        ui->S_displayMainButton->setDisabled(true);
+    }
+    else{
+        ui->S_displayMainButton->setDisabled(false);
+    }
+}
 
+void Habbit_tracker::S_displayMainButtonClicked(){
+    if(ui->S_displayMainButton->isChecked()){
+        ui->S_displayMainButton->setStyleSheet("QPushButton { background-color: rgb" + T_button_select_color + "; } QPushButton:disabled { background-color: rgb" + T_button_disab_color + ";}" );
+    }else{
+        ui->S_displayMainButton->setStyleSheet("QPushButton { background-color: rgb" + T_button_color + "; } QPushButton:disabled { background-color: rgb" + T_button_disab_color + ";}" );
+    }
+}
+
+void Habbit_tracker::S_savedThemeBoxIndexChanged(){
+    // Catching when the index changes to nothing
+    if(ui->S_savedThemesBox->currentRow() == -1){
+        // Reset the saved theme box, will also hide the right section, and clear everything from the screen
+        loadThemesIntoBox();
+        return;
+    }
+
+
+    // Attempting to open the file with the given name
+    // Making theme name into the file name
+    string themeName = ui->S_savedThemesBox->currentItem()->text().toStdString();
+    string themeFileName = "";
+    for(auto& ch:themeName){
+        themeFileName += (ch == ' ' ? '_':ch);
+    }
+
+    themeFileName = themesPath + "/" + themeFileName + ".txt";
+
+    ifstream themeFile(themeFileName);
+    if(!themeFile){
+        QMessageBox::critical(this,"ERROR","Could not open the selected file. Please contact ema.");
+        loadThemesIntoBox();
+        return;
+    }
+
+
+
+
+
+
+
+    // Saving all the file variables into the above temp. variables
+    try{
+        string tempString;
+        int count = 1;
+
+        while(getline(themeFile, tempString)){
+            if(tempString.empty())              // Skipping empty lines
+                continue;
+            if(tempString[0] == '#')            // Skipping lines with # in front
+                continue;
+
+
+            tempString = tempString.substr(tempString.find('=') + 1); // Removing everything up to inclusive: "="
+            switch(count){
+            case 1 :T_main_darker_color       = QString::fromStdString(tempString);
+            case 2 :T_main_lighter_color      = QString::fromStdString(tempString);
+            case 3 :T_button_color            = QString::fromStdString(tempString);
+            case 4 :T_button_select_color     = QString::fromStdString(tempString);
+            case 5 :T_button_disab_color      = QString::fromStdString(tempString);
+            case 6 :T_keyboard_color          = QString::fromStdString(tempString);
+            case 7 :T_cancel_button_color     = QString::fromStdString(tempString);
+            case 8 :T_save_button_color       = QString::fromStdString(tempString);
+            case 9 :T_current_day_color       = QString::fromStdString(tempString);
+            case 10:T_is_checked_color        = QString::fromStdString(tempString);
+            case 11:T_not_checked_color       = QString::fromStdString(tempString);
+            case 12:T_month_header_color      = QString::fromStdString(tempString);
+            case 13:T_week_header_color       = QString::fromStdString(tempString);
+            case 14:T_complete_color          = QString::fromStdString(tempString);
+            case 15:T_other_days_color        = QString::fromStdString(tempString);
+            case 16:T_remove_item_selec_color = QString::fromStdString(tempString);
+            case 17:T_background_image        = QString::fromStdString(tempString);
+            }
+
+            count++;
+            if(count == 18) // Not checking the background image since we already checked that at the end of this function
+                continue;
+
+
+            // Validating the string that was saved | Format (x[xx],x[xx],x[xx]) x be 1-3 characters
+            if(tempString.empty()){
+                throw 1;
+            }
+            if(tempString[0] != '('){
+                throw 1;
+            }
+
+
+
+            if(tempString.find(',') == tempString.npos){
+                throw 1;
+            }
+            int tmp = stoi(tempString.substr(1,tempString.find(',')));
+            tempString = tempString.substr(tempString.find(',') + 1);
+
+
+
+            if(tempString.find(',') == tempString.npos){
+                throw 1;
+            }
+            tmp = stoi(tempString.substr(0,tempString.find(',')));
+            tempString = tempString.substr(tempString.find(',') + 1);
+
+
+
+            if(tempString.find(')') == tempString.npos){
+                cout << "ERROR 2" << endl;
+                throw 1;
+            }
+            tmp = stoi(tempString.substr(0,tempString.find(')')));
+            tempString = tempString.substr(tempString.find(')') + 1);
+
+            if(!tempString.empty())
+                throw 1;
+
+
+        }
+        // Checking if background_image is a valid image:
+        if(!possible_backgrounds.contains(T_background_image)){
+            throw 1;
+        }
+
+        themeFile.close();
+
+    }
+    catch(...){    // IF ANYTHING GOES WRONG DURING READING, close and do not change anything in screen
+        themeFile.close();
+        QMessageBox::critical(this, "Theme file Error", "Theme file was corrupted, Please contact ema.");
+        loadThemesIntoBox();
+        return;
+    }
+
+
+
+    // Setting the renaming text
+    ui->S_renameInput->setText(QString::fromStdString(themeName));
+
+    // Enabling the buttons
+    ui->S_renameButton->setDisabled(false);
+    ui->S_duplicateButton->setDisabled(false);
+    ui->S_deleteButton->setDisabled(false);
+
+    // Showing the right side
+    ui->S_selectedThemeTitle->show();
+    ui->S_selectedThemeFrame->show();
+    ui->S_selectedThemeDemoTitle->show();
+    ui->S_selectedThemeDemoFrame->show();
+    ui->S_saveThemeButton->show();
+    ui->S_setThemeButton->show();
+
+
+    // UPDATING THE DISPLAY DEMO ----------------------------------------------------------------------------------------------------
+    // Setting the main background color
+    ui->S_selectedThemeDemoFrame->setStyleSheet("background-color: rgb" + T_main_lighter_color + "; color:black;");
+    ui->S_selectedThemeDemoTitle->setStyleSheet("background-color: rgb" + T_main_darker_color + "; color:black;");
+
+    // Starting the demo with the radio button for the disabled to be inactive
+    ui->S_displayRadioButton->setChecked(false);
+
+    // Painting the display sections of the theme information (easy ones)
+    ui->S_displayCancelButton->setStyleSheet("background-color: rgb" + T_cancel_button_color + "; background-image: none;"); // Cancel Buttton
+    ui->S_displaySaveButton->setStyleSheet("background-color: rgb" + T_save_button_color + ";");                             // Save Button
+    ui->S_displayKeyboardButton->setStyleSheet("background-color: rgb" + T_keyboard_color + ";");                            // Keyboard Button
+    ui->S_displaySelection->setStyleSheet("QListWidget { background-color: rgb" + T_main_darker_color + "; }"                // Selection List
+                                          "QListWidget::item:selected { background-color: rgb" + T_remove_item_selec_color + "; color: black; }"
+                                          "QListWidget::item:hover { background-color: rgb" + T_remove_item_selec_color + "; }");
+    ui->S_displayMainButton->setStyleSheet("QPushButton { background-color: rgb" + T_button_color + "; } QPushButton:disabled { background-color: rgb" + T_button_disab_color + "}"); // Main Button (when is enabled)
+
+    // Painting the background image into the displayBackgroundImage
+    string backgroundUrl_string = T_background_image.toStdString();
+    if(backgroundUrl_string == "none"){ // If the image is none, then set it to the image of none
+        ui->S_displayBackground->setStyleSheet("border-image:url(:/none/images/none.png);"); // Background Image
+    }
+    else{ // If there is an actual background image selected, then parse for it and set the displaybackground using BORDER-IMAGE to show the full image
+        backgroundUrl_string = backgroundUrl_string.substr(backgroundUrl_string.find(':')+1);
+        ui->S_displayBackground->setStyleSheet("border-image:" + QString::fromStdString(backgroundUrl_string)); // Background Image
+    }
+
+    // Painting the display section of the QTableWidget ------------------------------------------------------
+
+
+    // Chaning the colors of the checkmarks that represent the ones in the home screen
+    QWidget* cellWidget1 = ui->S_displayTable->cellWidget(0,0);
+    cellWidget1->setStyleSheet("background-color: rgb" + T_is_checked_color + ";");
+
+    QWidget* cellWidget2 = ui->S_displayTable->cellWidget(1,0);
+    cellWidget2->setStyleSheet("background-color: rgb" + T_not_checked_color + ";");
+
+    QWidget* cellWidget3 = ui->S_displayTable->cellWidget(2,0);
+    cellWidget3->setStyleSheet("background-color: rgb" + T_current_day_color + ";");
+
+
+
+    // Changing the colors of the calendar section
+    QTableWidgetItem* calendarComplete = ui->S_displayTable->item(0, 1);
+    QTableWidgetItem* calendarIncomplete= ui->S_displayTable->item(1, 1);
+    QTableWidgetItem* calendarMonth = ui->S_displayTable->item(3, 1);
+    QTableWidgetItem* calendarWeekday = ui->S_displayTable->item(4, 1);
+
+    calendarComplete->setBackground(stringToColor(T_complete_color));
+    calendarIncomplete->setBackground(stringToColor(T_other_days_color));
+    calendarMonth->setBackground(stringToColor(T_month_header_color));
+    calendarWeekday->setBackground(stringToColor(T_week_header_color));
+
+    // Changing the background image on the table and setting the grid lines variable
+    ui->S_displayTable->setStyleSheet("background-color: rgb" + T_main_lighter_color + ";" + T_background_image + ";");
+    ui->S_displayTable->setShowGrid(showGrid);
+
+}
 
 
 
@@ -1878,6 +2143,47 @@ void Habbit_tracker::loadColorsFromFile(){
             }
 
             count++;
+            if(count == 18) // Not checking the background image since we already checked that at the end of this function
+                continue;
+
+
+            // Validating the string that was saved | Format (x[xx],x[xx],x[xx]) x be 1-3 characters
+            if(tempString.empty()){
+                throw 1;
+            }
+            if(tempString[0] != '('){
+                throw 1;
+            }
+
+
+
+            if(tempString.find(',') == tempString.npos){
+                throw 1;
+            }
+            int tmp = stoi(tempString.substr(1,tempString.find(',')));
+            tempString = tempString.substr(tempString.find(',') + 1);
+
+
+
+            if(tempString.find(',') == tempString.npos){
+                throw 1;
+            }
+            tmp = stoi(tempString.substr(0,tempString.find(',')));
+            tempString = tempString.substr(tempString.find(',') + 1);
+
+
+
+            if(tempString.find(')') == tempString.npos){
+                cout << "ERROR 2" << endl;
+                throw 1;
+            }
+            tmp = stoi(tempString.substr(0,tempString.find(')')));
+            tempString = tempString.substr(tempString.find(')') + 1);
+
+            if(!tempString.empty())
+                throw 1;
+
+
         }
         colorFile.close();  // Close the file
 

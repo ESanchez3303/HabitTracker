@@ -17,4 +17,7 @@
         <file>images/nutCrackers.png</file>
         <file>images/bowCherry.png</file>
     </qresource>
+    <qresource prefix="/none">
+        <file>images/none.png</file>
+    </qresource>
 </RCC>

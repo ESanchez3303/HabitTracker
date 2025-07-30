@@ -97,12 +97,22 @@ private:
 
 
     // Setings Frame Functions =========================================================================================================
+    QString T_main_darker_color, T_main_lighter_color;
+    QString T_button_color, T_button_select_color, T_button_disab_color;
+    QString T_keyboard_color, T_cancel_button_color, T_save_button_color;
+    QString T_current_day_color, T_is_checked_color, T_not_checked_color;
+    QString T_month_header_color, T_week_header_color, T_complete_color, T_other_days_color;
+    QString T_remove_item_selec_color;
+    QString T_background_image;
     bool showCapps_S = false;
     bool showNums_S = false;
     void S_backButtonClicked();
     void S_keyboardToggleButtonClicked();
     void loadThemesIntoBox();
     void S_addThemeButtonClicked();
+    void S_displayRadioButtonToggled();
+    void S_displayMainButtonClicked();
+    void S_savedThemeBoxIndexChanged();
 
 
 
