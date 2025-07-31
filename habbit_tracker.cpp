@@ -876,6 +876,7 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
                 if (cellIndex < startDayOffset || dayNumber > totalDays) {
                     item = new QTableWidgetItem("");
                     item->setFlags(Qt::NoItemFlags);
+                    item->setBackground(otherDaysColor_);
                 }
                 else {
                     QDate currentDay = spanStart.addDays(dayNumber - 1);
@@ -988,6 +989,7 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
                     if (cellIndex < startDayOffset || dayNum > daysInMonth) {
                         item = new QTableWidgetItem("");
                         item->setFlags(Qt::NoItemFlags);
+                        item->setBackground(dateBackgroundColor);
                     } else {
                         QDate currentDay(year, month, dayNum);
                         item = new QTableWidgetItem(QString::number(dayNum));
@@ -1338,6 +1340,8 @@ void Habbit_tracker::S_savedThemeBoxIndexChanged(){
         return;
     }
 
+    // Hiding again the background selection frame
+    ui->S_backgroundSelectionFrame->hide();
 
     // Attempting to open the file with the given name
     // Making theme name into the file name
