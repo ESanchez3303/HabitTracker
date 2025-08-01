@@ -97,7 +97,7 @@ private:
 
 
     // Setings Frame Functions =========================================================================================================
-    QString T_main_darker_color, T_main_lighter_color;
+    QString T_main_darker_color, T_main_lighter_color, T_text_color;
     QString T_button_color, T_button_select_color, T_button_disab_color;
     QString T_keyboard_color, T_cancel_button_color, T_save_button_color;
     QString T_current_day_color, T_is_checked_color, T_not_checked_color;
@@ -144,7 +144,7 @@ private:
 
 
     // Theme Functions ================================================================================================================
-    QString main_darker_color, main_lighter_color;
+    QString main_darker_color, main_lighter_color, text_color;
     QString button_color, button_select_color, button_disab_color;
     QString keyboard_color, cancel_button_color, save_button_color;
     QString current_day_color, is_checked_color, not_checked_color;

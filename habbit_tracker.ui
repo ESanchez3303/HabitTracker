@@ -4183,9 +4183,9 @@ color:black;
      <widget class="QPushButton" name="S_mainDarkerButton">
       <property name="geometry">
        <rect>
-        <x>343</x>
-        <y>11</y>
-        <width>130</width>
+        <x>298</x>
+        <y>10</y>
+        <width>85</width>
         <height>23</height>
        </rect>
       </property>
@@ -4203,7 +4203,7 @@ color:black;
        <string notr="true">background-color: rgb(255, 233, 176)</string>
       </property>
       <property name="text">
-       <string>Main Darker</string>
+       <string>M. Darker</string>
       </property>
      </widget>
      <widget class="QPushButton" name="S_mainLighterButton">
@@ -4211,7 +4211,7 @@ color:black;
        <rect>
         <x>209</x>
         <y>11</y>
-        <width>130</width>
+        <width>85</width>
         <height>23</height>
        </rect>
       </property>
@@ -4229,7 +4229,7 @@ color:black;
        <string notr="true">background-color: rgb(255, 233, 176)</string>
       </property>
       <property name="text">
-       <string>Main Ligther</string>
+       <string>M. Ligther</string>
       </property>
      </widget>
      <widget class="QPushButton" name="S_allButtonsButton">
@@ -5021,6 +5021,32 @@ color:black;
        </property>
       </widget>
      </widget>
+     <widget class="QPushButton" name="S_textColorButton">
+      <property name="geometry">
+       <rect>
+        <x>387</x>
+        <y>10</y>
+        <width>85</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 233, 176)</string>
+      </property>
+      <property name="text">
+       <string>Text</string>
+      </property>
+     </widget>
      <zorder>S_mainDarkerButton</zorder>
      <zorder>S_mainLighterButton</zorder>
      <zorder>S_allButtonsButton</zorder>
@@ -5047,6 +5073,7 @@ color:black;
      <zorder>label_6</zorder>
      <zorder>S_displayBackground</zorder>
      <zorder>S_backgroundSelectionFrame</zorder>
+     <zorder>S_textColorButton</zorder>
     </widget>
     <widget class="QPushButton" name="S_setThemeButton">
      <property name="geometry">
@@ -6817,8 +6844,8 @@ background-color: rgb(255, 170, 0)</string>
    </widget>
    <zorder>A_frame</zorder>
    <zorder>M_frame</zorder>
-   <zorder>S_frame</zorder>
    <zorder>H_frame</zorder>
+   <zorder>S_frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
