@@ -1484,6 +1484,12 @@ color:black;</string>
         <height>16</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
       <property name="styleSheet">
        <string notr="true">color:black;</string>
       </property>
@@ -5373,6 +5379,11 @@ color:black;
         <height>21</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+       </font>
+      </property>
       <property name="text">
        <string>Disable</string>
       </property>
@@ -6817,8 +6828,8 @@ background-color: rgb(255, 170, 0)</string>
    </widget>
    <zorder>M_frame</zorder>
    <zorder>H_frame</zorder>
-   <zorder>S_frame</zorder>
    <zorder>A_frame</zorder>
+   <zorder>S_frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
