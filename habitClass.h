@@ -42,7 +42,7 @@ public:
     string getName() { return name; }
     string getFileName() {return fileName; }
     array<bool,7> getWeek() { return week; }
-    historyWeek getLastWeek();
+    historyWeek getCurrentWeek();
     int getHistorySize(){return history.size();}
     vector<historyWeek>& getHistory(){return history;}
 

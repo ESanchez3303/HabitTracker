@@ -668,8 +668,7 @@ void Habbit_tracker::spanButtonClicked(){
 
     // Setting the color to be set as currently in this tab
     if(pressedButton == ui->H_weekButton){
-        int currentDayOfWeek = currentDate.dayOfWeek();
-        spanStart = currentDate.addDays(-currentDayOfWeek - 6);
+        spanStart = currentDate.addDays(1 - currentDate.dayOfWeek());
         spanEnd = spanStart.addDays(6);
 
         ui->H_dateSpan->setText(spanStart.toString(dateFormat) + " - " + spanEnd.toString(dateFormat));
@@ -798,6 +797,9 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
     QColor completedColor_ = stringToColor(complete_color);
     QColor otherDaysColor_ = stringToColor(other_days_color);
 
+    vector<historyWeek> allHistory = currentHabit.getHistory();
+    allHistory.push_back(currentHabit.getCurrentWeek());
+
     if (currentTab == "week") {
         ui->H_spanDisplay->setShowGrid(true);
         ui->H_spanDisplay->horizontalHeader()->setVisible(true);
@@ -813,7 +815,7 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
 
         // Find matching week
         historyWeek* targetWeek = nullptr;
-        for (auto& hw : currentHabit.getHistory()) {
+        for (auto& hw : allHistory) {
             if (hw.start == spanStart && hw.end == spanEnd) {
                 targetWeek = &hw;
                 break;
@@ -855,7 +857,7 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
 
         // Build progressMap as before
         std::map<QDate, bool> progressMap;
-        for (const auto& hw : currentHabit.getHistory()) {
+        for (const auto& hw : allHistory) {
             if (!(hw.end < spanStart || hw.start > spanEnd)) {
                 for (int i = 0; i < 7; ++i) {
                     QDate day = hw.start.addDays(i);
@@ -939,7 +941,7 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
 
         // Build progress map
         std::map<QDate, bool> progressMap;
-        for (const auto& hw : currentHabit.getHistory()) {
+        for (const auto& hw : allHistory) {
             for (int i = 0; i < 7; ++i) {
                 QDate day = hw.start.addDays(i);
                 if (day.year() == year) {
@@ -1279,6 +1281,7 @@ void Habbit_tracker::S_addThemeButtonClicked(){
         newThemeFile << "#Main Colors:" << endl;
         newThemeFile << "main_darker_color=(255,255,187)" << endl;
         newThemeFile << "main_lighter_color=(253,255,222)" << endl;
+        newThemeFile << "text_color=(0,0,0)" << endl;
         newThemeFile << endl;
         newThemeFile << "#Buttons Colors:" << endl;
         newThemeFile << "button_color=(255,233,176)" << endl;
@@ -1365,13 +1368,16 @@ void Habbit_tracker::S_savedThemeBoxIndexChanged(){
 
 
 
-
+    QString errorString = "";
+    string tempString = "";
+    string holdingFullString = "";
     // Saving all the file variables into the above temp. variables
     try{
-        string tempString;
+        tempString = "[none]";
         int count = 1;
 
         while(getline(themeFile, tempString)){
+            holdingFullString = tempString;
             if(tempString.empty())              // Skipping empty lines
                 continue;
             if(tempString[0] == '#')            // Skipping lines with # in front
@@ -1407,44 +1413,58 @@ void Habbit_tracker::S_savedThemeBoxIndexChanged(){
 
             // Validating the string that was saved | Format (x[xx],x[xx],x[xx]) x be 1-3 characters
             if(tempString.empty()){
+                errorString = "<string was empty>";
                 throw 1;
             }
+
             if(tempString[0] != '('){
+                errorString = "missing (";
                 throw 1;
             }
 
 
 
             if(tempString.find(',') == tempString.npos){
+                errorString = "missing first comma";
                 throw 1;
             }
+
+            errorString = "converting FIRST number";
             int tmp = stoi(tempString.substr(1,tempString.find(',')));
             tempString = tempString.substr(tempString.find(',') + 1);
-
+            errorString = "";
 
 
             if(tempString.find(',') == tempString.npos){
+                errorString = "missing second comma";
                 throw 1;
             }
+            errorString = "converting SECOND number";
             tmp = stoi(tempString.substr(0,tempString.find(',')));
             tempString = tempString.substr(tempString.find(',') + 1);
-
+            errorString = "";
 
 
             if(tempString.find(')') == tempString.npos){
-                cout << "ERROR 2" << endl;
+                errorString = "missing )";
                 throw 1;
             }
+
+            errorString = "converting THIRD number";
             tmp = stoi(tempString.substr(0,tempString.find(')')));
             tempString = tempString.substr(tempString.find(')') + 1);
+            errorString = "";
 
-            if(!tempString.empty())
+            if(!tempString.empty()){
+                errorString = "string was not empty after reading.";
                 throw 1;
+            }
 
 
         }
         // Checking if background_image is a valid image:
         if(!possible_backgrounds.contains(T_background_image)){
+            errorString = "background image not found";
             throw 1;
         }
 
@@ -1453,7 +1473,8 @@ void Habbit_tracker::S_savedThemeBoxIndexChanged(){
     }
     catch(...){    // IF ANYTHING GOES WRONG DURING READING, close and do not change anything in screen
         themeFile.close();
-        QMessageBox::critical(this, "Theme file Error", "Theme file was corrupted, Please contact ema.");
+        QMessageBox::critical(this, "Theme file Error", "Theme file was corrupted, Please contact ema. ERROR: " + errorString +
+                              ", TMPSTRING: [" + QString::fromStdString(tempString) + "], FULLSTRING: [" + QString::fromStdString(holdingFullString) + "]");
         loadThemesIntoBox();
         return;
     }
@@ -1829,8 +1850,12 @@ void Habbit_tracker::S_backSelectionConfirmButtonClicked(){
     if(ui->S_backgroundSelectionBox->currentRow() == -1)
         return;
 
-    // Setting the temp value for the background
-    T_background_image = "background-image:url(:/backgrounds/images/" + ui->S_backgroundSelectionBox->currentItem()->text() + ")";
+    // Checking if the chosen value was none
+    QString userChoice = ui->S_backgroundSelectionBox->currentItem()->text();
+    if(userChoice == "NONE")
+        T_background_image = "none"; // Setting the temp value to "none"
+    else
+        T_background_image = "background-image:url(:/backgrounds/images/" + userChoice + ")"; // Setting the temp value for the background
 
     // Painting the demo again
     paintDemo();
@@ -1853,6 +1878,11 @@ void Habbit_tracker::S_backgroundSelectionScrollButtonClicked(){
         ui->S_backgroundSelectionBox->verticalScrollBar()->setValue(currentValue - step);
     }
 }
+
+
+
+
+
 
 
 
@@ -2054,6 +2084,9 @@ QColor Habbit_tracker::stringToColor(QString input){
     QColor rValue = QColor(red,green,blue);
     return rValue;
 }
+
+
+
 
 
 
@@ -2347,39 +2380,14 @@ void Habbit_tracker::paintTheme(){
     ui->A_cancelButton->setStyleSheet("background-color: rgb" + cancel_button_color + ";");
     ui->A_saveButton->setStyleSheet("background-color: rgb" + save_button_color + ";");
 
+    // Text Input
+    ui->A_nameInput->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+
     // Keyboard Buttons:
-    ui->key_Q->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_W->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_E->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_R->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_T->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_Y->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_U->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_I->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_O->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_P->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_A->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_S->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_D->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_F->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_G->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_H->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_J->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_K->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_L->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_Z->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_X->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_C->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_V->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_B->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_N->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_M->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_spacebar->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_backSpace->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_capps->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-    ui->key_num->setStyleSheet("background-color: rgb" + keyboard_color + ";");
-
-
+    QList<QPushButton*> keys_A = ui->A_keyboard->findChildren<QPushButton*>();
+    for (auto &key : keys_A) {
+        key->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    }
 
 
 
@@ -2426,6 +2434,10 @@ void Habbit_tracker::paintTheme(){
     ui->S_backgroundSelectionFrame->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->frame_4->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
 
+    // Text Boxes
+    ui->S_renameInput->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->S_addThemeInput->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+
     // Buttons:
     ui->S_backButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
     ui->S_scrollUpButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
@@ -2459,6 +2471,7 @@ void Habbit_tracker::paintTheme(){
     ui->S_backgroundSelectionScrollDown->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
     ui->S_backgroundSelectionScrollUp->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
     ui->S_keyboardToggleButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_textColorButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
 
     // Saved Theme box:
     ui->S_savedThemesBox->setStyleSheet("QListWidget { background-color: rgb" + main_lighter_color + "; }"
@@ -2472,6 +2485,12 @@ void Habbit_tracker::paintTheme(){
                                                 "QListWidget::item:hover { background-color: rgb" + remove_item_selec_color + "; }");
 
 
+    // Keyboard Colors
+    QList<QPushButton*> keys_S = ui->S_keyboard->findChildren<QPushButton*>();
+    for (auto &key : keys_S) {
+        key->setStyleSheet("background-color: rgb" + keyboard_color + ";");
+    }
+    ui->S_keyboard->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
 
 }
 

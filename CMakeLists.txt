@@ -12,35 +12,27 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+# Add habitClass.cpp to your sources here so it's always compiled
 set(PROJECT_SOURCES
-        main.cpp
-        habbit_tracker.cpp
-        habbit_tracker.h
-        habbit_tracker.ui
+    main.cpp
+    habbit_tracker.cpp
+    habbit_tracker.h
+    habbit_tracker.ui
+    habitClass.cpp
+    habitClass.h
+    images.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Habit_Tracker
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        habitClass.h
-        habitClass.cpp
-        images.qrc
-
-
-
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET Habit_Tracker APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
         add_library(Habit_Tracker SHARED
             ${PROJECT_SOURCES}
         )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         add_executable(Habit_Tracker
             ${PROJECT_SOURCES}
@@ -50,26 +42,7 @@ endif()
 
 target_link_libraries(Habit_Tracker PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Habit_Tracker)
-endif()
-set_target_properties(Habit_Tracker PROPERTIES
-    ${BUNDLE_ID_OPTION}
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
-)
-
-include(GNUInstallDirs)
-install(TARGETS Habit_Tracker
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+# iOS/macOS bundle stuff omitted for brevity; keep as you had
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(Habit_Tracker)

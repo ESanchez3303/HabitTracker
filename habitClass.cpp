@@ -29,14 +29,7 @@ habit::habit(string newName, string newFilePath){
 
 void habit::saveWeek(QDate today){
 
-    cout << "History BEFORE: " << endl;
-    for(auto &entry : history){
-        cout << entry.start.toString(dateFormat).toStdString() << " - ";
-        cout << entry.end.toString(dateFormat).toStdString() << " | ";
-        for(auto &value : entry.values)
-            cout << value;
-        cout << endl;
-    }
+
 
     // Making new historyWeek object
     historyWeek newEntry;
@@ -54,15 +47,6 @@ void habit::saveWeek(QDate today){
     // Reset the week to all "false"
     for(auto &value : week){
         value = 0;
-    }
-
-    cout << "History AFTER: " << endl;
-    for(auto &entry : history){
-        cout << entry.start.toString(dateFormat).toStdString() << " - ";
-        cout << entry.end.toString(dateFormat).toStdString() << " | ";
-        for(auto &value : entry.values)
-            cout << value;
-        cout << endl;
     }
 
     // Leave the writting for outside of this function by calling the writeToFile() function
@@ -113,6 +97,7 @@ bool habit::writeToFile(){
     return true;
     return true;
 }
+
 
 string habit::makeFromFile(){
     // Opening file with <name_name>.txt
@@ -255,14 +240,21 @@ void habit::setDay(int targetDay, bool setTo){
 }
 
 
-historyWeek habit::getLastWeek(){
-    return history[history.size()-1];
+
+historyWeek habit::getCurrentWeek(){
+    historyWeek currentWeekHistory;
+    QDate today = QDate::currentDate();
+
+    // Find the week start date and end date and SET into the history week
+    currentWeekHistory.start = today.addDays(1 - today.dayOfWeek());
+    currentWeekHistory.end = currentWeekHistory.start.addDays(6);
+
+    // Load the values of current week into the historyWeek
+    currentWeekHistory.values = week;
+
+    // return the new history week
+    return currentWeekHistory;
 }
-
-
-
-
-
 
 
 
