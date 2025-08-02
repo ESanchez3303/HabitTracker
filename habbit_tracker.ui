@@ -5373,8 +5373,8 @@ color:black;
      <widget class="QRadioButton" name="S_displayRadioButton">
       <property name="geometry">
        <rect>
-        <x>9</x>
-        <y>17</y>
+        <x>10</x>
+        <y>20</y>
         <width>65</width>
         <height>21</height>
        </rect>
@@ -5382,10 +5382,17 @@ color:black;
       <property name="font">
        <font>
         <family>Times New Roman</family>
+        <kerning>false</kerning>
        </font>
       </property>
       <property name="text">
-       <string>Disable</string>
+       <string>DIS.</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
       </property>
      </widget>
      <widget class="QTableWidget" name="S_displayTable">
@@ -5446,7 +5453,7 @@ color:black;
        <number>10</number>
       </attribute>
       <attribute name="verticalHeaderDefaultSectionSize">
-       <number>14</number>
+       <number>13</number>
       </attribute>
       <row>
        <property name="text">
@@ -5507,10 +5514,20 @@ color:black;
        <property name="text">
         <string>Home Screen</string>
        </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+        </font>
+       </property>
       </column>
       <column>
        <property name="text">
         <string>Calendar Screen</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+        </font>
        </property>
       </column>
       <item row="0" column="0">

@@ -1,0 +1,33 @@
+#WARNING: Do not put spaces inside the ()
+
+#Main Colors:
+main_darker_color=(255,134,166)
+main_lighter_color=(252,213,227)
+text_color=(0,0,0)
+
+#Buttons Colors:
+button_color=(223,105,146)
+button_select_color=(212,153,202)
+button_disab_color=(160,160,160)
+
+#Add Habit Colors:
+keyboard_color=(212,153,202)
+cancel_button_color=(255,126,126)
+save_button_color=(165,255,171)
+
+#Main Display Colors:
+current_day_color=(255,120,167)
+is_checked_color=(180,152,162)
+not_checked_color=(252,213,227)
+
+#Calendar Colors:
+month_header_color=(255,134,166)
+week_header_color=(230,230,230)
+complete_color=(252,213,227)
+other_days_color=(255,255,255)
+
+#Remove Habit Colors:
+remove_item_selec_color=(212,153,202)
+
+#Background Image:
+background_image=background-image:url(:/backgrounds/images/bowCherry.png)

@@ -1,0 +1,33 @@
+#WARNING: Do not put spaces inside the ()
+
+#Main Colors:
+main_darker_color=(233,100,52)
+main_lighter_color=(249,129,40)
+text_color=(0,0,0)
+
+#Buttons Colors:
+button_color=(93,37,134)
+button_select_color=(80,184,71)
+button_disab_color=(24,24,24)
+
+#Add Habit Colors:
+keyboard_color=(80,184,71)
+cancel_button_color=(234,207,26)
+save_button_color=(234,207,26)
+
+#Main Display Colors:
+current_day_color=(80,184,71)
+is_checked_color=(80,183,71)
+not_checked_color=(93,37,134)
+
+#Calendar Colors:
+month_header_color=(233,100,52)
+week_header_color=(249,129,40)
+complete_color=(100,200,100)
+other_days_color=(199,199,199)
+
+#Remove Habit Colors:
+remove_item_selec_color=(195,195,195)
+
+#Background Image:
+background_image=background-image:url(:/backgrounds/images/peepingPumpkins.png)
