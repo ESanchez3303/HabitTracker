@@ -69,13 +69,14 @@ private:
     void M_cancelButtonClicked();
     void M_confirmButtonClicked();
     void M_viewHistoryButtonClicked();
+    void M_themeButtonClicked();
     void M_settingsButtonClicked();
 
 
 
     // Add Frame Functions ============================================================================================================
-    bool showCapps_A = false;
-    bool showNums_A = false;
+    bool showCappT_A = false;
+    bool showNumT_A = false;
     void A_cancelButtonClicked();
     void A_saveButtonClicked();
 
@@ -96,36 +97,41 @@ private:
 
 
 
-    // Setings Frame Functions =========================================================================================================
+    // Theme Frame Functions =========================================================================================================
     QString T_main_darker_color, T_main_lighter_color, T_text_color;
     QString T_button_color, T_button_select_color, T_button_disab_color;
     QString T_keyboard_color, T_cancel_button_color, T_save_button_color;
-    QString T_current_day_color, T_is_checked_color, T_not_checked_color;
-    QString T_month_header_color, T_week_header_color, T_complete_color, T_other_days_color;
+    QString T_current_day_color, T_iT_checked_color, T_not_checked_color;
+    QString T_month_header_color, T_week_header_color, T_complete_color, T_other_dayT_color;
     QString T_remove_item_selec_color;
     QString T_background_image;
-    bool showCapps_S = false;
-    bool showNums_S = false;
-    void S_backButtonClicked();
-    void S_keyboardToggleButtonClicked();
-    void S_resetButtonClicked();
-    void S_renameButtonClicked();
+    bool showCapps_T = false;
+    bool showNums_T = false;
+    void T_backButtonClicked();
+    void T_keyboardToggleButtonClicked();
+    void T_resetButtonClicked();
+    void T_renameButtonClicked();
     void loadThemesIntoBox();
-    void S_addThemeButtonClicked();
-    void S_displayRadioButtonToggled();
-    void S_displayMainButtonClicked();
-    void S_savedThemeBoxIndexChanged();
+    void T_addThemeButtonClicked();
+    void T_displayRadioButtonToggled();
+    void T_displayMainButtonClicked();
+    void T_savedThemeBoxIndexChanged();
     void paintDemo();
     void settingsChangeThemeButtonClicked();
-    void S_setDefaultButtonClicked();
-    void S_deleteButtonClicked();
-    void S_duplicateButtonClicked();
-    void S_saveThemeButtonClicked();
-    void S_setThemeButtonClicked();
-    void S_backgroundButtonClicked();
-    void S_backSelectionConfirmButtonClicked();
-    void S_backgroundSelectionScrollButtonClicked();
+    void T_setDefaultButtonClicked();
+    void T_deleteButtonClicked();
+    void T_duplicateButtonClicked();
+    void T_saveThemeButtonClicked();
+    void T_setThemeButtonClicked();
+    void T_backgroundButtonClicked();
+    void T_backSelectionConfirmButtonClicked();
+    void T_backgroundSelectionScrollButtonClicked();
+    void T_scrollButtonClicked();
 
+
+
+    // Settings Frame Functions =========================================================================================================
+    void S_backButtonClicked();
 
 
 
@@ -147,8 +153,8 @@ private:
     QString main_darker_color, main_lighter_color, text_color;
     QString button_color, button_select_color, button_disab_color;
     QString keyboard_color, cancel_button_color, save_button_color;
-    QString current_day_color, is_checked_color, not_checked_color;
-    QString month_header_color,week_header_color,complete_color,other_days_color;
+    QString current_day_color, iT_checked_color, not_checked_color;
+    QString month_header_color,week_header_color,complete_color,other_dayT_color;
     QString remove_item_selec_color;
     QString background_image;
     QStringList const possible_backgrounds = {
@@ -163,7 +169,9 @@ private:
         "background-image:url(:/backgrounds/images/nutCrackers.png)",
         "background-image:url(:/backgrounds/images/hohoho.png)",
         "background-image:url(:/backgrounds/images/cuteChristmas.png)",
-        "background-image:url(:/backgrounds/images/bowCherry.png)"
+        "background-image:url(:/backgrounds/images/bowCherry.png)",
+        "background-image:url(:/backgrounds/images/trippy.png)",
+        "background-image:url(:/backgrounds/images/colorfullSmiley.png)",
     };
 
     void paintTheme();        // Paints all the objects their colors set in variables

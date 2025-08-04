@@ -16,6 +16,8 @@
         <file>images/hohoho.png</file>
         <file>images/nutCrackers.png</file>
         <file>images/bowCherry.png</file>
+        <file>images/trippy.png</file>
+        <file>images/colorfullSmiley.png</file>
     </qresource>
     <qresource prefix="/none">
         <file>images/none.png</file>
