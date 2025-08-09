@@ -38,7 +38,7 @@ private:
     string const filesPath = "habits";
     string const themesPath = "themes";
     string const themeCycleFileName = themesPath + "/themeCycle__.txt";
-    string const currentThemeFileName = themesPath + "/selectedTheme.txt";
+    string const selectedThemeFileName = themesPath + "/selectedTheme.txt";
     string const defaultColorsFileName = themesPath + "/default.txt";
     string targetThemeFileName = themesPath + "/default.txt";
 
@@ -133,12 +133,15 @@ private:
 
     // Settings Frame Functions =========================================================================================================
     vector<string> themeCycle;
-    bool cycleThemeActive = false;
+    bool   cycleThemeActive = false;
     string cycleSchedule = "None";
     void S_backButtonClicked();
     void S_loadTheme();
     void S_loadCurrentCycle();
     void S_updateCycleButtonClicked();
+    void S_activeRadioToggled();
+    void moveInThemeCycle();
+    void S_scrollButtonClicked();
 
 
 

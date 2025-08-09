@@ -196,6 +196,11 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
     connect(ui->S_backButton, &QPushButton::clicked, this, &Habbit_tracker::S_backButtonClicked);
     connect(ui->S_updateCycleButton, &QPushButton::clicked, this, &Habbit_tracker::S_updateCycleButtonClicked);
+    connect(ui->S_scrollUpButton, &QPushButton::clicked, this, &Habbit_tracker::S_scrollButtonClicked);
+    connect(ui->S_scrollDownButton, &QPushButton::clicked, this, &Habbit_tracker::S_scrollButtonClicked);
+
+
+
 
 
     QList<QPushButton*> themeRecolorButtons = ui->T_selectedThemeFrame->findChildren<QPushButton*>();
@@ -210,11 +215,12 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
     // Setting up the day checker timer to keep track of what day it is
     dayCheckTimer = new QTimer(this);
-    currentDate = QDate::currentDate();
-    //currentDate = QDate(2025, 7, 27); // <---- Sunday
+    //currentDate = QDate::currentDate();
+    currentDate = QDate(2025, 8, 31);
+    int savedMonth = currentDate.month();                                 // Keeping track of the month to see if it changed
     connect(dayCheckTimer, &QTimer::timeout, this, [=]() mutable {
         QDate now = QDate::currentDate();
-        //QDate now = QDate(2025, 7, 28); // <--- Monday | TESTING: moving into a new week
+        //QDate now = QDate(2025, 9, 1);
         if (now != currentDate) {                    // If now has moved to a different date than saved currentDate
             currentDate = now;                       // Updates the currentday to today to get ready for check of tomorrow
             if (currentDate.dayOfWeek() == 1) {      // If the new day is a MONDAY, then we need to save the previous week
@@ -222,6 +228,20 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
                     currHabit.saveWeek(currentDate); // Pushes week into history (vector of weeks), then resets the week bools to 0
                     currHabit.writeToFile();         // Saves the week to its file
                 }
+
+                // Checking if we have a theme cycle and its scheduled to weekly
+                if(cycleSchedule == "Weekly" && cycleThemeActive){
+                    moveInThemeCycle();
+                }
+            }
+
+            // Checking if we have a theme cycle and its scheduled to daily
+            if(cycleSchedule == "Daily" && cycleThemeActive){
+                moveInThemeCycle();
+            }
+            if (currentDate.month() != savedMonth){
+                if(cycleSchedule == "Monthly" && cycleThemeActive)
+                    moveInThemeCycle();
             }
 
             loadHabits();                            // Clears the allHabits and the habitTable and resets again from the files
@@ -232,15 +252,24 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
 
 
-    // Paint all Colors
+    // Loading the theme cycle
+    S_loadCurrentCycle();
+    if(cycleThemeActive && !themeCycle.empty()){     // If theme cycle is active then we are going to use the first one as the target theme
+        // Write into the current theme file which theme we want
+        ofstream writtingSelectedThemeFile(selectedThemeFileName);
+        writtingSelectedThemeFile << themeCycle[0] << endl;
+        writtingSelectedThemeFile.close();
+    }
     loadColorsFromFile();
     paintTheme();
+
+    // Making these connections after so that when we set the toggles in the Sloadcurrentcycle, they are not triggered
+    connect(ui->S_onRadio, &QRadioButton::toggled, this, &Habbit_tracker::S_activeRadioToggled);
+    connect(ui->S_offRadio, &QRadioButton::toggled, this, &Habbit_tracker::S_activeRadioToggled);
 
 
     // Switching to the Main Frame
     switchFrame(ui->M_frame);
-
-
 }
 
 
@@ -379,6 +408,9 @@ void Habbit_tracker::switchFrame(QFrame* target){
         setCapps();
     }
     else if(target == ui->S_frame){
+        // Stop the timer that checks the current date since we are making changes to the schedule
+        dayCheckTimer->stop();
+
         // Resetting everything in settings page
         ui->S_tabsWindow->setCurrentIndex(0);
 
@@ -1190,7 +1222,7 @@ void Habbit_tracker::T_renameButtonClicked(){
 
 
     // Rewrite the current theme file so that it knows where to look next time we open it
-    ofstream selectedThemeFile(currentThemeFileName);
+    ofstream selectedThemeFile(selectedThemeFileName);
     selectedThemeFile << savingFileName << endl;
     selectedThemeFile.close();
 
@@ -1722,7 +1754,7 @@ void Habbit_tracker::T_setDefaultButtonClicked(){
     }
 
     // Saving the new current theme
-    ofstream newSelectedTheme(currentThemeFileName);
+    ofstream newSelectedTheme(selectedThemeFileName);
     newSelectedTheme << defaultColorsFileName;
     newSelectedTheme.close();
 
@@ -1731,6 +1763,9 @@ void Habbit_tracker::T_setDefaultButtonClicked(){
 
     // Re-painting the program
     paintTheme();
+
+    // Changing the cycle theme to inactive
+    cycleThemeActive = false;
 
     // Re-sending back into this frame to fix up everything
     switchFrame(ui->T_frame);
@@ -1763,7 +1798,7 @@ void Habbit_tracker::T_deleteButtonClicked(){
 
     // Checking if we are removing the current theme that we have set
     if(targetThemeFileName == themeFileName){
-        ofstream resettingThemeFile(currentThemeFileName);
+        ofstream resettingThemeFile(selectedThemeFileName);
         resettingThemeFile << defaultColorsFileName;
         resettingThemeFile.close();
         QMessageBox::information(this,"Setting theme to default.","Removed theme was the set theme. Changing set theme back to default theme");
@@ -1781,6 +1816,17 @@ void Habbit_tracker::T_deleteButtonClicked(){
         if(item == themeFileName){ // If the theme cycle has this theme
             // Remove the theme from the themecycle
             themeCycle.erase(themeCycle.begin() + currentIndex);
+
+            // Checking if this would make the theme cycle go to size 0, then remove the file and create it again through the loadcycle function
+            if(themeCycle.empty()){
+                if(filesystem::exists(themeCycleFileName)){
+                    filesystem::remove(themeCycleFileName);
+                }
+                cycleThemeActive = false;
+                cycleSchedule = "None";
+                S_loadCurrentCycle();
+                break;
+            }
 
             // Writting using everything we have saved WITHOUT the theme that we just deleted
             ofstream rewrittingThemeCycle(themeCycleFileName);
@@ -1914,7 +1960,7 @@ void Habbit_tracker::T_setThemeButtonClicked(){
     T_saveThemeButtonClicked();
 
     // Setting the target theme file
-    ofstream themeSelectionFile(currentThemeFileName);
+    ofstream themeSelectionFile(selectedThemeFileName);
     if(!themeSelectionFile){
         QMessageBox::critical(this, "ERROR OPENING THEME SELEC FILE.","Could not open theme selection file. Please restart program.");
         return;
@@ -1928,7 +1974,7 @@ void Habbit_tracker::T_setThemeButtonClicked(){
     themeFileName = themesPath + "/" + themeFileName + ".txt";
 
 
-    // Writting the new selected theme into the currentThemeFileName file
+    // Writting the new selected theme into the selectedThemeFileName file
     themeSelectionFile << themeFileName << endl;
     themeSelectionFile.close();
 
@@ -2009,6 +2055,7 @@ void Habbit_tracker::T_scrollButtonClicked(){
 
 // SETTINGS FUNCTIONS:
 void Habbit_tracker::S_backButtonClicked(){
+    dayCheckTimer->start();
     switchFrame(ui->M_frame);
 }
 
@@ -2055,13 +2102,10 @@ void Habbit_tracker::S_loadCurrentCycle(){
         makingCycleFile << "0" << endl;                     // Will be set to false at first start
         makingCycleFile << "None" << endl;
         makingCycleFile.close();
-
-        // Setting up page to mode where there is no cycle set up
-        ui->S_offRadio->setChecked(true);
-        ui->S_currentCycleText->setText("None");
     }
-    else
+    else{
         testingCycleFile.close();
+    }
 
     // Reading from the file
     string tempString = "";
@@ -2083,6 +2127,11 @@ void Habbit_tracker::S_loadCurrentCycle(){
         return;
     }
 
+
+
+
+
+
     // Reading from the file, first line was already gravved and should be (1/0) to show if the theme is active
     try{
         if(tempString != "0" && tempString != "1"){ // Catching when first line was not a 0 or 1
@@ -2090,15 +2139,18 @@ void Habbit_tracker::S_loadCurrentCycle(){
         }
 
          // Setting the currentthemeActive bool and display of this value
-        cycleThemeActive = (tempString == "0" ? false:true);
-        if(!cycleThemeActive)
+        if(tempString == "0"){
             ui->S_offRadio->setChecked(true);
-        else
+            cycleThemeActive = false;
+        }
+        else{
             ui->S_onRadio->setChecked(true);
+            cycleThemeActive = true;
+        }
 
         // Setting the cycle schedule if there is any found
         getline(readingCycleFile, tempString);
-        if(tempString != "12 Hours" && tempString != "Daily" && tempString != "Weekly" && tempString != "None"){
+        if(tempString != "Monthly" && tempString != "Daily" && tempString != "Weekly" && tempString != "None"){
             throw 1;
         }
         ui->S_currentCycleText->setText(QString::fromStdString(tempString));
@@ -2145,7 +2197,7 @@ void Habbit_tracker::S_updateCycleButtonClicked(){
     }
 
     // Making sure that a schedule is selected
-    if(!ui->S_12HoursRadio->isChecked() && !ui->S_dailyRadio->isChecked() && !ui->S_weeklyRadio->isChecked()){
+    if(!ui->S_monthlyRadio->isChecked() && !ui->S_dailyRadio->isChecked() && !ui->S_weeklyRadio->isChecked()){
         QMessageBox::information(this, "No schedule selected.", "Please choose a schedule option to set up cycle");
         return;
     }
@@ -2167,7 +2219,7 @@ void Habbit_tracker::S_updateCycleButtonClicked(){
     // Save the cycle TO FILES using: true for activate, the schedule selected, and vector
     ofstream writtingThemeCycle(themeCycleFileName);
     writtingThemeCycle << "1" << endl;
-    if (ui->S_12HoursRadio->isChecked()) { writtingThemeCycle << "12 Hours" << endl;}
+    if (ui->S_monthlyRadio->isChecked()) { writtingThemeCycle << "Monthly" << endl;}
     else if (ui->S_dailyRadio->isChecked()) { writtingThemeCycle << "Daily" << endl;}
     else if (ui->S_weeklyRadio->isChecked()) { writtingThemeCycle << "Weekly" << endl;}
     for(auto& item : themeCycle){
@@ -2186,7 +2238,117 @@ void Habbit_tracker::S_updateCycleButtonClicked(){
 
     // Call the load current cycle to draw right right side
     S_loadCurrentCycle();
+
+    // -----------------------------
+    // Now we need to repaint using the new cycle that we have
+    ofstream writtingCurrentTheme(selectedThemeFileName);       // Writting into the current theme file
+    writtingCurrentTheme << themeCycle[0] << endl;
+    writtingCurrentTheme.close();
+
+    loadColorsFromFile(); // Loading colors from the file
+    paintTheme();         // Painting the theme to this color
 }
+
+void Habbit_tracker::S_activeRadioToggled(){
+    // Getting the radio button pressed
+    QRadioButton* buttonPressed  = qobject_cast<QRadioButton*>(sender());
+    if (!buttonPressed) return;
+
+    // If the button pressed was off, then set cycle to off
+    if(buttonPressed == ui->S_offRadio){
+        cycleThemeActive = false;
+        // We can leave the theme as it is, unless the user goes back into the theme file and changes it
+    }
+
+    // If the button pressed was on, check if there is a current cycle file that works and turn on
+    else if (buttonPressed == ui->S_onRadio){
+        if(themeCycle.empty() && !ui->S_offRadio->isChecked()){
+            QMessageBox::information(this, "No cycle has been made", "Please make a cycle before turning on.");
+            ui->S_offRadio->setChecked(true);
+            return;
+        }
+        cycleThemeActive = true;
+    }
+
+    // Rewriting the file so that it knows for next time what this bool is at
+    ofstream cycleFile(themeCycleFileName);
+    cycleFile << (cycleThemeActive ? "1" : "0") << endl << cycleSchedule << endl;
+    for(auto& item : themeCycle){
+        cycleFile << item << endl;
+    }
+    cycleFile.close();
+}
+
+void Habbit_tracker::moveInThemeCycle(){
+    // For some reason the theme cycle is empty, catch this (this shouldnt ever be reached if all is good)
+    if(themeCycle.empty()){
+        if(filesystem::exists(themeCycleFileName))   // Remove the theme cycle file to reconstruct
+            filesystem::remove(themeCycleFileName);
+
+        ofstream file(selectedThemeFileName);         // Rewrite the current theme file to default
+        file << defaultColorsFileName << endl;
+        file.close();
+
+        cycleThemeActive = false;
+        cycleSchedule = "None";
+
+        S_loadCurrentCycle();        // Remaking and writting the file
+        loadColorsFromFile();        // Load the colors using the current theme that we overwrote earlier
+        paintTheme();                // Painting the colors using those colors we just loaded up
+
+        QMessageBox::critical(this, "ERROR", "For some reason the theme cycle is empty");
+        return;
+    }
+
+    // Finding what index we are in
+    int currentIndex = 0;
+    for(auto & item : themeCycle){
+        if(item == targetThemeFileName){
+            break;
+        }
+        currentIndex++;
+    }
+
+
+
+    // Moving up the index and moving back to 0 if its already out of range
+    currentIndex++;
+    if(currentIndex >= themeCycle.size()){
+        currentIndex = 0;
+    }
+
+
+
+    // Rewritting the current theme
+    ofstream rewrittingCurrentTheme(selectedThemeFileName);
+    rewrittingCurrentTheme << themeCycle[currentIndex] << endl;
+    rewrittingCurrentTheme.close();
+
+    // Loading in new colors and painting everything
+    loadColorsFromFile();
+    paintTheme();
+}
+
+void Habbit_tracker::S_scrollButtonClicked(){
+    QObject* btn = sender();
+    if (!btn) return;
+
+    int leftValue = ui->S_allThemesBox->verticalScrollBar()->value();
+    int rightValue = ui->S_currentThemesBox->verticalScrollBar()->value();
+    int step = 2;
+
+
+    if (btn == ui->S_scrollDownButton) {
+        ui->S_allThemesBox->verticalScrollBar()->setValue(leftValue + step);
+        ui->S_currentThemesBox->verticalScrollBar()->setValue(rightValue + step);
+    } else if (btn == ui->S_scrollUpButton) {
+        ui->S_allThemesBox->verticalScrollBar()->setValue(leftValue - step);
+        ui->S_currentThemesBox->verticalScrollBar()->setValue(rightValue + step);
+    }
+}
+
+
+
 
 
 
@@ -2389,6 +2551,9 @@ QColor Habbit_tracker::stringToColor(QString input){
     QColor rValue = QColor(red,green,blue);
     return rValue;
 }
+
+
+
 
 
 
@@ -2639,6 +2804,8 @@ void Habbit_tracker::paintTheme(){
     ui->M_addHabitButton->setStyleSheet("background-color: rgb" + button_color + ";");
     ui->M_viewHistoryButton->setStyleSheet("background-color: rgb" + button_color + ";");
     ui->M_themeButton->setStyleSheet("background-color: rgb" + button_color + ";");
+    ui->M_settingsButton->setStyleSheet("background-color: rgb" + button_color + ";");
+
 
     // Other Frames:
     ui->M_buttonFrame->setStyleSheet("background-color: rgb" + main_darker_color + ";");
@@ -2646,9 +2813,11 @@ void Habbit_tracker::paintTheme(){
     ui->M_buttonFrame_3->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_line->setStyleSheet("background-color: rgb" + main_darker_color + ";");
 
+
     // Date Text
     ui->M_dateTitle->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_date->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+
 
     // Habit Table
     ui->M_habitTable->setStyleSheet("background-color: rgb" + main_lighter_color + ";" + background_image + ";");
@@ -2723,7 +2892,7 @@ void Habbit_tracker::paintTheme(){
     ui->H_spanDisplay->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
 
 
-    // Settings Frame ===========================================================================================
+    // Themes Frame ===========================================================================================
     // Frame:
     ui->T_frame->setStyleSheet("background-color: rgb" + main_darker_color + "; color:rgb" + text_color + ";");
 
@@ -2796,6 +2965,36 @@ void Habbit_tracker::paintTheme(){
     }
     ui->T_keyboard->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
 
+
+
+    // Settings Frame ===========================================================================================
+    // Main Frame
+    ui->S_frame->setStyleSheet("background-color: rgb" + main_darker_color + "; color:rgb" + text_color + ";");
+
+    // Other Frames
+    ui->frame_5->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->frame_8->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->S_tabsWindow->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->frame_10->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->label_2->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->label_11->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->frame_9->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->frame_11->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->frame_12->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+
+    // Tabs Widget
+    ui->S_tabsWindow->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+
+    // Left and Right Display Boxes
+    ui->S_allThemesBox->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->S_currentThemesBox->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+
+    // Buttons
+    ui->S_backButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_scrollUpButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_scrollDownButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_updateCycleButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+
 }
 
 void Habbit_tracker::loadColorsFromFile(){
@@ -2807,9 +3006,9 @@ void Habbit_tracker::loadColorsFromFile(){
 
 
     // Reading from the current theme file that says what file to use for the colors
-    ifstream themeFile(currentThemeFileName);
+    ifstream themeFile(selectedThemeFileName);
     if(!themeFile){                                      // If there is no theme file, then make a new one with the default.txt being target
-        ofstream newThemeFile(currentThemeFileName);     // Make the file
+        ofstream newThemeFile(selectedThemeFileName);     // Make the file
         newThemeFile << defaultColorsFileName;           // Write the const default file name
         targetThemeFileName = defaultColorsFileName;     // Set the target theme to const default file name
         newThemeFile.close();                            // Close
@@ -2962,7 +3161,6 @@ void Habbit_tracker::loadColorsFromFile(){
 
 
             if(tempString.find(')') == tempString.npos){
-                cout << "ERROR 2" << endl;
                 throw 1;
             }
             tmp = stoi(tempString.substr(0,tempString.find(')')));
@@ -2986,8 +3184,8 @@ void Habbit_tracker::loadColorsFromFile(){
         colorFile.close();
         QMessageBox::critical(this, "Theme file Error", "Theme file was corrupted, Please check file. Setting theme to default. File"
                                                         ":" + QString::fromStdString(targetThemeFileName));
-        if(filesystem::exists(currentThemeFileName))   // Remove the current theme so when the loadColors is called again it can make it
-            filesystem::remove(currentThemeFileName);
+        if(filesystem::exists(selectedThemeFileName))   // Remove the current theme so when the loadColors is called again it can make it
+            filesystem::remove(selectedThemeFileName);
         if(filesystem::exists(defaultColorsFileName))  // Remove the default colors file so that the loadColords can make it again
             filesystem::remove(defaultColorsFileName);
 
