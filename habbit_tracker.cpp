@@ -2405,6 +2405,7 @@ void Habbit_tracker::paintTheme(){
     // Frame:
     ui->M_frame->setStyleSheet("background-color: rgb" + main_darker_color + "; color:rgb" + text_color + ";");
 
+
     // Week Days Labels
     ui->M_monLabel->setAutoFillBackground(false);
     ui->M_monLabel->setStyleSheet("color:rgb" + text_color + "; background-color: rgb" + main_darker_color + ";");
@@ -2444,6 +2445,7 @@ void Habbit_tracker::paintTheme(){
 
     // Habit Table
     ui->M_habitTable->setStyleSheet("background-color: rgb" + main_lighter_color + ";" + background_image + ";");
+
 
 
     // Removing Frame:
