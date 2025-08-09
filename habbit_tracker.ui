@@ -6997,7 +6997,7 @@ background-color: rgb(255, 170, 0)</string>
       </property>
      </widget>
     </widget>
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="QTabWidget" name="S_tabsWindow">
      <property name="geometry">
       <rect>
        <x>50</x>
@@ -7006,11 +7006,20 @@ background-color: rgb(255, 170, 0)</string>
        <height>450</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>Times New Roman</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="styleSheet">
       <string notr="true">background-color:rgb(253,255,222)</string>
      </property>
      <property name="tabPosition">
       <enum>QTabWidget::TabPosition::East</enum>
+     </property>
+     <property name="tabShape">
+      <enum>QTabWidget::TabShape::Triangular</enum>
      </property>
      <property name="currentIndex">
       <number>0</number>
@@ -7020,16 +7029,22 @@ background-color: rgb(255, 170, 0)</string>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Cycle Theme</string>
+       <string>Theme Cycle</string>
       </attribute>
       <widget class="QFrame" name="frame_10">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>870</width>
+         <width>901</width>
          <height>450</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
        </property>
        <property name="styleSheet">
         <string notr="true">background-color:rgb(253,255,222)</string>
@@ -7043,61 +7058,19 @@ background-color: rgb(255, 170, 0)</string>
        <property name="lineWidth">
         <number>2</number>
        </property>
-       <widget class="QLabel" name="label">
+       <widget class="QPushButton" name="S_updateCycleButton">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>851</width>
-          <height>41</height>
+          <x>22</x>
+          <y>400</y>
+          <width>418</width>
+          <height>35</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Times New Roman</family>
-          <pointsize>19</pointsize>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="text">
-         <string>Change Theme Daily</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="checkBox">
-        <property name="geometry">
-         <rect>
-          <x>45</x>
-          <y>44</y>
-          <width>71</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Times New Roman</family>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Active</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="S_button">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>390</y>
-          <width>351</width>
-          <height>30</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Times New Roman</family>
-          <pointsize>12</pointsize>
+          <pointsize>15</pointsize>
           <bold>false</bold>
          </font>
         </property>
@@ -7108,16 +7081,16 @@ background-color: rgb(255, 170, 0)</string>
          <string notr="true">background-color: rgb(255, 233, 176)</string>
         </property>
         <property name="text">
-         <string>Save and Set Theme</string>
+         <string>Update Cycle Settings</string>
         </property>
        </widget>
-       <widget class="QListWidget" name="listWidget">
+       <widget class="QListWidget" name="S_allThemesBox">
         <property name="geometry">
          <rect>
-          <x>40</x>
-          <y>70</y>
-          <width>351</width>
-          <height>271</height>
+          <x>20</x>
+          <y>54</y>
+          <width>420</width>
+          <height>286</height>
          </rect>
         </property>
         <property name="font">
@@ -7192,9 +7165,9 @@ background-color: rgb(255, 170, 0)</string>
        <widget class="QFrame" name="frame_9">
         <property name="geometry">
          <rect>
-          <x>40</x>
-          <y>345</y>
-          <width>351</width>
+          <x>20</x>
+          <y>350</y>
+          <width>420</width>
           <height>41</height>
          </rect>
         </property>
@@ -7207,10 +7180,10 @@ background-color: rgb(255, 170, 0)</string>
         <property name="lineWidth">
          <number>2</number>
         </property>
-        <widget class="QRadioButton" name="radioButton">
+        <widget class="QRadioButton" name="S_dailyRadio">
          <property name="geometry">
           <rect>
-           <x>141</x>
+           <x>175</x>
            <y>11</y>
            <width>90</width>
            <height>20</height>
@@ -7225,11 +7198,14 @@ background-color: rgb(255, 170, 0)</string>
          <property name="text">
           <string>Daily</string>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
         </widget>
-        <widget class="QRadioButton" name="radioButton_2">
+        <widget class="QRadioButton" name="S_weeklyRadio">
          <property name="geometry">
           <rect>
-           <x>245</x>
+           <x>305</x>
            <y>11</y>
            <width>90</width>
            <height>20</height>
@@ -7245,10 +7221,10 @@ background-color: rgb(255, 170, 0)</string>
           <string>Weekly</string>
          </property>
         </widget>
-        <widget class="QRadioButton" name="radioButton_3">
+        <widget class="QRadioButton" name="S_12HoursRadio">
          <property name="geometry">
           <rect>
-           <x>20</x>
+           <x>32</x>
            <y>11</y>
            <width>90</width>
            <height>20</height>
@@ -7264,6 +7240,271 @@ background-color: rgb(255, 170, 0)</string>
           <string>12 hours</string>
          </property>
         </widget>
+       </widget>
+       <widget class="QListWidget" name="S_currentThemesBox">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>54</y>
+          <width>420</width>
+          <height>286</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
+        <property name="autoScroll">
+         <bool>false</bool>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+        </property>
+        <property name="showDropIndicator" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="defaultDropAction">
+         <enum>Qt::DropAction::IgnoreAction</enum>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>false</bool>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>theme 1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>theme 2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>theme 3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>theme 4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>theme 5</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>theme 6</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>theme 7</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="label_2">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>10</y>
+          <width>420</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>18</pointsize>
+          <underline>false</underline>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color:rgb(253,255,222)</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
+        <property name="text">
+         <string>Current Theme Cycle</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QFrame" name="frame_11">
+        <property name="geometry">
+         <rect>
+          <x>459</x>
+          <y>399</y>
+          <width>421</width>
+          <height>36</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
+        <widget class="QRadioButton" name="S_onRadio">
+         <property name="geometry">
+          <rect>
+           <x>94</x>
+           <y>9</y>
+           <width>90</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>13</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>ON</string>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="S_offRadio">
+         <property name="geometry">
+          <rect>
+           <x>284</x>
+           <y>9</y>
+           <width>90</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>13</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>OFF</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QFrame" name="frame_12">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>349</y>
+          <width>420</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
+        <widget class="QLabel" name="label">
+         <property name="geometry">
+          <rect>
+           <x>108</x>
+           <y>12</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>13</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Cycle Schedule:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="S_currentCycleText">
+         <property name="geometry">
+          <rect>
+           <x>228</x>
+           <y>12</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>13</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;12 hours&gt;</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QLabel" name="label_11">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>10</y>
+          <width>420</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>18</pointsize>
+          <underline>false</underline>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color:rgb(253,255,222)</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
+        <property name="text">
+         <string>All Themes to Choose From</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
        </widget>
       </widget>
      </widget>

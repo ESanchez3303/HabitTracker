@@ -145,6 +145,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     ui->A_keyboard->setFocusPolicy(Qt::NoFocus);
     ui->T_keyboardToggleButton->setFocusPolicy(Qt::NoFocus);
     ui->T_displayTable->setFocusPolicy(Qt::NoFocus);
+    ui->S_currentThemesBox->setFocusPolicy(Qt::NoFocus);
 
 
 
@@ -194,6 +195,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
 
     connect(ui->S_backButton, &QPushButton::clicked, this, &Habbit_tracker::S_backButtonClicked);
+    connect(ui->S_updateCycleButton, &QPushButton::clicked, this, &Habbit_tracker::S_updateCycleButtonClicked);
 
 
     QList<QPushButton*> themeRecolorButtons = ui->T_selectedThemeFrame->findChildren<QPushButton*>();
@@ -377,7 +379,12 @@ void Habbit_tracker::switchFrame(QFrame* target){
         setCapps();
     }
     else if(target == ui->S_frame){
+        // Resetting everything in settings page
+        ui->S_tabsWindow->setCurrentIndex(0);
 
+        // Setting everything in settings page
+        S_loadTheme();
+        S_loadCurrentCycle();
     }
     target->show();
 }
@@ -1209,19 +1216,18 @@ void Habbit_tracker::loadThemesIntoBox(){
     // Adding all the files into the theme box after parsing/cleaning their names
     for (const auto& entry : filesystem::recursive_directory_iterator(themesPath)) {
         if (entry.is_regular_file()) {
-            string habitNameWith_ = entry.path().filename().string();
-            habitNameWith_ = habitNameWith_.substr(0, habitNameWith_.length() - 4);
-
-            string habitName = "";
-            for (auto& ch : habitNameWith_) {
-                habitName += (ch == '_') ? ' ' : ch;
-            }
+            string fileNameWith_ = entry.path().filename().string();
+            fileNameWith_ = fileNameWith_.substr(0, fileNameWith_.length() - 4);
 
             // Checking if its the selectedTheme file
-            if(habitName == "selectedTheme" || habitName == "default")
+            if(fileNameWith_ == "selectedTheme" || fileNameWith_ == "default" || fileNameWith_ == "themeCycle__")
                 continue;
 
-            ui->T_savedThemesBox->addItem(QString::fromStdString(habitName));
+            string fixedFileName = "";
+            for (auto& ch : fileNameWith_) {
+                fixedFileName += (ch == '_') ? ' ' : ch;
+            }
+            ui->T_savedThemesBox->addItem(QString::fromStdString(fixedFileName));
         }
     }
 
@@ -1298,6 +1304,14 @@ void Habbit_tracker::T_addThemeButtonClicked(){
         ui->T_addThemeInput->setText("");
         return;
     }
+
+    // Making sure they cant rename it to selectedTheme
+    if(cleanedThemeName == "themeCycle__"){
+        QMessageBox::information(this, "Name Cannot Be themeCycle__","Theme name cannot be themeCycle__. This file name is used in the backend for other reasons.");
+        ui->T_addThemeInput->setText("");
+        return;
+    }
+
 
 
     // Make a copy of the default file and name it to the cleanedThemeName
@@ -1761,6 +1775,25 @@ void Habbit_tracker::T_deleteButtonClicked(){
     if(filesystem::exists(themeFileName))
         filesystem::remove(themeFileName);
 
+    // Removing the theme from the cycle theme and saving the cycle theme
+    int currentIndex = 0;
+    for(auto& item : themeCycle){
+        if(item == themeFileName){ // If the theme cycle has this theme
+            // Remove the theme from the themecycle
+            themeCycle.erase(themeCycle.begin() + currentIndex);
+
+            // Writting using everything we have saved WITHOUT the theme that we just deleted
+            ofstream rewrittingThemeCycle(themeCycleFileName);
+            rewrittingThemeCycle << (cycleThemeActive ? "1" : "0") << endl << cycleSchedule << endl;
+            for(auto& item1 : themeCycle){
+                rewrittingThemeCycle << item1 << endl;
+            }
+            rewrittingThemeCycle.close();
+            break;
+        }
+        currentIndex++;
+    }
+
     // Reloading the themes from the files
     switchFrame(ui->T_frame);
 }
@@ -1979,7 +2012,181 @@ void Habbit_tracker::S_backButtonClicked(){
     switchFrame(ui->M_frame);
 }
 
+void Habbit_tracker::S_loadTheme(){
+    // Loading the themes from the vector into the all themes box
+    ui->S_allThemesBox->clear();
 
+    // Reading from the folder and loading in
+    for (const auto& entry : filesystem::recursive_directory_iterator(themesPath)) {
+        if (entry.is_regular_file()) {
+            string themeName = entry.path().filename().string();
+
+            if(themeName == "selectedTheme.txt" || themeName == "default.txt" || themeName == "themeCycle__.txt")
+                continue;
+
+            // Fxiing name for presentation
+            themeName = themeName.substr(0, themeName.find('.'));
+            string fixedThemeName = "";
+            for(auto &ch : themeName){
+                fixedThemeName += (ch == '_' ? ' ' : ch);
+            }
+
+            // Adding theme into all themes box
+            ui->S_allThemesBox->addItem(QString::fromStdString(fixedThemeName));
+        }
+    }
+}
+
+void Habbit_tracker::S_loadCurrentCycle(){
+    // Clear the current cycle box
+    ui->S_currentThemesBox->clear();
+    themeCycle.clear();
+
+    // Technically we already guanrateed that the path exists, but doing it again just in case
+    if (!filesystem::exists(themesPath)) {
+        filesystem::create_directories(themesPath);
+    }
+
+
+    // Checking if the file exists, if not then make it
+    ifstream testingCycleFile(themeCycleFileName);
+    if(!testingCycleFile){                                  // Making general format of the file, the first line will be 0/1 if is activated
+        ofstream makingCycleFile(themeCycleFileName);
+        makingCycleFile << "0" << endl;                     // Will be set to false at first start
+        makingCycleFile << "None" << endl;
+        makingCycleFile.close();
+
+        // Setting up page to mode where there is no cycle set up
+        ui->S_offRadio->setChecked(true);
+        ui->S_currentCycleText->setText("None");
+    }
+    else
+        testingCycleFile.close();
+
+    // Reading from the file
+    string tempString = "";
+    ifstream readingCycleFile(themeCycleFileName);
+
+    if(!readingCycleFile){ // Final checking if we have the file open before reading
+        QMessageBox::critical(this, "ERROR", "Could not open file after making the file. FILE: " + QString::fromStdString(themeCycleFileName));
+        return;
+    }
+
+    // If there was nothing read then we assume file is corrupted, remove file and remake by calling this function again
+    getline(readingCycleFile, tempString);
+    if(tempString.empty()){
+        readingCycleFile.close();
+        if(filesystem::exists(themeCycleFileName))
+            filesystem::remove(themeCycleFileName);
+        QMessageBox::critical(this, "ERROR", "Cycle file was corrupted. Removing and rebuilding file.");
+        S_loadCurrentCycle();
+        return;
+    }
+
+    // Reading from the file, first line was already gravved and should be (1/0) to show if the theme is active
+    try{
+        if(tempString != "0" && tempString != "1"){ // Catching when first line was not a 0 or 1
+            throw 1;
+        }
+
+         // Setting the currentthemeActive bool and display of this value
+        cycleThemeActive = (tempString == "0" ? false:true);
+        if(!cycleThemeActive)
+            ui->S_offRadio->setChecked(true);
+        else
+            ui->S_onRadio->setChecked(true);
+
+        // Setting the cycle schedule if there is any found
+        getline(readingCycleFile, tempString);
+        if(tempString != "12 Hours" && tempString != "Daily" && tempString != "Weekly" && tempString != "None"){
+            throw 1;
+        }
+        ui->S_currentCycleText->setText(QString::fromStdString(tempString));
+        cycleSchedule = tempString;
+
+
+
+        while(getline(readingCycleFile,tempString)){
+            // Skiping simple corruption of empty lines
+            if(tempString.empty())
+                continue;
+
+            // Adding the full string being in form of /themes/something.txt to the theme cycle
+            themeCycle.push_back(tempString);
+
+            // Fixing the name for display
+            tempString = tempString.substr(tempString.find('/')+1);
+            tempString = tempString.substr(0,tempString.find('.'));
+            string fixedThemeName = "";
+            for(auto& ch : tempString)
+                fixedThemeName += (ch == '_' ? ' ' : ch);
+
+            ui->S_currentThemesBox->addItem(QString::fromStdString(fixedThemeName));
+
+        }
+        readingCycleFile.close();
+
+
+    }catch(...){
+        readingCycleFile.close();
+        QMessageBox::critical(this, "ERROR", "Error reading file. Filename: " + QString::fromStdString(themeCycleFileName));
+        return;
+    }
+}
+
+void Habbit_tracker::S_updateCycleButtonClicked(){
+    // Reset the current theme cycle
+    themeCycle.clear();
+
+    // Making sure that at least one is chosen
+    if(ui->S_allThemesBox->selectedItems().count() <= 1){
+        QMessageBox::information(this, "No themes selected.", "Please select at least 2 themes to set up a cycle");
+        return;
+    }
+
+    // Making sure that a schedule is selected
+    if(!ui->S_12HoursRadio->isChecked() && !ui->S_dailyRadio->isChecked() && !ui->S_weeklyRadio->isChecked()){
+        QMessageBox::information(this, "No schedule selected.", "Please choose a schedule option to set up cycle");
+        return;
+    }
+
+    // Grab all the items that are selected and add into the vector
+    for (QListWidgetItem* item : ui->S_allThemesBox->selectedItems()) { // detaching is okay as long as computer is fast enough
+        // Fixing the text into file name form
+        string selected = item->text().toStdString();
+        string fixedSelected = "";
+        for(auto &ch : selected)
+            fixedSelected += (ch == ' ' ? '_' : ch);
+
+        fixedSelected = themesPath + "/" + fixedSelected + ".txt";
+
+        // Adding file name form into the vector
+        themeCycle.push_back(fixedSelected);
+    }
+
+    // Save the cycle TO FILES using: true for activate, the schedule selected, and vector
+    ofstream writtingThemeCycle(themeCycleFileName);
+    writtingThemeCycle << "1" << endl;
+    if (ui->S_12HoursRadio->isChecked()) { writtingThemeCycle << "12 Hours" << endl;}
+    else if (ui->S_dailyRadio->isChecked()) { writtingThemeCycle << "Daily" << endl;}
+    else if (ui->S_weeklyRadio->isChecked()) { writtingThemeCycle << "Weekly" << endl;}
+    for(auto& item : themeCycle){
+        writtingThemeCycle << item << endl;
+    }
+    writtingThemeCycle.close();
+
+    // Set the active checkmark to true
+    ui->S_onRadio->setChecked(true);
+
+    // Clear the selection of the allthemesbox
+    ui->S_allThemesBox->clearSelection();
+
+
+    //------------------------------
+
+    // Call the load current cycle to draw right right side
+    S_loadCurrentCycle();
+}
 
 
 
