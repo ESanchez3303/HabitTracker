@@ -215,8 +215,8 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
     // Setting up the day checker timer to keep track of what day it is
     dayCheckTimer = new QTimer(this);
-    //currentDate = QDate::currentDate();
-    currentDate = QDate(2025, 8, 31);
+    currentDate = QDate::currentDate();
+    //currentDate = QDate(2025, 8, 31);
     int savedMonth = currentDate.month();                                 // Keeping track of the month to see if it changed
     connect(dayCheckTimer, &QTimer::timeout, this, [=]() mutable {
         QDate now = QDate::currentDate();
@@ -1115,6 +1115,9 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
         ui->H_spanDisplay->setRowHeight(r, rowHeight);
     }
 }
+
+
+
 
 
 
@@ -2053,6 +2056,9 @@ void Habbit_tracker::T_scrollButtonClicked(){
 
 
 
+
+
+
 // SETTINGS FUNCTIONS:
 void Habbit_tracker::S_backButtonClicked(){
     dayCheckTimer->start();
@@ -2354,6 +2360,8 @@ void Habbit_tracker::S_scrollButtonClicked(){
 
 
 
+
+
 // HELPER FUNCTIONS:
 bool Habbit_tracker::validString(QString input) {
     // Step 1: Remove leading spaces
@@ -2551,6 +2559,10 @@ QColor Habbit_tracker::stringToColor(QString input){
     QColor rValue = QColor(red,green,blue);
     return rValue;
 }
+
+
+
+
 
 
 
@@ -3197,6 +3209,13 @@ void Habbit_tracker::loadColorsFromFile(){
 
 
 }
+
+
+
+
+
+
+
 
 
 

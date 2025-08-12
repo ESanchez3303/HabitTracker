@@ -35,8 +35,8 @@ private:
 
 
     // FILES ==========================================================================================================================
-    string const filesPath = "habits";
-    string const themesPath = "themes";
+    string const filesPath  = "habitFiles/habits";
+    string const themesPath = "habitFiles/themes";
     string const themeCycleFileName = themesPath + "/themeCycle__.txt";
     string const selectedThemeFileName = themesPath + "/selectedTheme.txt";
     string const defaultColorsFileName = themesPath + "/default.txt";
@@ -184,7 +184,7 @@ private:
         "background-image:url(:/backgrounds/images/colorfullSmiley.png)",
     };
 
-    void paintTheme();        // Paints all the objects their colors set in variables
+    void paintTheme();         // Paints all the objects their colors set in variables
 
     void loadColorsFromFile(); // Reads information from file saved in targetThemeFileName
 
