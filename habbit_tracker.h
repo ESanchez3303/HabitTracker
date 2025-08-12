@@ -37,6 +37,7 @@ private:
     // FILES ==========================================================================================================================
     string const filesPath  = "habitFiles/habits";
     string const themesPath = "habitFiles/themes";
+    string const backgroundPath = "habitFiles/backgrounds";
     string const themeCycleFileName = themesPath + "/themeCycle__.txt";
     string const selectedThemeFileName = themesPath + "/selectedTheme.txt";
     string const defaultColorsFileName = themesPath + "/default.txt";
@@ -167,22 +168,10 @@ private:
     QString month_header_color,week_header_color,complete_color,other_dayT_color;
     QString remove_item_selec_color;
     QString background_image;
-    QStringList const possible_backgrounds = {
-        "none",
-        "background-image:url(:/backgrounds/images/blue_stars.png)",
-        "background-image:url(:/backgrounds/images/hearts.png)",
-        "background-image:url(:/backgrounds/images/leaves.png)",
-        "background-image:url(:/backgrounds/images/uniformSquiggles.png)",
-        "background-image:url(:/backgrounds/images/coolHalloween.png)",
-        "background-image:url(:/backgrounds/images/orangePumpkins.png)",
-        "background-image:url(:/backgrounds/images/peepingPumpkins.png)",
-        "background-image:url(:/backgrounds/images/nutCrackers.png)",
-        "background-image:url(:/backgrounds/images/hohoho.png)",
-        "background-image:url(:/backgrounds/images/cuteChristmas.png)",
-        "background-image:url(:/backgrounds/images/bowCherry.png)",
-        "background-image:url(:/backgrounds/images/trippy.png)",
-        "background-image:url(:/backgrounds/images/colorfullSmiley.png)",
-    };
+
+    // Testing : |background-image: url(\"habitFiles/backgrounds/blue_stars.png\")|
+    QString const background_first  = "background-image: url(\"" + QString::fromStdString(backgroundPath) + "/";
+    QString const background_second = "\")";
 
     void paintTheme();         // Paints all the objects their colors set in variables
 

@@ -7574,8 +7574,8 @@ background-color: rgb(255, 170, 0)</string>
    <zorder>A_frame</zorder>
    <zorder>H_frame</zorder>
    <zorder>M_frame</zorder>
-   <zorder>T_frame</zorder>
    <zorder>S_frame</zorder>
+   <zorder>T_frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

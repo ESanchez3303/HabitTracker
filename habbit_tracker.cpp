@@ -58,19 +58,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     ui->M_habitTable->setRowCount(initRowCount);
 
 
-    // Setting up the table for the backgrounds images in settings
-    ui->T_backgroundSelectionBox->clear();
-    string backTempString;
-    for(auto &item:possible_backgrounds){
-        if(item == "none"){
-            ui->T_backgroundSelectionBox->addItem("NONE");
-            continue;
-        }
-        backTempString = item.toStdString();
-        backTempString = backTempString.substr(backTempString.find("images/") + 7);
-        backTempString = backTempString.substr(0,backTempString.size()-1);
-        ui->T_backgroundSelectionBox->addItem(QString::fromStdString(backTempString));
-    }
+
 
 
     // Setting up the table for the display
@@ -270,6 +258,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
     // Switching to the Main Frame
     switchFrame(ui->M_frame);
+
 }
 
 
@@ -385,6 +374,7 @@ void Habbit_tracker::switchFrame(QFrame* target){
 
         // Getting the current them from saved target theme file name
         string currentTheme = targetThemeFileName.substr(targetThemeFileName.find('/')+1);
+        currentTheme = currentTheme.substr(currentTheme.find('/')+1);
         currentTheme = currentTheme.substr(0,currentTheme.find('.'));
 
         // Cleaning the underscores and setting them to spaces instead
@@ -1537,11 +1527,6 @@ void Habbit_tracker::T_savedThemeBoxIndexChanged(){
 
 
         }
-        // Checking if background_image is a valid image:
-        if(!possible_backgrounds.contains(T_background_image)){
-            errorString = "background image not found";
-            throw 1;
-        }
 
         themeFile.close();
 
@@ -1607,8 +1592,8 @@ void Habbit_tracker::paintDemo(){
         ui->T_displayBackground->setStyleSheet("border-image:" + QString::fromStdString(backgroundUrl_string)); // Background Image
 
         // Getting only the name of the file with the .png tag at the end for cleaner presentation
-        backgroundUrl_string = backgroundUrl_string.substr(backgroundUrl_string.find("images/") + 7);
-        backgroundUrl_string = backgroundUrl_string.substr(0,backgroundUrl_string.size()-1);
+        backgroundUrl_string = backgroundUrl_string.substr(backgroundUrl_string.find("backgrounds/")+12);
+        backgroundUrl_string = backgroundUrl_string.substr(0,backgroundUrl_string.size()-2);
         ui->T_backgroundButton->setText(QString::fromStdString(backgroundUrl_string));
     }
 
@@ -1992,15 +1977,32 @@ void Habbit_tracker::T_setThemeButtonClicked(){
 }
 
 void Habbit_tracker::T_backgroundButtonClicked(){
-    ui->T_backgroundSelectionFrame->show();
-    int indexOfSelectedBackground = 0;
-    for(auto &item : possible_backgrounds){
-        if(item == T_background_image)
-            break;
-        indexOfSelectedBackground++;
+
+    // Making the directory to the background section if it does not exists
+    if(!filesystem::exists(backgroundPath)){
+        filesystem::create_directories(backgroundPath);
     }
 
-    ui->T_backgroundSelectionBox->setCurrentRow(indexOfSelectedBackground);
+    // Setting up the table for the backgrounds images in settings AFTER making the directory if it does not exist
+    ui->T_backgroundSelectionBox->clear();
+    string backTempString;
+    ui->T_backgroundSelectionBox->addItem("NONE");  // Adding the first selection to be NONE
+
+    int backgroundIndex = 1; // Starting at 1 because 0 is going to be the none
+    ui->T_backgroundSelectionBox->setCurrentRow(0); // Setting the index to backgroundINdex, which stays 0 if there was no match found
+    for (const auto& entry : filesystem::directory_iterator(backgroundPath)) {
+        if (entry.is_regular_file()) {
+            backTempString = entry.path().filename().string();
+            ui->T_backgroundSelectionBox->addItem(QString::fromStdString(backTempString));
+            if(backTempString == ui->T_backgroundButton->text().toStdString()){           // If this new item we added matches button text
+                ui->T_backgroundSelectionBox->setCurrentRow(backgroundIndex);              // Set the current row to this
+            }
+            backgroundIndex++;           // No point of doing an if since its still one LOC that is executed
+        }
+    }
+
+    // Show at the very end the frame after everything is finished up loading
+    ui->T_backgroundSelectionFrame->show();
 }
 
 void Habbit_tracker::T_backSelectionConfirmButtonClicked(){
@@ -2012,7 +2014,7 @@ void Habbit_tracker::T_backSelectionConfirmButtonClicked(){
     if(userChoice == "NONE")
         T_background_image = "none"; // Setting the temp value to "none"
     else
-        T_background_image = "background-image:url(:/backgrounds/images/" + userChoice + ")"; // Setting the temp value for the background
+        T_background_image = background_first + userChoice + background_second; // Setting the temp value for the background
 
     // Painting the demo again
     paintDemo();
@@ -3184,12 +3186,6 @@ void Habbit_tracker::loadColorsFromFile(){
 
         }
         colorFile.close();  // Close the file
-
-
-        // Checking if background_image is a valid image:
-        if(!possible_backgrounds.contains(background_image)){
-            throw 1;
-        }
 
     }
     catch(...){    // IF ANYTHING GOES WRONG DURING READING
