@@ -39,7 +39,7 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
 
 
     // Moving frames where they are suppose to be
-    ui->T_keyboard->move(QPoint(50,7));
+    ui->T_keyboard->move(QPoint(1,1));
     ui->T_backgroundSelectionFrame->move(QPoint(4,4));
 
 
@@ -143,7 +143,6 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     connect(ui->M_cancelButton, &QPushButton::clicked, this, &Habbit_tracker::M_cancelButtonClicked);
     connect(ui->M_confirmButton, &QPushButton::clicked, this, &Habbit_tracker::M_confirmButtonClicked);
     connect(ui->M_viewHistoryButton, &QPushButton::clicked, this, &Habbit_tracker::M_viewHistoryButtonClicked);
-    connect(ui->M_themeButton, &QPushButton::clicked, this, &Habbit_tracker::M_themeButtonClicked);
     connect(ui->M_settingsButton, &QPushButton::clicked, this, &Habbit_tracker::M_settingsButtonClicked);
 
     connect(ui->A_cancelButton, &QPushButton::clicked, this, &Habbit_tracker::A_cancelButtonClicked);
@@ -160,7 +159,6 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     connect(ui->H_displayPreviousButton, &QPushButton::clicked, this, &Habbit_tracker::displayNextPreviousButtonClicked);
     connect(ui->H_displayNextButton, &QPushButton::clicked, this, &Habbit_tracker::displayNextPreviousButtonClicked);
 
-    connect(ui->T_backButton, &QPushButton::clicked, this, &Habbit_tracker::T_backButtonClicked);
     connect(ui->T_addThemeButton, &QPushButton::clicked, this, &Habbit_tracker::T_addThemeButtonClicked);
     connect(ui->T_keyboardToggleButton, &QPushButton::clicked, this, &Habbit_tracker::T_keyboardToggleButtonClicked);
     connect(ui->T_savedThemesBox,&QListWidget::currentRowChanged, this, &Habbit_tracker::T_savedThemeBoxIndexChanged);
@@ -177,18 +175,21 @@ Habbit_tracker::Habbit_tracker(QWidget *parent): QMainWindow(parent), ui(new Ui:
     connect(ui->T_backgroundSelectionScrollUp, &QPushButton::clicked, this, &Habbit_tracker::T_backgroundSelectionScrollButtonClicked);
     connect(ui->T_backgroundSelectionScrollDown, &QPushButton::clicked, this, &Habbit_tracker::T_backgroundSelectionScrollButtonClicked);
     connect(ui->T_backgroundSelectionConfirmButton, &QPushButton::clicked, this, &Habbit_tracker::T_backSelectionConfirmButtonClicked);
-    connect(ui->T_backButton, &QPushButton::clicked, this, &Habbit_tracker::T_backButtonClicked);
     connect(ui->T_scrollDownButton, &QPushButton::clicked, this, &Habbit_tracker::T_scrollButtonClicked);
     connect(ui->T_scrollUpButton, &QPushButton::clicked, this, &Habbit_tracker::T_scrollButtonClicked);
 
 
     connect(ui->S_backButton, &QPushButton::clicked, this, &Habbit_tracker::S_backButtonClicked);
     connect(ui->S_updateCycleButton, &QPushButton::clicked, this, &Habbit_tracker::S_updateCycleButtonClicked);
-    connect(ui->S_scrollUpButton, &QPushButton::clicked, this, &Habbit_tracker::S_scrollButtonClicked);
-    connect(ui->S_scrollDownButton, &QPushButton::clicked, this, &Habbit_tracker::S_scrollButtonClicked);
+    connect(ui->S_scrollUpButtonLeft, &QPushButton::clicked, this, &Habbit_tracker::S_scrollButtonClicked);
+    connect(ui->S_scrollDownButtonLeft, &QPushButton::clicked, this, &Habbit_tracker::S_scrollButtonClicked);
+    connect(ui->S_scrollUpButtonRight, &QPushButton::clicked, this, &Habbit_tracker::S_scrollButtonClicked);
+    connect(ui->S_scrollDownButtonRight, &QPushButton::clicked, this, &Habbit_tracker::S_scrollButtonClicked);
 
 
-
+    connect(ui->O_translucentLeftButton, &QPushButton::clicked, this, &Habbit_tracker::O_buttonClicked);
+    connect(ui->O_translucentLeftLevelInput, QOverload<int>::of(&QSpinBox::valueChanged),this, &Habbit_tracker::O_translucentValueChanged);
+    connect(ui->O_makeLeftDarkerColorButton, &QPushButton::clicked, this, &Habbit_tracker::O_buttonClicked);
 
 
     QList<QPushButton*> themeRecolorButtons = ui->T_selectedThemeFrame->findChildren<QPushButton*>();
@@ -270,7 +271,6 @@ void Habbit_tracker::switchFrame(QFrame* target){
     ui->M_frame->hide();
     ui->A_frame->hide();
     ui->H_frame->hide();
-    ui->T_frame->hide();
     ui->S_frame->hide();
     if(target == ui->M_frame){
         // Hiding the removing habits frame
@@ -365,39 +365,8 @@ void Habbit_tracker::switchFrame(QFrame* target){
 
 
     }
-    else if(target == ui->T_frame){
-        // Stop the timer that checks the current date
-        dayCheckTimer->stop();
-
-        // Upload the current themes from theme folder, also hides everything on the right side
-        loadThemesIntoBox();
-
-        // Getting the current them from saved target theme file name
-        string currentTheme = targetThemeFileName.substr(targetThemeFileName.find('/')+1);
-        currentTheme = currentTheme.substr(currentTheme.find('/')+1);
-        currentTheme = currentTheme.substr(0,currentTheme.find('.'));
-
-        // Cleaning the underscores and setting them to spaces instead
-        string cleanedCurrentTheme = "";
-        for(auto& ch:currentTheme)
-            cleanedCurrentTheme += (ch == '_' ? ' ' : ch);
-
-        if(cleanedCurrentTheme == "default")
-            cleanedCurrentTheme = "Default Theme";
-
-        ui->T_currentTheme->setText("Current Theme: " + QString::fromStdString(cleanedCurrentTheme));
-
-        // Hiding the keyboard until the show keyboard button is pressed and SETTTING UP THE KEYBOARD
-        ui->T_keyboard->hide();
-        ui->T_keyboardToggleButton->setText("Show\nKeyboard");
-
-        target->show(); // Calling this first to be able to use in set capps
-        // Resetting the variables and setting to all capps
-        showNums_T = false;
-        showCapps_T = false;
-        setCapps();
-    }
     else if(target == ui->S_frame){
+        // THEME CYCLE PRESETS ================================================================================
         // Stop the timer that checks the current date since we are making changes to the schedule
         dayCheckTimer->stop();
 
@@ -407,6 +376,14 @@ void Habbit_tracker::switchFrame(QFrame* target){
         // Setting everything in settings page
         S_loadTheme();
         S_loadCurrentCycle();
+
+        // THEME PRESETS ======================================================================================
+        setUpThemePage();
+
+        // OTHER SETTINGS PRESET ==============================================================================
+        ui->O_translucentLeftButton->setChecked(leftSideTranslucent);
+        ui->O_translucentLeftLevelInput->setValue(leftSideTranslucentLevel);
+        ui->O_makeLeftDarkerColorButton->setChecked(makeLeftSideDarker);
     }
     target->show();
 }
@@ -446,9 +423,6 @@ void Habbit_tracker::M_removeButtonClicked(){
     ui->M_removeFrame->show();
 }
 
-void Habbit_tracker::M_themeButtonClicked(){
-    switchFrame(ui->T_frame);
-}
 
 void Habbit_tracker::M_cancelButtonClicked(){
     ui->M_removeFrame->hide();
@@ -1113,7 +1087,40 @@ void Habbit_tracker::updateSpanDisplay(QDate spanStart, QDate spanEnd, int habit
 
 
 
-// THEME FRAME FUNCTIONS:
+// SETTINGS THEME PAGE FUNCTIONS:
+void Habbit_tracker::setUpThemePage(){
+    // Stop the timer that checks the current date
+    dayCheckTimer->stop();
+
+    // Upload the current themes from theme folder, also hides everything on the right side
+    loadThemesIntoBox();
+
+    // Getting the current them from saved target theme file name
+    string currentTheme = targetThemeFileName.substr(targetThemeFileName.find('/')+1);
+    currentTheme = currentTheme.substr(currentTheme.find('/')+1);
+    currentTheme = currentTheme.substr(0,currentTheme.find('.'));
+
+    // Cleaning the underscores and setting them to spaces instead
+    string cleanedCurrentTheme = "";
+    for(auto& ch:currentTheme)
+        cleanedCurrentTheme += (ch == '_' ? ' ' : ch);
+
+    if(cleanedCurrentTheme == "default")
+        cleanedCurrentTheme = "Default Theme";
+
+    ui->T_currentTheme->setText("Current Theme: " + QString::fromStdString(cleanedCurrentTheme));
+
+    // Hiding the keyboard until the show keyboard button is pressed and SETTTING UP THE KEYBOARD
+    ui->T_keyboard->hide();
+    ui->T_keyboardToggleButton->setText("Show\nKeyboard");
+
+    ui->S_frame->show(); // Calling this first to be able to use in set capps
+    // Resetting the variables and setting to all capps
+    showNums_T = false;
+    showCapps_T = false;
+    setCapps();
+}
+
 void Habbit_tracker::T_backButtonClicked(){
     // Start up the timer again
     dayCheckTimer->start(dayCheckerInterval);
@@ -1225,7 +1232,7 @@ void Habbit_tracker::T_renameButtonClicked(){
 
 
     // Reload the themes page
-    switchFrame(ui->T_frame);
+    setUpThemePage();
 }
 
 void Habbit_tracker::loadThemesIntoBox(){
@@ -1271,7 +1278,6 @@ void Habbit_tracker::loadThemesIntoBox(){
     }
 
     // Hiding the whole selected theme section (rigth section)
-    ui->T_selectedThemeTitle->hide();
     ui->T_selectedThemeFrame->hide();
     ui->T_selectedThemeDemoTitle->hide();
     ui->T_selectedThemeDemoFrame->hide();
@@ -1551,7 +1557,6 @@ void Habbit_tracker::T_savedThemeBoxIndexChanged(){
     ui->T_renameInput->setDisabled(false);
 
     // Showing the right side
-    ui->T_selectedThemeTitle->show();
     ui->T_selectedThemeFrame->show();
     ui->T_selectedThemeDemoTitle->show();
     ui->T_selectedThemeDemoFrame->show();
@@ -1756,7 +1761,7 @@ void Habbit_tracker::T_setDefaultButtonClicked(){
     cycleThemeActive = false;
 
     // Re-sending back into this frame to fix up everything
-    switchFrame(ui->T_frame);
+    setUpThemePage();
 
 }
 
@@ -1829,7 +1834,7 @@ void Habbit_tracker::T_deleteButtonClicked(){
     }
 
     // Reloading the themes from the files
-    switchFrame(ui->T_frame);
+    setUpThemePage();
 }
 
 void Habbit_tracker::T_duplicateButtonClicked(){
@@ -1893,7 +1898,7 @@ void Habbit_tracker::T_saveThemeButtonClicked(){
     ofstream themeFile(themeFileName);
     if(!themeFile){
         QMessageBox::critical(this,"ERROR SAVING FILE", "There was an error in saving the file, please conctact ema.");
-        switchFrame(ui->T_frame);
+        setUpThemePage();
         return;
     }
 
@@ -1973,7 +1978,7 @@ void Habbit_tracker::T_setThemeButtonClicked(){
     paintTheme();
 
     // Resetting completely the frame
-    switchFrame(ui->T_frame);
+    setUpThemePage();
 }
 
 void Habbit_tracker::T_backgroundButtonClicked(){
@@ -2061,9 +2066,9 @@ void Habbit_tracker::T_scrollButtonClicked(){
 
 
 
-// SETTINGS FUNCTIONS:
+// SETTINGS THEME CYCLE FUNCTIONS:
 void Habbit_tracker::S_backButtonClicked(){
-    dayCheckTimer->start();
+    dayCheckTimer->start();   // Start the timer again so that we can keep checking
     switchFrame(ui->M_frame);
 }
 
@@ -2346,18 +2351,47 @@ void Habbit_tracker::S_scrollButtonClicked(){
     int step = 2;
 
 
-    if (btn == ui->S_scrollDownButton) {
-        ui->S_allThemesBox->verticalScrollBar()->setValue(leftValue + step);
-        ui->S_currentThemesBox->verticalScrollBar()->setValue(rightValue + step);
-    } else if (btn == ui->S_scrollUpButton) {
+    if (btn == ui->S_scrollDownButtonLeft) {
+        ui->S_allThemesBox->verticalScrollBar()->setValue(leftValue + step);   
+    }
+    else if (btn == ui->S_scrollUpButtonLeft) {
         ui->S_allThemesBox->verticalScrollBar()->setValue(leftValue - step);
+    }
+    else if (btn == ui->S_scrollDownButtonRight){
         ui->S_currentThemesBox->verticalScrollBar()->setValue(rightValue + step);
+    }
+    else if (btn == ui->S_scrollUpButtonRight){
+        ui->S_currentThemesBox->verticalScrollBar()->setValue(rightValue + step);
+
     }
 }
 
 
 
 
+// SETTINGS OTHER FUNCTIONS:
+void Habbit_tracker::O_buttonClicked(){
+    auto button = qobject_cast<QPushButton*>(sender());
+    if (!button) return;
+
+    if(button->isChecked()){
+        button->setText("ON");
+        if(button == ui->O_translucentLeftButton) leftSideTranslucent = true;
+        if(button == ui->O_makeLeftDarkerColorButton) makeLeftSideDarker = true;
+    }
+    else{
+        button->setText("OFF");
+        if(button == ui->O_translucentLeftButton) leftSideTranslucent = false;
+        if(button == ui->O_makeLeftDarkerColorButton) makeLeftSideDarker = false;
+    }
+}
+
+void Habbit_tracker::O_translucentValueChanged(){
+    auto spin = qobject_cast<QSpinBox*>(sender());
+    if(!spin) return;
+
+    leftSideTranslucentLevel = spin->value();
+}
 
 
 
@@ -2453,46 +2487,42 @@ void Habbit_tracker::loadHabits() {
 
 
 
-    QString colorString = main_lighter_color;
-    colorString.remove('(');
-    colorString.remove(')');
 
-    QStringList rgbList = colorString.split(',');
+    // Depending on if the user wanted the left side to be dark or not, set that color to the background color
+    QColor habitBackgroundColor = stringToColor(makeLeftSideDarker ? main_darker_color : main_lighter_color);
+    // Depending on if the user wanted the left side to be translucent, set to that level of translucence
+    if(leftSideTranslucent){
+        habitBackgroundColor.setAlphaF((100-leftSideTranslucentLevel)/100.00);
+    }
+    int colCount = ui->M_habitTable->columnCount();
+    int rowCount = ui->M_habitTable->rowCount();
 
-    if (rgbList.size() == 3) {
-        int r = rgbList[0].trimmed().toInt();
-        int g = rgbList[1].trimmed().toInt();
-        int b = rgbList[2].trimmed().toInt();
-
-        QColor habitBackgroundColor(r, g, b);
-        int colCount = ui->M_habitTable->columnCount();
-
-        for (int row = 0; row < initRowCount; ++row) {
-            for (int col = 0; col < colCount; ++col) {
-                if (col == 0) {
-                    QTableWidgetItem* item = ui->M_habitTable->item(row, col);
-                    if (!item) {
-                        item = new QTableWidgetItem();
-                        item->setTextAlignment(Qt::AlignCenter);
-                        ui->M_habitTable->setItem(row, col, item);
-                    }
-                    item->setBackground(habitBackgroundColor);
-                } else {
-                    QWidget* cellWidget = ui->M_habitTable->cellWidget(row, col);
-                    if (!cellWidget) {
-                        cellWidget = new QWidget();
-                        QHBoxLayout* layout = new QHBoxLayout(cellWidget);
-                        layout->setContentsMargins(0, 0, 0, 0);
-                        layout->setSpacing(0);
-                        layout->addStretch();
-                        ui->M_habitTable->setCellWidget(row, col, cellWidget);
-                    }
-                    cellWidget->setStyleSheet("background: transparent;");
-                    cellWidget->setAttribute(Qt::WA_TranslucentBackground);
+    for (int row = 0; row < rowCount; ++row) {
+        for (int col = 0; col < colCount; ++col) {
+            if (col == 0) {
+                QTableWidgetItem* item = ui->M_habitTable->item(row, col);
+                if (!item) {
+                    item = new QTableWidgetItem();
+                    item->setTextAlignment(Qt::AlignCenter);
+                    ui->M_habitTable->setItem(row, col, item);
                 }
+                item->setBackground(habitBackgroundColor);
+            } else {
+                QWidget* cellWidget = ui->M_habitTable->cellWidget(row, col);
+                if (!cellWidget) {
+                    cellWidget = new QWidget();
+                    QHBoxLayout* layout = new QHBoxLayout(cellWidget);
+                    layout->setContentsMargins(0, 0, 0, 0);
+                    layout->setSpacing(0);
+                    layout->addStretch();
+                    ui->M_habitTable->setCellWidget(row, col, cellWidget);
+                }
+                cellWidget->setStyleSheet("background: transparent;");
+                cellWidget->setAttribute(Qt::WA_TranslucentBackground);
             }
         }
     }
+
 
     for (int row = 0; row < ui->M_habitTable->rowCount(); ++row) {
         ui->M_habitTable->setRowHeight(row, rowHeight);
@@ -2606,7 +2636,7 @@ void Habbit_tracker::setCapps(){
         showCappT_A = !showCappT_A;
         showNumT_A = false;
     }
-    else if(ui->T_frame->isVisible()){
+    else if(ui->S_frame->isVisible()){
         // When starting, isCapps is true. So it will enter the first section
         if(showCapps_T){
             ui->key_Q_T->setText("Q"); ui->key_A_T->setText("A"); ui->key_Z_T->setText("Z");
@@ -2817,7 +2847,6 @@ void Habbit_tracker::paintTheme(){
     ui->M_removeButton->setStyleSheet("background-color: rgb" + button_color + ";");
     ui->M_addHabitButton->setStyleSheet("background-color: rgb" + button_color + ";");
     ui->M_viewHistoryButton->setStyleSheet("background-color: rgb" + button_color + ";");
-    ui->M_themeButton->setStyleSheet("background-color: rgb" + button_color + ";");
     ui->M_settingsButton->setStyleSheet("background-color: rgb" + button_color + ";");
 
 
@@ -2825,11 +2854,10 @@ void Habbit_tracker::paintTheme(){
     ui->M_buttonFrame->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_buttonFrame_2->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_buttonFrame_3->setStyleSheet("background-color: rgb" + main_darker_color + ";");
-    ui->M_line->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->M_line->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
 
 
     // Date Text
-    ui->M_dateTitle->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_date->setStyleSheet("background-color: rgb" + main_darker_color + ";");
 
 
@@ -2842,9 +2870,8 @@ void Habbit_tracker::paintTheme(){
     ui->M_removeFrame->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->M_cancelButton->setStyleSheet("background-color: rgb" + cancel_button_color + "; background-image: none;");
     ui->M_confirmButton->setStyleSheet("background-color: rgb" + save_button_color + ";");
-    ui->M_removeList->setStyleSheet("background-color: rgb" + main_darker_color + ";");
     ui->M_removeTitle->setStyleSheet("background-color: rgb" + main_darker_color + ";");
-    ui->M_removeList->setStyleSheet("QListWidget { background-color: rgb" + main_darker_color + "; }"
+    ui->M_removeList->setStyleSheet("QListWidget { background-color: rgb" + main_lighter_color + "; }"
                                     "QListWidget::item { padding: 5px; }"
                                     "QListWidget::item:selected { background-color: rgb" + remove_item_selec_color + "; color:rgb" + text_color + "; }"
                                     "QListWidget::item:hover { background-color: rgb" + remove_item_selec_color + "; }");
@@ -2906,27 +2933,31 @@ void Habbit_tracker::paintTheme(){
     ui->H_spanDisplay->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
 
 
-    // Themes Frame ===========================================================================================
-    // Frame:
-    ui->T_frame->setStyleSheet("background-color: rgb" + main_darker_color + "; color:rgb" + text_color + ";");
 
+    // SETTINGS GENERAL Frame ===========================================================================================
+    // Main Frame
+    ui->S_frame->setStyleSheet("background-color: rgb" + main_darker_color + "; color:rgb" + text_color + ";");
+    // Background Frame
+    ui->S_background->setStyleSheet(background_image);
+    // Title Lable
+    ui->frame_8->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+    ui->frame_5->setStyleSheet("background-color: rgb" + main_darker_color + ";");
+
+
+    // Settings THEME PAGE Frame ===========================================================================================
     // Other Frames:
-    ui->frame_2->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
-    ui->frame_3->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
-    ui->T_savedThemeBoxTitle->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
-    ui->T_selectedThemeTitle->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->T_selectedThemeFrame->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->frame_6->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->frame_7->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->T_backgroundSelectionFrame->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
-    ui->frame_4->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->frame_13->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
 
     // Text Boxes
     ui->T_renameInput->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->T_addThemeInput->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->T_currentTheme->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
 
     // Buttons:
-    ui->T_backButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
     ui->T_scrollUpButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
     ui->T_scrollDownButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
     ui->T_renameButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
@@ -2981,13 +3012,10 @@ void Habbit_tracker::paintTheme(){
 
 
 
-    // Settings Frame ===========================================================================================
-    // Main Frame
-    ui->S_frame->setStyleSheet("background-color: rgb" + main_darker_color + "; color:rgb" + text_color + ";");
+    // Settings THEME CYCLE PAGE Frame ===========================================================================================
+
 
     // Other Frames
-    ui->frame_5->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
-    ui->frame_8->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->S_tabsWindow->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->frame_10->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
     ui->label_2->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
@@ -3005,9 +3033,23 @@ void Habbit_tracker::paintTheme(){
 
     // Buttons
     ui->S_backButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
-    ui->S_scrollUpButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
-    ui->S_scrollDownButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_scrollUpButtonLeft->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_scrollDownButtonLeft->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_scrollUpButtonRight->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->S_scrollDownButtonRight->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
     ui->S_updateCycleButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+
+
+
+
+    // Settings OTHER SETTINGS Frame ===========================================================================================
+    // Frames:
+    ui->frame_2->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+    ui->frame_3->setStyleSheet("background-color: rgb" + main_lighter_color + ";");
+
+    // Buttons:
+    ui->O_translucentLeftButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
+    ui->O_makeLeftDarkerColorButton->setStyleSheet("QPushButton { background-color: rgb" + button_color + "; } QPushButton:disabled { background-color: rgb" + button_disab_color + "}");
 
 }
 

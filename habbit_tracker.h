@@ -99,7 +99,7 @@ private:
 
 
 
-    // Theme Frame Functions =========================================================================================================
+    // Settings THEMES Frame Functions =========================================================================================================
     QString T_main_darker_color, T_main_lighter_color, T_text_color;
     QString T_button_color, T_button_select_color, T_button_disab_color;
     QString T_keyboard_color, T_cancel_button_color, T_save_button_color;
@@ -109,6 +109,7 @@ private:
     QString T_background_image;
     bool showCapps_T = false;
     bool showNums_T = false;
+    void setUpThemePage();
     void T_backButtonClicked();
     void T_keyboardToggleButtonClicked();
     void T_resetButtonClicked();
@@ -132,7 +133,7 @@ private:
 
 
 
-    // Settings Frame Functions =========================================================================================================
+    // Settings THEME CYCLE Functions =======================================================================================================
     vector<string> themeCycle;
     bool   cycleThemeActive = false;
     string cycleSchedule = "None";
@@ -176,6 +177,14 @@ private:
     void paintTheme();         // Paints all the objects their colors set in variables
 
     void loadColorsFromFile(); // Reads information from file saved in targetThemeFileName
+
+
+    // Theme Functions ================================================================================================================
+    bool leftSideTranslucent = false, makeLeftSideDarker = false;
+    int leftSideTranslucentLevel = 0;
+    void O_buttonClicked();
+    void O_translucentValueChanged();
+
 
 
 
