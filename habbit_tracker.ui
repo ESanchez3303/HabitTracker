@@ -1405,14 +1405,14 @@ color:black;</string>
        <x>0</x>
        <y>50</y>
        <width>1024</width>
-       <height>150</height>
+       <height>221</height>
       </rect>
      </property>
      <property name="styleSheet">
       <string notr="true">background-color: rgb(253, 255, 222);</string>
      </property>
      <property name="frameShape">
-      <enum>QFrame::Shape::Box</enum>
+      <enum>QFrame::Shape::NoFrame</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Shadow::Raised</enum>
@@ -1442,7 +1442,7 @@ color:black;</string>
      <widget class="QLabel" name="A_note">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>208</x>
         <y>115</y>
         <width>611</width>
         <height>16</height>
@@ -1510,34 +1510,62 @@ color:black;</string>
        </property>
       </widget>
      </widget>
-    </widget>
-    <widget class="QPushButton" name="A_cancelButton">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>200</y>
-       <width>512</width>
-       <height>70</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Times New Roman</family>
-       <pointsize>17</pointsize>
-       <italic>false</italic>
-       <bold>false</bold>
-       <underline>false</underline>
-      </font>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color:black; background-color: rgb(255, 126, 126)</string>
-     </property>
-     <property name="text">
-      <string>Cancel</string>
-     </property>
+     <widget class="QPushButton" name="A_cancelButton">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>170</y>
+        <width>500</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>17</pointsize>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black; background-color: rgb(255, 126, 126)</string>
+      </property>
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="A_saveButton">
+      <property name="geometry">
+       <rect>
+        <x>515</x>
+        <y>170</y>
+        <width>500</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>17</pointsize>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:black; background-color: rgb(165, 255, 171)</string>
+      </property>
+      <property name="text">
+       <string>Save</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QFrame" name="A_keyboard">
      <property name="geometry">
@@ -2406,38 +2434,25 @@ background-color: rgb(255, 170, 0)</string>
      <zorder>key_num</zorder>
      <zorder>key_X</zorder>
     </widget>
-    <widget class="QPushButton" name="A_saveButton">
+    <widget class="QLabel" name="A_background">
      <property name="geometry">
       <rect>
-       <x>512</x>
-       <y>200</y>
-       <width>512</width>
-       <height>70</height>
+       <x>0</x>
+       <y>0</y>
+       <width>1024</width>
+       <height>600</height>
       </rect>
      </property>
-     <property name="font">
-      <font>
-       <family>Times New Roman</family>
-       <pointsize>17</pointsize>
-       <italic>false</italic>
-       <bold>false</bold>
-       <underline>false</underline>
-      </font>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
      <property name="styleSheet">
-      <string notr="true">color:black; background-color: rgb(165, 255, 171)</string>
+      <string notr="true">background-color:red;</string>
      </property>
      <property name="text">
-      <string>Save</string>
+      <string/>
      </property>
     </widget>
+    <zorder>A_background</zorder>
     <zorder>A_frame1</zorder>
     <zorder>A_keyboard</zorder>
-    <zorder>A_cancelButton</zorder>
-    <zorder>A_saveButton</zorder>
     <zorder>A_title</zorder>
    </widget>
    <widget class="QFrame" name="H_frame">
@@ -7161,7 +7176,7 @@ background-color: rgb(255, 170, 0)</string>
         <widget class="QRadioButton" name="S_onRadio">
          <property name="geometry">
           <rect>
-           <x>94</x>
+           <x>196</x>
            <y>9</y>
            <width>90</width>
            <height>20</height>
@@ -7180,7 +7195,7 @@ background-color: rgb(255, 170, 0)</string>
         <widget class="QRadioButton" name="S_offRadio">
          <property name="geometry">
           <rect>
-           <x>284</x>
+           <x>306</x>
            <y>9</y>
            <width>90</width>
            <height>20</height>
@@ -7194,6 +7209,32 @@ background-color: rgb(255, 170, 0)</string>
          </property>
          <property name="text">
           <string>OFF</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="S_clearCycleButton">
+         <property name="geometry">
+          <rect>
+           <x>7</x>
+           <y>7</y>
+           <width>140</width>
+           <height>24</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>11</pointsize>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 233, 176)</string>
+         </property>
+         <property name="text">
+          <string>Clear Cycle</string>
          </property>
         </widget>
        </widget>
@@ -7440,7 +7481,7 @@ background-color: rgb(255, 170, 0)</string>
           <rect>
            <x>20</x>
            <y>20</y>
-           <width>450</width>
+           <width>451</width>
            <height>64</height>
           </rect>
          </property>
@@ -7469,13 +7510,13 @@ background-color: rgb(255, 170, 0)</string>
            </font>
           </property>
           <property name="text">
-           <string>Translucent Left Side in Menu:</string>
+           <string>Make Frames to &quot;Better Color&quot;:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
           </property>
          </widget>
-         <widget class="QPushButton" name="O_translucentLeftButton">
+         <widget class="QPushButton" name="O_betterColorButton">
           <property name="geometry">
            <rect>
             <x>250</x>
@@ -7500,7 +7541,7 @@ background-color: rgb(255, 170, 0)</string>
            <bool>true</bool>
           </property>
          </widget>
-         <widget class="QSpinBox" name="O_translucentLeftLevelInput">
+         <widget class="QSpinBox" name="O_betterColorValueInput">
           <property name="geometry">
            <rect>
             <x>362</x>
@@ -7618,8 +7659,8 @@ background-color: rgb(255, 170, 0)</string>
     <zorder>S_tabsWindow</zorder>
    </widget>
    <zorder>H_frame</zorder>
-   <zorder>A_frame</zorder>
    <zorder>M_frame</zorder>
+   <zorder>A_frame</zorder>
    <zorder>S_frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">

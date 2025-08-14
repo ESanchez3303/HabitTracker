@@ -44,6 +44,13 @@ private:
     string targetThemeFileName = themesPath + "/default.txt";
 
 
+    // CONST PHOTOS: =================================================================================================================
+    QString const none_background_image = "border-image:url(\"" + QString::fromStdString(backgroundPath) + "/none.png\");";
+    QString const sad_face_image = "border-image:url(\"" + QString::fromStdString(backgroundPath) + "/sadFace.png\");";
+    QString const happy_face_image = "border-image:url(\"" + QString::fromStdString(backgroundPath) + "/happyFace.png\");";
+    QString const nuetral_face_image = "border-image:url(\"" + QString::fromStdString(backgroundPath) + "/nuetralFace.png\");";
+
+
     // TIME KEEPING ==================================================================================================================
     QTimer *dayCheckTimer;
     QDate currentDate;
@@ -144,6 +151,7 @@ private:
     void S_activeRadioToggled();
     void moveInThemeCycle();
     void S_scrollButtonClicked();
+    void S_clearCycleButtonClicked();
 
 
 
@@ -151,6 +159,7 @@ private:
     bool validString(QString input);
     void loadHabits();
     QColor stringToColor(QString input);
+    QString toBetterColor(QString targetColor);
 
 
 
@@ -180,10 +189,10 @@ private:
 
 
     // Theme Functions ================================================================================================================
-    bool leftSideTranslucent = false, makeLeftSideDarker = false;
-    int leftSideTranslucentLevel = 0;
+    bool betterColor = false, makeLeftSideDarker = false;
+    int betterColorValue = 0;
     void O_buttonClicked();
-    void O_translucentValueChanged();
+    void O_betterColorValueChanged();
 
 
 

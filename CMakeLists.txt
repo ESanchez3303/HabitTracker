@@ -20,7 +20,7 @@ set(PROJECT_SOURCES
     habbit_tracker.ui
     habitClass.cpp
     habitClass.h
-    images.qrc
+
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
