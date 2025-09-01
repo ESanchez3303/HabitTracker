@@ -2187,6 +2187,7 @@ void Habbit_tracker::S_loadCurrentCycle(){
             throw 1;
         }
         ui->S_currentCycleText->setText(QString::fromStdString(tempString));
+        cout << tempString << endl;
         cycleSchedule = tempString;
 
 
